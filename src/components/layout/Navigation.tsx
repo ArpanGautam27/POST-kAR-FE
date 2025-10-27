@@ -1,0 +1,65 @@
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { LogIn, ShoppingCart } from 'lucide-react';
+import { useCart } from '../../contexts/CartContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { AuthModal } from '../auth/AuthModal';
+import { ProfileDropdown } from '../auth/ProfileDropdown';
+import './Navigation.css';
+
+interface NavigationProps {}
+
+/**
+ * Navigation component provides consistent header with navigation options
+ * Implements requirements 5.2, 5.5, 2.5 - responsive navigation with breadcrumbs
+ * Now integrated with NavigationContext for consistent state management
+ */
+export const Navigation: React.FC<NavigationProps> = () => {
+  const { totalItems } = useCart();
+  const { isAuthenticated, isLoading } = useAuth();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  return (
+    <>
+      <nav className="landing-nav">
+        <div className="nav-container">
+          <Link to="/" className="nav-logo">POST-kAR</Link>
+          <div className="nav-links">
+            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/products" className="nav-link">Products</Link>
+            <Link to="/scanner/scan.html" className="nav-link">Scanner</Link>
+            <Link to="/cart" className="nav-link nav-cart-link">
+              <ShoppingCart size={18} />
+              {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
+            </Link>
+            
+            {/* Authentication Section */}
+            <div className="nav-auth">
+              {!isLoading && (
+                isAuthenticated ? (
+                  <ProfileDropdown />
+                ) : (
+                  <button
+                    onClick={() => setIsAuthModalOpen(true)}
+                    className="nav-login-button"
+                  >
+                    <LogIn size={16} />
+                    <span>Login</span>
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
+    </>
+  );
+};
+
+export default Navigation;

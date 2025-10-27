@@ -1,0 +1,370 @@
+/* Page Transition Loading Indicators */
+/* Implements smooth page transitions and loading states */
+
+.page-transition {
+  position: relative;
+  min-height: 100vh;
+}
+
+.page-transition--loading {
+  overflow: hidden;
+}
+
+/* Top loading bar */
+.page-loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--color-primary);
+  transform: translateX(-100%);
+  transition: transform var(--transition-base);
+  z-index: var(--z-fixed);
+}
+
+.page-loading-bar--active {
+  animation: loading-bar 2s ease-in-out infinite;
+}
+
+.page-loading-bar--complete {
+  transform: translateX(0%);
+  transition: transform 0.3s ease-out;
+}
+
+@keyframes loading-bar {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(-10%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Page fade transitions */
+.page-fade-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+.page-fade-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-fade-exit-active {
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity var(--transition-base), transform var(--transition-base);
+}
+
+/* Slide transitions */
+.page-slide-enter {
+  transform: translateX(100%);
+}
+
+.page-slide-enter-active {
+  transform: translateX(0);
+  transition: transform var(--transition-base);
+}
+
+.page-slide-exit {
+  transform: translateX(0);
+}
+
+.page-slide-exit-active {
+  transform: translateX(-100%);
+  transition: transform var(--transition-base);
+}
+
+/* Loading overlay for page transitions */
+.page-transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-modal);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-base), visibility var(--transition-base);
+}
+
+.page-transition-overlay--active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.page-transition-overlay__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-8);
+  background-color: var(--color-white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--color-border-light);
+  max-width: 300px;
+  text-align: center;
+}
+
+.page-transition-overlay__spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--color-gray-200);
+  border-top: 4px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+}
+
+.page-transition-overlay__text {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+}
+
+.page-transition-overlay__subtext {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-1);
+}
+
+/* Route change indicators */
+.route-loading-indicator {
+  position: fixed;
+  top: var(--spacing-4);
+  right: var(--spacing-4);
+  background-color: var(--color-white);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-3) var(--spacing-4);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  z-index: var(--z-fixed);
+  transform: translateY(-100px);
+  opacity: 0;
+  transition: all var(--transition-base);
+}
+
+.route-loading-indicator--active {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.route-loading-indicator__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-gray-200);
+  border-top: 2px solid var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: spin 1s linear infinite;
+}
+
+.route-loading-indicator__text {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Content loading placeholders */
+.content-loading-placeholder {
+  padding: var(--spacing-6);
+}
+
+.content-loading-placeholder__header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  margin-bottom: var(--spacing-6);
+}
+
+.content-loading-placeholder__avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, 
+    var(--color-gray-100) 25%, 
+    var(--color-gray-200) 50%, 
+    var(--color-gray-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+.content-loading-placeholder__title {
+  height: 24px;
+  width: 200px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, 
+    var(--color-gray-100) 25%, 
+    var(--color-gray-200) 50%, 
+    var(--color-gray-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+.content-loading-placeholder__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.content-loading-placeholder__line {
+  height: 16px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, 
+    var(--color-gray-100) 25%, 
+    var(--color-gray-200) 50%, 
+    var(--color-gray-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+.content-loading-placeholder__line--full {
+  width: 100%;
+}
+
+.content-loading-placeholder__line--three-quarters {
+  width: 75%;
+}
+
+.content-loading-placeholder__line--half {
+  width: 50%;
+}
+
+/* Error boundary styles */
+.error-boundary {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-bg-secondary);
+  padding: var(--spacing-5);
+}
+
+.error-boundary__content {
+  max-width: 600px;
+  text-align: center;
+  background-color: var(--color-white);
+  padding: var(--spacing-12) var(--spacing-8);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--color-border-light);
+}
+
+.error-boundary__icon {
+  font-size: var(--font-size-4xl);
+  color: var(--color-danger);
+  margin-bottom: var(--spacing-4);
+}
+
+.error-boundary__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-3);
+}
+
+.error-boundary__message {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-6);
+  line-height: var(--line-height-relaxed);
+}
+
+.error-boundary__actions {
+  display: flex;
+  gap: var(--spacing-3);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .route-loading-indicator {
+    top: var(--spacing-2);
+    right: var(--spacing-2);
+    padding: var(--spacing-2) var(--spacing-3);
+  }
+  
+  .page-transition-overlay__content {
+    padding: var(--spacing-6);
+    margin: var(--spacing-4);
+  }
+  
+  .error-boundary__content {
+    padding: var(--spacing-8) var(--spacing-5);
+    margin: var(--spacing-4);
+  }
+  
+  .error-boundary__actions {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .page-loading-bar--active {
+    animation: none;
+    transform: translateX(-50%);
+  }
+  
+  .page-fade-enter-active,
+  .page-fade-exit-active,
+  .page-slide-enter-active,
+  .page-slide-exit-active {
+    transition: none;
+  }
+  
+  .page-fade-enter,
+  .page-slide-enter {
+    opacity: 1;
+    transform: none;
+  }
+  
+  .page-transition-overlay__spinner,
+  .route-loading-indicator__spinner {
+    animation: none;
+    border-top-color: var(--color-gray-400);
+  }
+  
+  .content-loading-placeholder__avatar,
+  .content-loading-placeholder__title,
+  .content-loading-placeholder__line {
+    animation: none;
+    background: var(--color-gray-200);
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .page-transition-overlay {
+    background-color: rgba(255, 255, 255, 0.95);
+  }
+  
+  .route-loading-indicator,
+  .page-transition-overlay__content,
+  .error-boundary__content {
+    border-width: 2px;
+  }
+}

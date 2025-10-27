@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://postkar.com/sitemap.xml
+
+# Disallow scanner pages from indexing (placeholder content)
+Disallow: /scanner/
