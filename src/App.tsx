@@ -56,6 +56,17 @@ export default function App() {
           >
             Your browser does support the video tag.
           </video>
+
+          {/* 🆕 SCAN BUTTON ADDED HERE */}
+    <div style={{ textAlign: 'center', marginTop: '30px' }}>
+      <button
+        className="scan-btn"
+       onClick={() => window.location.href = '/scanner/scan_mind.html'}
+
+      >
+        🔍 Scan with AR
+      </button>
+    </div>
         </div>
       </section>
 
@@ -483,6 +494,25 @@ export default function App() {
           background-color: #4338ca;
           box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
         }
+
+          .scan-btn {
+  padding: 14px 36px;
+  background-color: #22c55e; /* Green for AR action */
+  color: #ffffff;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 18px;
+}
+
+.scan-btn:hover {
+  background-color: #16a34a;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+  transform: scale(1.03);
+}
+
 
         /* Modal */
         .modal-overlay {

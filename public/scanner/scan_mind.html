@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .example-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 2;
+            background: rgba(0,0,0,0.8);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            max-width: 300px;
+        }
+        
+        .example-container h3 {
+            margin: 0 0 10px 0;
+            color: #4CAF50;
+        }
+        
+        .target-preview {
+            width: 150px;
+            border: 3px solid #4CAF50;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        #status {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 2;
+            font-size: 14px;
+        }
+        
+        .found { background: rgba(76, 175, 80, 0.9) !important; }
+        .lost { background: rgba(244, 67, 54, 0.9) !important; }
+        
+        #download-link {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+
+    <div id="status">Initializing...</div>
+
+    <a-scene 
+        mindar-image="imageTargetSrc: https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/image-tracking/assets/card-example/card.mind;"
+        color-space="sRGB" 
+        renderer="colorManagement: true, physicallyCorrectLights" 
+        vr-mode-ui="enabled: false" 
+        device-orientation-permission-ui="enabled: false"
+    >
+        <a-assets>
+            <video 
+                id="my-video" 
+                loop="true"
+                preload="auto"
+                muted
+                crossorigin="anonymous"
+                playsinline
+                webkit-playsinline
+            >
+                <source src="./placeholder.mov">
+            </video>
+        </a-assets>
+
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+        <a-entity mindar-image-target="targetIndex: 0" id="target">
+            <!-- Video -->
+            <a-video 
+                src="#my-video" 
+                position="0 0 0" 
+                height="0.552" 
+                width="1"
+                rotation="0 0 0"
+            ></a-video>
+            
+            <!-- Background plane for visibility -->
+            <a-plane 
+                position="0 0 -0.01" 
+                height="0.6" 
+                width="1.05"
+                color="#ffffff"
+                opacity="0.5"
+            ></a-plane>
+        </a-entity>
+    </a-scene>
+
+    <script>
+        const statusEl = document.getElementById('status');
+        const video = document.getElementById('my-video');
+        
+        // Update status on load
+        document.addEventListener('DOMContentLoaded', () => {
+            statusEl.textContent = '📹 Camera starting...';
+        });
+
+        // Scene loaded
+        document.querySelector('a-scene').addEventListener('loaded', () => {
+            console.log('Scene loaded');
+            statusEl.textContent = '🔍 Scanning for target...';
+            statusEl.classList.remove('found', 'lost');
+        });
+
+        // Target found
+        document.getElementById('target').addEventListener('targetFound', event => {
+            console.log('Target found!');
+            statusEl.textContent = '✅ Target Found! Video Playing';
+            statusEl.classList.add('found');
+            statusEl.classList.remove('lost');
+            
+            // Play video
+            video.play().catch(e => {
+                console.log('Play error:', e);
+                video.muted = true;
+                video.play();
+            });
+        });
+
+        // Target lost
+        document.getElementById('target').addEventListener('targetLost', event => {
+            console.log('Target lost');
+            statusEl.textContent = '❌ Target Lost - Keep scanning';
+            statusEl.classList.add('lost');
+            statusEl.classList.remove('found');
+        });
+
+        // Error handling
+        window.addEventListener('error', (e) => {
+            console.error('Error:', e);
+            statusEl.textContent = '⚠️ Error: ' + e.message;
+        });
+    </script>
+</body>
+</html>

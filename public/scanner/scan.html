@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>AR.js NFT Video Anchored + Correct Scale</title>
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@master/aframe/build/aframe-ar-nft.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+        font-family: sans-serif;
+      }
+      .arjs-loader {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+      }
+      #startButton {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        z-index: 10000;
+      }
+      #debugInfo {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-family: monospace;
+        z-index: 10001;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="arjs-loader"><div>Loading, please wait...</div></div>
+    <button id="startButton">Tap to Start AR</button>
+    <div id="debugInfo">Status: Initializing...</div>
+
+    <a-scene
+      embedded
+      vr-mode-ui="enabled: false"
+      renderer="logarithmicDepthBuffer: true; precision: medium;"
+      arjs="trackingMethod: best; sourceType: webcam; debugUIEnabled: false;"
+    >
+      <a-assets>
+        <video
+          id="video"
+          src="./placeholder.mov"
+          preload="auto"
+          loop
+          muted
+          crossorigin="anonymous"
+          playsinline
+          webkit-playsinline
+        ></video>
+      </a-assets>
+
+      <a-nft
+        id="marker"
+        type="nft"
+        url="https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/trex-image/trex"
+        smooth="true"
+        smoothCount="10"
+        smoothTolerance="0.01"
+        smoothThreshold="5"
+      >
+        <!-- Plane will be auto-positioned/scaled by script -->
+        <a-plane
+          id="videoPlane"
+          src="#video"
+          rotation="-90 0 0"
+          material="shader: flat; side: double; transparent: true;"
+        ></a-plane>
+      </a-nft>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <script>
+      const startButton = document.getElementById('startButton');
+      const debugInfo = document.getElementById('debugInfo');
+      const video = document.getElementById('video');
+      const marker = document.getElementById('marker');
+      const loader = document.querySelector('.arjs-loader');
+      const videoPlane = document.getElementById('videoPlane');
+
+      let markerVisible = false;
+
+      // Hide loader once AR is ready
+      window.addEventListener('arjs-video-loaded', () => {
+        if (loader) loader.style.display = 'none';
+      });
+
+      // When NFT metadata is loaded — align and scale properly
+      window.addEventListener('arjs-nft-init-data', (ev) => {
+        const { width, height } = ev.detail;
+        console.log('Raw NFT metadata:', { width, height });
+
+        // 🧭 Scale factor: 0.001 = roughly 1 unit = 1 meter
+        // Adjust this if your real marker is smaller/larger
+        const scaleFactor = 0.1;
+        const scaledWidth = width * scaleFactor;
+        const scaledHeight = height * scaleFactor;
+
+        // Position plane so it's centered on marker
+        const posX = scaledWidth / 2;
+        const posY = scaledHeight / 2;
+        const posZ = 0.01; // lift slightly above to prevent z-fighting
+
+        videoPlane.setAttribute('position', `${posX} ${posY} ${posZ}`);
+        videoPlane.setAttribute('width', scaledWidth);
+        videoPlane.setAttribute('height', scaledHeight);
+
+        console.log(`Aligned plane: ${scaledWidth.toFixed(3)} × ${scaledHeight.toFixed(3)} meters`);
+        debugInfo.innerHTML = `Status: Marker ready (${scaledWidth.toFixed(2)} × ${scaledHeight.toFixed(2)}m)`;
+      });
+
+      // Start button
+      startButton.addEventListener('click', async () => {
+        startButton.style.display = 'none';
+        debugInfo.innerHTML = 'Status: Camera started. Point at image...';
+        try {
+          await video.play();
+        } catch {
+          console.warn('Autoplay blocked; will play when marker found.');
+        }
+      });
+
+      marker.addEventListener('markerFound', () => {
+        markerVisible = true;
+        video.play().catch((e) => console.warn('Play error:', e));
+        debugInfo.innerHTML = 'Status: ✓ Marker detected! Playing video.';
+      });
+
+      marker.addEventListener('markerLost', () => {
+        markerVisible = false;
+        video.pause();
+        debugInfo.innerHTML = 'Status: Marker lost. Searching...';
+      });
+    </script>
+  </body>
+</html>
