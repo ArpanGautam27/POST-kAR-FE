@@ -82,9 +82,6 @@ export default function ProductsPage() {
       <div className="products-container">
         <div className="products-header">
           <h1 className="products-title">Discover Products</h1>
-          <p className="products-subtitle">
-            Explore our collection of AR-enabled products. Click on any product to learn more and access the scanner.
-          </p>
         </div>
         
         <ProductGrid 

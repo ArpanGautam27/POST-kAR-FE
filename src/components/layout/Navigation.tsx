@@ -25,9 +25,8 @@ export const Navigation: React.FC<NavigationProps> = () => {
         <div className="nav-container">
           <Link to="/" className="nav-logo">POST-kAR</Link>
           <div className="nav-links">
-            <Link to="/" className="nav-link">Home</Link>
             <Link to="/products" className="nav-link">Products</Link>
-            <Link to="/scanner/scan.html" className="nav-link">Scanner</Link>
+            <a href="/scanner/scan_mind.html" className="nav-link">Scanner</a>
             <Link to="/cart" className="nav-link nav-cart-link">
               <ShoppingCart size={18} />
               {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}

@@ -9,6 +9,7 @@ export default function CartPage() {
   const { items, totalItems, totalPrice, removeFromCart, updateQuantity, clearCart } = useCart();
   const { navigate } = useNavigation();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleQuantityChange = (productId: string, newQuantity: string) => {
     const quantity = parseInt(newQuantity, 10);
@@ -18,14 +19,24 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
-    setIsCheckingOut(true);
-    // Simulate checkout process
-    setTimeout(() => {
-      alert('Thank you for your order! This is a demo checkout.');
-      clearCart();
-      setIsCheckingOut(false);
-      navigate('/products');
-    }, 2000);
+    if (!termsAccepted) {
+      alert('Please accept the Terms & Conditions before proceeding.');
+      return;
+    }
+    // Check for at least one saved address
+    let hasAddress = false;
+    try {
+      const raw = localStorage.getItem('pk_addresses_v1');
+      const list = raw ? JSON.parse(raw) : [];
+      hasAddress = Array.isArray(list) && list.length > 0;
+    } catch {}
+
+    if (!hasAddress) {
+      navigate('/addresses?return=/cart');
+      return;
+    }
+
+    navigate('/checkout');
   };
 
   const formatPrice = (price: number) => {
@@ -153,17 +164,27 @@ export default function CartPage() {
               </div>
 
               <div className="cart-actions">
-                <Link to="/products" className="continue-shopping-link">
-                  ← Continue Shopping
-                </Link>
-                <button 
-                  className="checkout-btn"
-                  onClick={handleCheckout}
-                  disabled={items.length === 0}
-                >
-                  Proceed to Checkout
-                </button>
-              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <input
+                  type="checkbox"
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                />
+                <span>
+                  I agree to the <a href="#terms">Terms & Conditions</a>
+                </span>
+              </label>
+              <Link to="/products" className="continue-shopping-link">
+                ← Continue Shopping
+              </Link>
+              <button 
+                className="checkout-btn"
+                onClick={handleCheckout}
+                disabled={items.length === 0 || !termsAccepted}
+              >
+                Proceed to Checkout
+              </button>
+            </div>
             </div>
           </>
         )}

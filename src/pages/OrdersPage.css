@@ -1,0 +1,142 @@
+.orders-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+
+.orders-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.orders-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.orders-header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #111827;
+}
+
+.orders-count {
+  color: #6b7280;
+  font-weight: 700;
+}
+
+.orders-empty {
+  background: #fff;
+  border: 1px dashed #e5e7eb;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.orders-empty-lottie { display:flex; justify-content:center; align-items:center; margin-bottom: 8px; }
+.orders-empty-title { font-size: 22px; font-weight: 800; color:#111827; margin-bottom: 4px; }
+.orders-empty-sub { color:#6b7280; margin-bottom: 10px; }
+
+.orders-empty-emoji {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+
+.browse-btn {
+  display: inline-block;
+  margin-top: 12px;
+  background: #4f46e5;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.orders-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.order-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 120ms ease, transform 120ms ease;
+}
+
+.order-card:hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  transform: translateY(-1px);
+}
+
+.order-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.order-id {
+  font-weight: 800;
+  color: #111827;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  background: #eef2ff;
+  color: #3730a3;
+}
+
+.status.placed { background: #dbeafe; color: #1e3a8a; }
+.status.shipped { background: #e0f2fe; color: #075985; }
+.status.delivered { background: #dcfce7; color: #065f46; }
+.status.cancelled { background: #fee2e2; color: #991b1b; }
+
+.order-meta {
+  margin-top: 6px;
+  color: #6b7280;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.order-items {
+  display: flex;
+  gap: 8px;
+  margin: 10px 0;
+  align-items: center;
+}
+
+.order-items img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #eef0f3;
+}
+
+.order-items .more {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.order-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid #eef0f3;
+}
+
+.order-total .price {
+  font-weight: 800;
+}

@@ -68,12 +68,13 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     <div className="product-grid">
       <div className="product-grid__container">
         {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            onClick={onProductClick}
-            loading={false}
-          />
+          <div key={product.id} className="product-grid__item">
+            <ProductCard
+              product={product}
+              onClick={onProductClick}
+              loading={false}
+            />
+          </div>
         ))}
       </div>
     </div>

@@ -49,7 +49,7 @@ export const useBreadcrumbs = () => {
 
     breadcrumbs.push({
       label: 'Scanner',
-      path: '/scanner/scan.html',
+      path: '/scanner/scan_mind.html',
       isActive: true
     });
 
@@ -73,7 +73,7 @@ export const useBreadcrumbs = () => {
       ];
     } else if (pagePath.startsWith('/product/')) {
       breadcrumbs = createProductDetailBreadcrumbs(productName);
-    } else if (pagePath === '/scanner/scan.html') {
+    } else if (pagePath === '/scanner/scan_mind.html') {
       breadcrumbs = createScannerBreadcrumbs(productId);
     } else {
       // Default breadcrumbs for unknown pages

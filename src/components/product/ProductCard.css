@@ -34,14 +34,15 @@
 .product-card__image-container {
   position: relative;
   width: 100%;
-  height: 200px;
   overflow: hidden;
   background-color: var(--color-bg-secondary);
+  aspect-ratio: 4 / 5; /* fixed tile height for uniform grid */
 }
 
 .product-card__image {
   width: 100%;
   height: 100%;
+  display: block;
   object-fit: cover;
   opacity: 0;
   transition: opacity var(--transition-base);
@@ -72,6 +73,99 @@
   background-color: var(--color-bg-secondary);
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+}
+
+/* Top overlay with product name */
+.product-card__top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: flex-start;
+}
+
+.product-card__name {
+  margin: 0;
+  color: #ffffff;
+  font-family: var(--font-family-primary);
+  font-weight: 500;
+  font-size: 0.875rem; /* 14px mobile */
+  line-height: 1.2;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+  .product-card__name {
+    font-size: 1.125rem; /* 18px desktop */
+  }
+}
+
+/* No desktop override needed when using fixed aspect ratio */
+
+/* Bottom overlay for CTAs */
+.product-card__overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 0, 0, 0.15); /* ~15% shadow overlay */
+  backdrop-filter: saturate(120%);
+}
+
+/* Make sure price stays white inside overlay on all pages */
+.product-card__overlay .product-card__price {
+  color: #ffffff !important;
+}
+
+/* Price chip kept white for contrast */
+.product-card__price {
+  color: #ffffff;
+  font-family: var(--font-family-primary);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* Cart icon button as white square */
+.product-card__cart-icon {
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111827;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.product-card__cart-icon:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.16);
+}
+
+.product-card__cart-icon:active {
+  transform: translateY(0);
+}
+
+.product-card__cart-icon--added {
+  background: #10B981; /* emerald */
+  color: #ffffff;
 }
 
 /* Content area */
@@ -153,10 +247,6 @@
 
 /* Responsive design - Tablet and up */
 @media (min-width: 768px) {
-  .product-card__image-container {
-    height: 240px;
-  }
-  
   .product-card__title {
     font-size: var(--font-size-xl);
   }
@@ -216,7 +306,7 @@
 .product-card__price {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: #ffffff; /* ensure white price text */
 }
 
 .product-card__cart-btn {

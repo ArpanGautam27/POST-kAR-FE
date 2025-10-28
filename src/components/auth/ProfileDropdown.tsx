@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User, LogOut, Settings, ChevronDown } from 'lucide-react';
+import { User, LogOut, Settings, ChevronDown, Package } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import './ProfileDropdown.css';
 
@@ -62,12 +62,30 @@ export const ProfileDropdown: React.FC = () => {
 
           <div className="profile-menu-items">
             <Link 
+              to="/orders" 
+              className="profile-menu-item"
+              onClick={() => setIsOpen(false)}
+            >
+              <Package size={16} />
+              <span>Orders</span>
+            </Link>
+
+            <Link 
               to="/profile" 
               className="profile-menu-item"
               onClick={() => setIsOpen(false)}
             >
               <User size={16} />
               <span>View Profile</span>
+            </Link>
+
+            <Link 
+              to="/addresses" 
+              className="profile-menu-item"
+              onClick={() => setIsOpen(false)}
+            >
+              <Settings size={16} />
+              <span>Addresses</span>
             </Link>
             
             <button className="profile-menu-item" disabled>

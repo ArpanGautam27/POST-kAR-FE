@@ -43,10 +43,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     return (
       <div className="product-card product-card--loading">
         <div className="product-card__image-skeleton"></div>
-        <div className="product-card__content">
-          <div className="product-card__title-skeleton"></div>
-          <div className="product-card__description-skeleton"></div>
-        </div>
       </div>
     );
   }
@@ -70,9 +66,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <div className="product-card__image-skeleton"></div>
         )}
         {imageError ? (
-          <div className="product-card__image-fallback">
-            <span>Image not available</span>
-          </div>
+          <img
+            src="/android-chrome-512x512.png"
+            alt="Placeholder"
+            className={`product-card__image product-card__image--loaded`}
+            loading="lazy"
+          />
         ) : (
           <img
             src={product.thumbnail_url}
@@ -83,17 +82,15 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             loading="lazy"
           />
         )}
-      </div>
-      <div className="product-card__content">
-        <h3 className="product-card__title">{product.name}</h3>
-        <p className="product-card__description">{product.description}</p>
-        {product.metadata?.category && (
-          <span className="product-card__category">{product.metadata.category}</span>
-        )}
-        <div className="product-card__actions">
+        {/* Top overlay with product name */}
+        <div className="product-card__top" onClick={(e) => e.stopPropagation()}>
+          <h3 className="product-card__name" title={product.name}>{product.name}</h3>
+        </div>
+        {/* Bottom overlay with price + cart icon */}
+        <div className="product-card__overlay" onClick={(e) => e.stopPropagation()}>
           <span className="product-card__price">$99.99</span>
           <button
-            className={`product-card__cart-btn ${addedToCart ? 'product-card__cart-btn--added' : ''} ${isInCart(product.id) ? 'product-card__cart-btn--in-cart' : ''}`}
+            className={`product-card__cart-icon ${addedToCart ? 'product-card__cart-icon--added' : ''}`}
             onClick={handleAddToCart}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
@@ -101,14 +98,9 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               }
             }}
             aria-label={isInCart(product.id) ? 'Add another to cart' : 'Add to cart'}
+            title={isInCart(product.id) ? 'Add another to cart' : 'Add to cart'}
           >
-            {addedToCart ? (
-              <>✓ Added</>
-            ) : isInCart(product.id) ? (
-              <>+ Add More</>
-            ) : (
-              <>🛒 Add to Cart</>
-            )}
+            {addedToCart ? '✓' : '🛒'}
           </button>
         </div>
       </div>

@@ -15,10 +15,10 @@
 }
 
 .products-title {
-  font-size: 48px;
-  font-weight: bold;
+  font-size: 64px;
+  font-weight: 800;
   color: #111827;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   line-height: 1.2;
 }
 
@@ -81,7 +81,8 @@
   }
   
   .products-title {
-    font-size: 32px;
+    font-size: 40px;
+    line-height: 1.15;
   }
   
   .products-subtitle {

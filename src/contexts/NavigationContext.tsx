@@ -100,7 +100,7 @@ export const NavigationProvider: React.FC<NavigationProviderProps> = ({ children
         { label: 'Products', path: '/products', isActive: false },
         { label: 'Product Detail', path: path, isActive: true }
       ];
-    } else if (path === '/scanner/scan.html') {
+    } else if (path === '/scanner/scan.html' || path === '/scanner/scan_mind.html') {
       pageName = 'Scanner';
       breadcrumbs = [
         { label: 'Products', path: '/products', isActive: false },

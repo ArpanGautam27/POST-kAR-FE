@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { NavigationProvider } from '../contexts/NavigationContext';
 import { CartProvider } from '../contexts/CartContext';
 import { AuthProvider } from '../contexts/AuthContext';
@@ -8,9 +8,13 @@ import { withLazyLoading, preloadComponent } from '../utils/lazyLoad';
 const LandingPage = withLazyLoading(() => import('../pages/LandingPage'));
 const ProductsPage = withLazyLoading(() => import('../pages/ProductsPage'));
 const ProductDetailPage = withLazyLoading(() => import('../pages/ProductDetailPage'));
-const ScannerPage = withLazyLoading(() => import('../pages/ScannerPage'));
 const CartPage = withLazyLoading(() => import('../pages/CartPage'));
+const CheckoutPage = withLazyLoading(() => import('../pages/CheckoutPage'));
+const OrderConfirmationPage = withLazyLoading(() => import('../pages/OrderConfirmationPage'));
+const OrdersPage = withLazyLoading(() => import('../pages/OrdersPage'));
+const OrderDetailPage = withLazyLoading(() => import('../pages/OrderDetailPage'));
 const ProfilePage = withLazyLoading(() => import('../pages/ProfilePage'));
+const AddressesPage = withLazyLoading(() => import('../pages/AddressesPage'));
 const NotFoundPage = withLazyLoading(() => import('../pages/NotFoundPage'));
 
 // Preload critical pages for better UX
@@ -37,15 +41,22 @@ export default function AppRouter() {
               
               {/* Cart route */}
               <Route path="/cart" element={<CartPage />} />
+              {/* Checkout route */}
+              <Route path="/checkout" element={<CheckoutPage />} />
+              {/* Order Confirmation */}
+              <Route path="/order-confirmation" element={<OrderConfirmationPage />} />
+              {/* Orders */}
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/order/:orderId" element={<OrderDetailPage />} />
+              {/* Addresses route */}
+              <Route path="/addresses" element={<AddressesPage />} />
               
               {/* Profile route - protected */}
               <Route path="/profile" element={<ProfilePage />} />
               
               {/* Scanner route */}
-              <Route path="/scanner/scan.html" element={<ScannerPage />} />
-              
-              {/* Redirect old scanner route if needed */}
-              <Route path="/scanner" element={<Navigate to="/scanner/scan.html" replace />} />
+              {/* Scanner is served as a static page under public/scanner/scan_mind.html */}
+              {/* Links should use <a href="/scanner/scan_mind.html"> to trigger a full-page load */}
               
               {/* 404 Not Found */}
               <Route path="*" element={<NotFoundPage />} />

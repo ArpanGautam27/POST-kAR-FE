@@ -1,22 +1,14 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-<<<<<<< HEAD
-  padding: 2rem;
-=======
+  width: 100%;
+  max-width: none;
+  margin: 0;
   padding: 0;
->>>>>>> origin/feature/WebApp1.0
-  text-align: center;
+  text-align: initial;
 }
 
 .logo {
-<<<<<<< HEAD
-  height: 6em;
-  padding: 1.5em;
-=======
   height: 2em;
   padding: 0;
->>>>>>> origin/feature/WebApp1.0
   will-change: filter;
   transition: filter 300ms;
 }
