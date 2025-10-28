@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { useState } from 'react';
 import arVideo from './assets/placeholder.mov';
 
@@ -842,4 +843,11 @@ export default function App() {
       `}</style>
     </div>
   );
+=======
+import AppRouter from './router/AppRouter';
+import './App.css';
+
+export default function App() {
+  return <AppRouter />;
+>>>>>>> origin/feature/WebApp1.0
 }
