@@ -73,12 +73,19 @@ export interface ProductCardProps {
   product: Product;
   onClick: (productId: string) => void;
   loading?: boolean;
+  comingSoon?: boolean;
+  hideCart?: boolean;
+  hidePrice?: boolean;
 }
 
 export interface ProductGridProps {
   products: Product[];
   loading?: boolean;
   onProductClick: (productId: string) => void;
+  cardProps?: Partial<ProductCardProps>;
+  horizontal?: boolean;
+  forceFourColumns?: boolean;
+  showArrows?: boolean;
 }
 
 export interface ProductDetailProps {

@@ -7,6 +7,7 @@ import { withLazyLoading, preloadComponent } from '../utils/lazyLoad';
 // Lazy load pages for better performance
 const LandingPage = withLazyLoading(() => import('../pages/LandingPage'));
 const ProductsPage = withLazyLoading(() => import('../pages/ProductsPage'));
+const FreeExperiencePage = withLazyLoading(() => import('../pages/FreeExperiencePage'));
 const ProductDetailPage = withLazyLoading(() => import('../pages/ProductDetailPage'));
 const CartPage = withLazyLoading(() => import('../pages/CartPage'));
 const CheckoutPage = withLazyLoading(() => import('../pages/CheckoutPage'));
@@ -22,6 +23,7 @@ if (typeof window !== 'undefined') {
   // Preload products page as it's likely to be visited first
   setTimeout(() => {
     preloadComponent(() => import('../pages/ProductsPage'));
+    preloadComponent(() => import('../pages/FreeExperiencePage'));
   }, 1000);
 }
 
@@ -36,6 +38,7 @@ export default function AppRouter() {
               <Route path="/" element={<LandingPage />} />
               
               {/* Product routes */}
+              <Route path="/free-experience" element={<FreeExperiencePage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
               

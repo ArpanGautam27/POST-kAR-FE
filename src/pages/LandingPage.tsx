@@ -10,6 +10,17 @@ import { ProductService } from '../services/ProductService';
 import { MockProductService } from '../services/MockProductService';
 import { config } from '../config/environment';
 import type { Product } from '../types';
+import cf1 from '../assets/customer_feedback_1.mp4';
+import cf2 from '../assets/customer_feedback_2.mp4';
+import cf3 from '../assets/customer_feedback_3.mp4';
+import cf4 from '../assets/customer_feedback_4.mp4';
+import cf5 from '../assets/customer_feedback_5.mp4';
+import cf6 from '../assets/customer_feedback_6.mp4';
+import cf7 from '../assets/customer_feedback_7.mp4';
+import cf8 from '../assets/customer_feedback_8.mp4';
+import cf9 from '../assets/customer_feedback_9.mp4';
+import cf10 from '../assets/customer_feedback_10.mp4';
+import cf11 from '../assets/customer_feedback_11.mp4';
 import xLogo from '../assets/x_logo.svg';
 import instagramLogo from '../assets/instagram_logo.svg';
 import linkedinLogo from '../assets/linkedin_logo.svg';
@@ -17,7 +28,7 @@ import './LandingPage.css';
 
 export default function LandingPage() {
   const { totalItems } = useCart();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -26,6 +37,25 @@ export default function LandingPage() {
   const containerRef = useRef(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activePanel, setActivePanel] = useState(0);
+  const spotlightRef = useRef<HTMLDivElement | null>(null);
+  const feedbackVideos = [cf8, cf1, cf2, cf3, cf4, cf5, cf6, cf7, cf9, cf10, cf11];
+  const videoRefs = useRef<HTMLVideoElement[]>([]);
+  const [muted, setMuted] = useState<boolean[]>(() => feedbackVideos.map(() => true));
+
+  const toggleMute = (idx: number) => {
+    setMuted(prev => {
+      const next = [...prev];
+      next[idx] = !next[idx];
+      const v = videoRefs.current[idx];
+      if (v) {
+        v.muted = next[idx];
+        if (!next[idx]) {
+          v.play().catch(() => {});
+        }
+      }
+      return next;
+    });
+  };
 
   // ALL SLIDES - Updated to include everything
   const cinematicPanels = [
@@ -183,22 +213,25 @@ export default function LandingPage() {
         <div className="nav-container">
           <Link to="/" className="nav-logo">POST-kAR</Link>
           <div className="nav-links">
+            <Link to="/free-experience" className="nav-link">Free Experience</Link>
             <Link to="/products" className="nav-link">Products</Link>
-            <a href="/scanner/scan_mind.html" className="nav-link" target="_blank" rel="noopener noreferrer">Scanner</a>
-            <Link to="/cart" className="nav-link nav-cart-link">
+            <a href="/scanner/scan_mind.html" className="nav-link scanner-only" target="_blank" rel="noopener noreferrer">Scanner</a>
+            <Link to="/cart" className="nav-link nav-cart-link" style={{ display: 'none' }}>
               <ShoppingCart size={20} />
               {totalItems > 0 && (
                 <span className="cart-badge">{totalItems}</span>
               )}
             </Link>
-            {isAuthenticated ? (
-              <ProfileDropdown />
-            ) : (
-              <button className="nav-login-button" onClick={() => setIsAuthModalOpen(true)}>
-                <LogIn size={16} />
-                <span>Login</span>
-              </button>
-            )}
+            <div style={{ display: 'none' }}>
+              {isAuthenticated ? (
+                <ProfileDropdown />
+              ) : (
+                <button className="nav-login-button" onClick={() => setIsAuthModalOpen(true)}>
+                  <LogIn size={16} />
+                  <span>Login</span>
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </nav>
@@ -224,77 +257,118 @@ export default function LandingPage() {
       <header className="hero">
         <div className="hero-inner">
           <h1 className="hero-title">POST-kAR</h1>
-          <p className="hero-subtitle">Experience art and culture in augmented reality</p>
+          <p className="hero-subtitle">Beyond The Frame</p>
           <p className="hero-desc">Scan posters and images to unlock immersive, interactive stories.</p>
         </div>
         <div className="hero-bg" />
       </header>
 
+      {/* Community Spotlight: Video Stories */}
+      <section className="section section-video-reviews reveal in" style={{ paddingTop: '2rem' }}>
+        <div className="container">
+          <div className="card" style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 12, padding: '1rem', position: 'relative', overflow: 'visible' }}>
+            <div className="section-head" style={{ marginBottom: '1rem' }}>
+              <h2 className="section-title">Community Spotlight</h2>
+            </div>
+            <div style={{ position: 'relative' }}>
+              <button
+                type="button"
+                aria-label="Scroll left"
+                onClick={() => spotlightRef.current?.scrollBy({ left: -((spotlightRef.current?.clientWidth || 0) * 0.8), behavior: 'smooth' })}
+                style={{ position: 'absolute', left: -8, top: '50%', transform: 'translateY(-50%)', zIndex: 2, background: 'rgba(255,255,255,0.18)', color: '#ddd', border: 'none', width: 36, height: 36, borderRadius: 18, cursor: 'pointer' }}
+              >
+                ‹
+              </button>
+              <button
+                type="button"
+                aria-label="Scroll right"
+                onClick={() => spotlightRef.current?.scrollBy({ left: +((spotlightRef.current?.clientWidth || 0) * 0.8), behavior: 'smooth' })}
+                style={{ position: 'absolute', right: -8, top: '50%', transform: 'translateY(-50%)', zIndex: 2, background: 'rgba(255,255,255,0.18)', color: '#ddd', border: 'none', width: 36, height: 36, borderRadius: 18, cursor: 'pointer' }}
+              >
+                ›
+              </button>
+              <div
+                ref={spotlightRef}
+                className="video-cards"
+                style={{ WebkitOverflowScrolling: 'touch' as any }}
+              >
+                {feedbackVideos.map((src, idx) => (
+                  <div key={idx} className="video-card" style={{ background: '#111', borderRadius: 12, overflow: 'hidden', position: 'relative', aspectRatio: '2 / 3', boxShadow: '0 6px 24px rgba(0,0,0,0.25)' }}>
+                    <video
+                      ref={(el) => { if (el) videoRefs.current[idx] = el; }}
+                      src={src}
+                      muted={muted[idx]}
+                      loop
+                      playsInline
+                      autoPlay
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => toggleMute(idx)}
+                      aria-label={muted[idx] ? 'Unmute video' : 'Mute video'}
+                      style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.55)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', width: 34, height: 34, borderRadius: 17, cursor: 'pointer', display: 'grid', placeItems: 'center', backdropFilter: 'blur(6px)' as any }}
+                    >
+                      {muted[idx] ? '🔇' : '🔊'}
+                    </button>
+                    <div style={{ position: 'absolute', left: 12, bottom: 12, background: 'rgba(0,0,0,0.6)', color: '#fff', padding: '6px 10px', borderRadius: 999, fontSize: 12 }}>#postkar</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Featured Products (from catalog) */}
       <section className="section section-products reveal in">
         <div className="container">
-          <div className="section-head">
-            <h2 className="section-title">Featured Products</h2>
-            <Link to="/products" className="link-more">View all</Link>
+          <div className="card" style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 12, padding: '1rem', overflow: 'visible' }}>
+            <div className="section-head" style={{ marginBottom: '1rem' }}>
+              <h2 className="section-title">Featured Products</h2>
+            </div>
+            <ProductGrid 
+              products={products} 
+              loading={loadingProducts} 
+              onProductClick={(id) => { window.location.href = `/product/${id}`; }}
+              horizontal={true}
+              showArrows={true}
+              cardProps={{ comingSoon: true, hideCart: true, hidePrice: true }}
+            />
           </div>
-          <ProductGrid products={products} loading={loadingProducts} onProductClick={(id) => { window.location.href = `/product/${id}`; }} />
         </div>
       </section>
 
       {/* Services (Coming Soon) */}
       <section className="section section-services reveal in">
         <div className="container">
-          <h2 className="section-title">Services</h2>
-          <p className="section-subtitle">Studio offerings • Coming soon</p>
-          <div className="cards-grid services-grid">
-            <div className="card service-card">
-              <div className="card-badge">Coming Soon</div>
-              <div className="card-body">
-                <h3 className="card-title">Custom AR Campaigns</h3>
-                <p className="card-meta">Branded AR experiences for culture & retail</p>
+          <div className="card" style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 12, padding: '1.5rem' }}>
+            <h2 className="section-title">Services</h2>
+            <div className="cards-grid services-grid">
+              <div className="card service-card" style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 12 }}>
+                <div className="card-body">
+                  <h3 className="card-title">Custom AR Campaigns</h3>
+                  <p className="card-meta">Branded AR experiences for culture & retail</p>
+                </div>
               </div>
-            </div>
-            <div className="card service-card">
-              <div className="card-badge">Coming Soon</div>
-              <div className="card-body">
-                <h3 className="card-title">Creator Tools</h3>
-                <p className="card-meta">Upload artworks and publish AR layers</p>
+              <div className="card service-card" style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 12 }}>
+                <div className="card-body">
+                  <h3 className="card-title">Creator Tools</h3>
+                  <p className="card-meta">Upload artworks and publish AR layers</p>
+                </div>
               </div>
-            </div>
-            <div className="card service-card">
-              <div className="card-badge">Coming Soon</div>
-              <div className="card-body">
-                <h3 className="card-title">Mobile App</h3>
-                <p className="card-meta">Native app for scanning & collectibles</p>
+              <div className="card service-card" style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 12 }}>
+                <div className="card-body">
+                  <h3 className="card-title">Mobile App</h3>
+                  <p className="card-meta">Native app for scanning & collectibles</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Reviews */}
-      <section className="section section-reviews reveal in">
-        <div className="container">
-          <h2 className="section-title">What users say</h2>
-          <div className="cards-grid reviews-grid">
-            <div className="card review-card">
-              <div className="review-quote">“</div>
-              <p className="review-text">PostkAR turned our poster into a living story. Our audience loved the surprise.</p>
-              <div className="review-meta">— Museum Curator</div>
-            </div>
-            <div className="card review-card">
-              <div className="review-quote">“</div>
-              <p className="review-text">So clean and simple. Scan and boom—an immersive layer. Studio vibes.</p>
-              <div className="review-meta">— Visual Artist</div>
-            </div>
-            <div className="card review-card">
-              <div className="review-quote">“</div>
-              <p className="review-text">Great for campaigns. Fast to deploy and delightful to use.</p>
-              <div className="review-meta">— Creative Producer</div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Reviews removed as requested */}
 
       {/* Cinematic Hero Section - ALL SLIDES (hidden for minimal landing) */}
       {false && (
@@ -382,7 +456,7 @@ export default function LandingPage() {
       )}
 
       {/* Contact Section - Keep this below slides */}
-      <section className="contact-section" style={{ display: 'block', background: '#fafafa', padding: '10rem 0', position: 'relative' }}>
+      <section className="contact-section" style={{ display: 'none' }}>
         <div className="container">
           <h2 className="section-title" style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 800, textAlign: 'center', marginBottom: '1rem', color: '#1a1a1a' }}>Get In Touch</h2>
           <p className="section-subtitle" style={{ fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)', color: '#666', textAlign: 'center', marginBottom: '6rem' }}>Connect with us</p>
@@ -423,6 +497,14 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="footer-col">
+              <p className="footer-title">Contact</p>
+              <div className="footer-links">
+                <a href="tel:+917579122216">+91 7579122216</a>
+                <a href="mailto:postkar.info@gmail.com">postkar.info@gmail.com</a>
+                <span>Engineer's Enclave, GMS Rd, Kanwali, Dehradun, Uttarakhand 248171</span>
+              </div>
+            </div>
+            <div className="footer-col">
               <p className="footer-title">Follow Us</p>
               <div className="footer-links social-links">
                 <a href="https://www.instagram.com/post._.kar?igsh=MWNqdGkxazJjM2xhdA==" target="_blank" rel="noopener noreferrer" title="Instagram">
@@ -438,7 +520,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="footer-bottom">
-            © 2025 NitiNex Studio. All rights reserved.
+            &copy; 2025 NitiNex Studio. All rights reserved.
           </div>
         </div>
       </footer>

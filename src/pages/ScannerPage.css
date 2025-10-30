@@ -299,8 +299,10 @@
   position: relative;
   width: 200px;
   height: 200px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: var(--radius-lg);
+  border: 2px solid rgba(99, 102, 241, 0.7); /* accent */
+  border-radius: 16px;
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.15) inset, 0 0 24px rgba(99,102,241,0.25);
+  animation: frameGlow 2.2s ease-in-out infinite;
 }
 
 .scan-corners {
@@ -313,9 +315,10 @@
 
 .corner {
   position: absolute;
-  width: 20px;
-  height: 20px;
-  border: 3px solid #ffffff;
+  width: 16px;
+  height: 16px;
+  border: 3px solid rgba(99,102,241,0.95);
+  box-shadow: 0 0 10px rgba(99,102,241,0.6);
 }
 
 .corner-tl {
@@ -352,18 +355,25 @@
 
 .scan-line {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, #ffffff, transparent);
-  animation: scan 2s ease-in-out infinite;
+  top: 8px; /* start a bit below top */
+  left: 10px;
+  right: 10px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(99,102,241,1), transparent);
+  filter: drop-shadow(0 0 8px rgba(99,102,241,0.8));
+  border-radius: 999px;
+  animation: scan 1.8s ease-in-out infinite;
 }
 
 @keyframes scan {
   0% { transform: translateY(0); opacity: 1; }
-  50% { transform: translateY(196px); opacity: 0.8; }
+  50% { transform: translateY(160px); opacity: 0.9; }
   100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes frameGlow {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(99,102,241,0.15) inset, 0 0 18px rgba(99,102,241,0.22); }
+  50% { box-shadow: 0 0 0 2px rgba(99,102,241,0.25) inset, 0 0 28px rgba(99,102,241,0.35); }
 }
 
 .scanner-info {

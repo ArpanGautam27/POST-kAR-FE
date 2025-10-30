@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import type { ProductGridProps } from '../../types';
 import ProductCard from './ProductCard';
 import './ProductGrid.css';
@@ -10,7 +10,11 @@ import './ProductGrid.css';
 export const ProductGrid: React.FC<ProductGridProps> = ({ 
   products, 
   loading = false, 
-  onProductClick 
+  onProductClick,
+  cardProps,
+  horizontal = false,
+  forceFourColumns = false,
+  showArrows = false
 }) => {
   // Show loading skeleton when loading
   if (loading) {
@@ -31,6 +35,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
               }}
               onClick={() => {}}
               loading={true}
+              {...cardProps}
             />
           ))}
         </div>
@@ -64,16 +69,55 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     );
   }
 
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const containerClasses = [
+    'product-grid__container',
+    horizontal ? 'product-grid__container--horizontal' : '',
+    !horizontal && forceFourColumns ? 'product-grid__container--four' : ''
+  ].filter(Boolean).join(' ');
+
+  const scrollByAmount = (dir: 'left' | 'right') => {
+    const el = containerRef.current;
+    if (!el) return;
+    const amount = el.clientWidth * 0.8;
+    el.scrollBy({ left: dir === 'left' ? -amount : amount, behavior: 'smooth' });
+  };
+
   return (
-    <div className="product-grid">
-      <div className="product-grid__container">
+    <div className="product-grid" style={{ position: 'relative' }}>
+      {horizontal && showArrows && (
+        <>
+          <button
+            type="button"
+            aria-label="Scroll left"
+            onClick={() => scrollByAmount('left')}
+            style={{ position: 'absolute', left: -8, top: '50%', transform: 'translateY(-50%)', zIndex: 2, background: 'rgba(0,0,0,0.4)', color: '#fff', border: 'none', width: 36, height: 36, borderRadius: 18, cursor: 'pointer' }}
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            aria-label="Scroll right"
+            onClick={() => scrollByAmount('right')}
+            style={{ position: 'absolute', right: -8, top: '50%', transform: 'translateY(-50%)', zIndex: 2, background: 'rgba(0,0,0,0.4)', color: '#fff', border: 'none', width: 36, height: 36, borderRadius: 18, cursor: 'pointer' }}
+          >
+            ›
+          </button>
+        </>
+      )}
+      <div ref={containerRef} className={containerClasses}>
         {products.map((product) => (
           <div key={product.id} className="product-grid__item">
             <ProductCard
               product={product}
               onClick={onProductClick}
               loading={false}
+              {...cardProps}
             />
+            <div className="product-grid__caption">
+              <span className="product-grid__name" title={product.name}>{product.name}</span>
+            </div>
           </div>
         ))}
       </div>

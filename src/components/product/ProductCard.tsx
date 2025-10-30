@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useCart } from '../../contexts/CartContext';
 import type { ProductCardProps } from '../../types';
 import './ProductCard.css';
 
@@ -10,25 +9,19 @@ import './ProductCard.css';
 export const ProductCard: React.FC<ProductCardProps> = ({ 
   product, 
   onClick, 
-  loading = false 
+  loading = false,
+  comingSoon = false
 }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
-  const { addToCart, isInCart } = useCart();
-  const [addedToCart, setAddedToCart] = useState(false);
 
   const handleClick = () => {
-    if (!loading) {
+    if (!loading && !comingSoon) {
       onClick(product.id);
     }
   };
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    addToCart(product);
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
-  };
+  // cart interactions are intentionally disabled/hidden for now
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -61,7 +54,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       }}
       aria-label={`View details for ${product.name}`}
     >
-      <div className="product-card__image-container">
+      <div className="product-card__image-container" style={{ position: 'relative' }}>
         {!imageLoaded && !imageError && (
           <div className="product-card__image-skeleton"></div>
         )}
@@ -82,30 +75,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             loading="lazy"
           />
         )}
-        {/* Top overlay with product name */}
-        <div className="product-card__top" onClick={(e) => e.stopPropagation()}>
-          <h3 className="product-card__name" title={product.name}>{product.name}</h3>
-        </div>
-        {/* Bottom overlay with price + cart icon */}
-        <div className="product-card__overlay" onClick={(e) => e.stopPropagation()}>
-          <span className="product-card__price">$99.99</span>
-          <button
-            className={`product-card__cart-icon ${addedToCart ? 'product-card__cart-icon--added' : ''}`}
-            onClick={handleAddToCart}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.stopPropagation();
-              }
-            }}
-            aria-label={isInCart(product.id) ? 'Add another to cart' : 'Add to cart'}
-            title={isInCart(product.id) ? 'Add another to cart' : 'Add to cart'}
-          >
-            {addedToCart ? '✓' : '🛒'}
-          </button>
-        </div>
+        {comingSoon && (
+          <>
+            <div className="product-card__overlay-mask" style={{ position: 'absolute', inset: 0, background: 'rgba(240,240,240,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
+            <div className="product-card__coming-soon" style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
+              <span style={{ color: '#ffffff', background: 'rgba(0,0,0,0.6)', padding: '10px 16px', borderRadius: 999, fontWeight: 700, letterSpacing: 0.5 }}>Coming Soon</span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
-};
+}
+;
 
 export default ProductCard;

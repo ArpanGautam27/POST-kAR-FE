@@ -4,7 +4,7 @@ import ProductGrid from '../components/product/ProductGrid';
 import { ProductService } from '../services/ProductService';
 import { MockProductService } from '../services/MockProductService';
 import { config } from '../config/environment';
-import { useNavigation } from '../hooks/useNavigation';
+ 
 import type { Product } from '../types';
 import './ProductsPage.css';
 
@@ -17,7 +17,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { navigate } = useNavigation();
+  
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -52,15 +52,13 @@ export default function ProductsPage() {
     loadProducts();
   }, []);
 
-  const handleProductClick = (productId: string) => {
-    navigate(`/product/${productId}`);
-  };
+  // Navigation to product detail is disabled while products are marked as coming soon
 
   if (error) {
     return (
       <div className="products-page">
         <Navigation />
-        <div className="products-container">
+        <div className="products-container" style={{ paddingTop: 80 }}>
           <div className="error-state">
             <h2>Oops! Something went wrong</h2>
             <p>{error}</p>
@@ -77,18 +75,20 @@ export default function ProductsPage() {
   }
 
   return (
-    <div className="products-page">
+    <div className="products-page" style={{ background: 'transparent' }}>
       <Navigation />
-      <div className="products-container">
+      <div className="products-container" style={{ paddingTop: 80 }}>
         <div className="products-header">
-          <h1 className="products-title">Discover Products</h1>
+          <h1 className="products-title" style={{ textAlign: 'center', width: '100%', color: '#ffffff' }}>Discover Products</h1>
         </div>
-        
-        <ProductGrid 
-          products={products}
-          loading={loading}
-          onProductClick={handleProductClick}
-        />
+        <div>
+          <ProductGrid 
+            products={products}
+            loading={loading}
+            onProductClick={() => { /* disabled while coming soon */ }}
+            cardProps={{ comingSoon: true, hideCart: true, hidePrice: true }}
+          />
+        </div>
       </div>
     </div>
   );

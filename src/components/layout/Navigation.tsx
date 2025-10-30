@@ -25,15 +25,16 @@ export const Navigation: React.FC<NavigationProps> = () => {
         <div className="nav-container">
           <Link to="/" className="nav-logo">POST-kAR</Link>
           <div className="nav-links">
+            <Link to="/free-experience" className="nav-link">Free Experience</Link>
             <Link to="/products" className="nav-link">Products</Link>
-            <a href="/scanner/scan_mind.html" className="nav-link">Scanner</a>
-            <Link to="/cart" className="nav-link nav-cart-link">
+            <a href="/scanner/scan_mind.html" className="nav-link scanner-only">Scanner</a>
+            <Link to="/cart" className="nav-link nav-cart-link" style={{ display: 'none' }}>
               <ShoppingCart size={18} />
               {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
             </Link>
             
             {/* Authentication Section */}
-            <div className="nav-auth">
+            <div className="nav-auth" style={{ display: 'none' }}>
               {!isLoading && (
                 isAuthenticated ? (
                   <ProfileDropdown />

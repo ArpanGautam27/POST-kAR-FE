@@ -3,19 +3,85 @@
 
 .product-grid {
   width: 100%;
-  padding: var(--spacing-4);
+  padding: 0;
+}
+
+/* Mobile refinements: ensure no clipping of second column */
+@media (max-width: 767px) {
+  .product-grid {
+    padding: 0 12px;
+  }
+  .product-grid__container {
+    gap: 12px;
+  }
 }
 
 .product-grid__container {
   display: grid;
   gap: var(--spacing-4);
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+  max-width: none;
+  margin: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 columns on mobile */
+  box-sizing: border-box;
+}
+
+.product-grid__item { display: flex; flex-direction: column; }
+.product-grid__item > .product-card { flex: 0 0 auto; }
+.product-grid__item > .product-grid__caption { flex: 0 0 auto; position: relative; z-index: 1; }
+
+/* Horizontal scroller mode (Home) */
+.product-grid__container--horizontal {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--spacing-4);
+  overflow-x: auto;
+  width: 100%;
+  max-width: none;
+  padding-bottom: var(--spacing-2);
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  align-items: flex-start;
+}
+.product-grid__container--horizontal .product-grid__item {
+  flex: 0 0 300px; /* uniform width */
+}
+
+/* Ensure uniform sizing within horizontal cards */
+.product-grid__container--horizontal .product-grid__item,
+.product-grid__container--horizontal .product-card {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Hide captions below cards in horizontal row, per 'coming soon list' */
+.product-grid__container--horizontal .product-grid__caption { display: none; }
+
+/* Force exactly 4 columns regardless of breakpoint */
+.product-grid__container--four {
+  grid-template-columns: repeat(4, 1fr) !important;
+}
+@media (min-width: 768px) {
+  .product-grid__container--four { grid-template-columns: repeat(4, 1fr) !important; }
+}
+@media (min-width: 1024px) {
+  .product-grid__container--four { grid-template-columns: repeat(4, 1fr) !important; }
 }
 
 /* Mobile already uses grid with 2 columns */
+
+/* Caption styles under cards */
+.product-grid__caption { margin-top: 8px; margin-bottom: 10px; display: flex; justify-content: center; }
+.product-grid__name {
+  color: var(--color-text-primary);
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 /* Empty state styles */
 .product-grid__empty {
@@ -92,7 +158,7 @@
   
   .product-grid__container {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--spacing-6);
   }
 }
@@ -100,7 +166,7 @@
 /* Large desktop: 4 columns */
 @media (min-width: 1280px) {
   .product-grid__container {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
