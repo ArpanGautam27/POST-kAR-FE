@@ -26,6 +26,55 @@ import instagramLogo from '../assets/instagram_logo.svg';
 import linkedinLogo from '../assets/linkedin_logo.svg';
 import './LandingPage.css';
 
+// Simple drag-to-scroll hook
+function useDragScroll(ref: React.RefObject<HTMLElement | null>) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    let isDown = false;
+    let startX: number;
+    let scrollLeft: number;
+
+    const onMouseDown = (e: MouseEvent) => {
+      isDown = true;
+      el.classList.add('dragging');
+      startX = e.pageX - el.offsetLeft;
+      scrollLeft = el.scrollLeft;
+    };
+
+    const onMouseLeave = () => {
+      isDown = false;
+      el.classList.remove('dragging');
+    };
+
+    const onMouseUp = () => {
+      isDown = false;
+      el.classList.remove('dragging');
+    };
+
+    const onMouseMove = (e: MouseEvent) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - el.offsetLeft;
+      const walk = (x - startX) * 1; // scroll speed multiplier
+      el.scrollLeft = scrollLeft - walk;
+    };
+
+    el.addEventListener('mousedown', onMouseDown);
+    el.addEventListener('mouseleave', onMouseLeave);
+    el.addEventListener('mouseup', onMouseUp);
+    el.addEventListener('mousemove', onMouseMove);
+
+    return () => {
+      el.removeEventListener('mousedown', onMouseDown);
+      el.removeEventListener('mouseleave', onMouseLeave);
+      el.removeEventListener('mouseup', onMouseUp);
+      el.removeEventListener('mousemove', onMouseMove);
+    };
+  }, [ref]);
+}
+
 export default function LandingPage() {
   const { totalItems } = useCart();
   const { isAuthenticated } = useAuth();
@@ -38,9 +87,14 @@ export default function LandingPage() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activePanel, setActivePanel] = useState(0);
   const spotlightRef = useRef<HTMLDivElement | null>(null);
+  const servicesRef = useRef<HTMLDivElement | null>(null);
   const feedbackVideos = [cf8, cf1, cf2, cf3, cf4, cf5, cf6, cf7, cf9, cf10, cf11];
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const [muted, setMuted] = useState<boolean[]>(() => feedbackVideos.map(() => true));
+
+  // Apply drag scroll to horizontal sections
+  useDragScroll(spotlightRef);
+  useDragScroll(servicesRef);
 
   const toggleMute = (idx: number) => {
     setMuted(prev => {
@@ -63,7 +117,7 @@ export default function LandingPage() {
     {
       id: 'hero1',
       heading: 'POST-kAR',
-      subtitle: '"Beyond The Frame"',
+      subtitle: '"Beyond The Frame: Link your clicks"',
       description: 'Experience Culture Through Augmented Reality',
     },
     // Slide 2 - Hero 2
@@ -76,7 +130,7 @@ export default function LandingPage() {
     // Slide 3 - Hero 3
     {
       id: 'hero3',
-      heading: 'Beyond The Frame',
+      heading: 'Beyond The Frame: Link your clicks',
       subtitle: 'Turning culture into AR moments',
       description: 'Experience culture through augmented reality. Preserve tradition with modern technology.',
     },
@@ -131,16 +185,18 @@ export default function LandingPage() {
   const productService = config.enableMockData ? MockProductService.getInstance() : ProductService.getInstance();
 
   useEffect(() => {
-    // Load a subset of products for the home page
+    // Load first 6 products for the home page (featured products)
     (async () => {
       try {
         setLoadingProducts(true);
         let data = await productService.getProducts();
+        // Always show first 6 products as featured on landing page
         setProducts(Array.isArray(data) ? data.slice(0, 6) : []);
       } catch (e) {
         if (config.enableMockData) {
           const mock = MockProductService.getInstance();
           const data = await mock.getProducts();
+          // Always show first 6 products as featured on landing page
           setProducts(Array.isArray(data) ? data.slice(0, 6) : []);
         } else {
           setProducts([]);
@@ -256,9 +312,9 @@ export default function LandingPage() {
       {/* Minimal Hero Section */}
       <header className="hero">
         <div className="hero-inner">
-          <h1 className="hero-title">POST-kAR</h1>
+          <h1 className="hero-title">post-kAR</h1>
           <p className="hero-subtitle">Beyond The Frame</p>
-          <p className="hero-desc">Scan posters and images to unlock immersive, interactive stories.</p>
+          <p className="hero-desc">Link your clicks</p>
         </div>
         <div className="hero-bg" />
       </header>
@@ -339,34 +395,69 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Services (Coming Soon) */}
-      <section className="section section-services reveal in">
-        <div className="container">
-          <div className="card" style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 12, padding: '1.5rem' }}>
-            <h2 className="section-title">Services</h2>
-            <div className="cards-grid services-grid">
-              <div className="card service-card" style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 12 }}>
-                <div className="card-body">
-                  <h3 className="card-title">Custom AR Campaigns</h3>
-                  <p className="card-meta">Branded AR experiences for culture & retail</p>
-                </div>
-              </div>
-              <div className="card service-card" style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 12 }}>
-                <div className="card-body">
-                  <h3 className="card-title">Creator Tools</h3>
-                  <p className="card-meta">Upload artworks and publish AR layers</p>
-                </div>
-              </div>
-              <div className="card service-card" style={{ background: 'rgba(255,255,255,0.06)', border: 'none', borderRadius: 12 }}>
-                <div className="card-body">
-                  <h3 className="card-title">Mobile App</h3>
-                  <p className="card-meta">Native app for scanning & collectibles</p>
-                </div>
-              </div>
+{/* Services Section (Netflix-style scroll) */}
+<section className="section section-services reveal in">
+  <div className="container">
+    <div
+      className="card"
+      style={{
+        background: 'rgba(255,255,255,0.08)',
+        border: 'none',
+        borderRadius: 12,
+        padding: '1.5rem',
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      <h2 className="section-title">Services</h2>
+
+      {/* Horizontal Scrollable Cards */}
+      <div ref={servicesRef} className="services-scroll">
+        {[
+          {
+            title: 'Custom AR Campaigns',
+            meta: 'Branded AR experiences for culture & retail',
+          },
+          {
+            title: 'Creator Tools',
+            meta: 'Upload artworks and publish AR layers',
+          },
+          {
+            title: 'Mobile App',
+            meta: 'Native app for scanning & collectibles',
+          },
+          {
+            title: 'Virtual Tours',
+            meta: 'Interactive 3D & VR experiences for spaces',
+          },
+          {
+            title: 'Mixed Reality',
+            meta: 'Blend real and virtual worlds seamlessly',
+          },
+        ].map((service, i) => (
+          <div
+            key={i}
+            className="card service-card"
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              border: 'none',
+              borderRadius: 12,
+              flex: '0 0 auto',
+            }}
+          >
+            <div className="card-body">
+              <h3 className="card-title">{service.title}</h3>
+              <p className="card-meta">{service.meta}</p>
             </div>
           </div>
-        </div>
-      </section>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
 
       {/* Reviews removed as requested */}
 
