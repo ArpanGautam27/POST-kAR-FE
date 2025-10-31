@@ -50,7 +50,7 @@ export default function FreeExperiencePage() {
     <div className="products-page" style={{ background: 'transparent' }}>
       <Navigation />
       <div className="products-container" style={{ paddingTop: 80 }}>
-        <div className="products-header" style={{ marginBottom: 64 }}>
+        <div className="products-header" style={{ marginBottom: 64, marginTop: 40 }}>
           <h1 className="products-title" style={{ color: '#ffffff' }}>Free Experience</h1>
         </div>
         <ProductGrid

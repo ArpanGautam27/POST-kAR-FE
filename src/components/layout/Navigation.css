@@ -37,8 +37,15 @@
   display: block;
   height: 40px;
   width: auto;
+  max-width: 150px;
   object-fit: contain;
   border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-logo-video[data-loaded="true"] {
+  opacity: 1;
 }
 
 .nav-logo:hover {
@@ -139,10 +146,9 @@
   line-height: 1;
 }
 
-/* Scanner link: mobile only */
-.scanner-only { display: none; }
-@media (max-width: 768px) {
-  .scanner-only { display: inline-flex; }
+/* Scanner link: visible on all devices */
+.scanner-only { 
+  display: inline-flex; 
 }
 
 /* Mobile Navigation */

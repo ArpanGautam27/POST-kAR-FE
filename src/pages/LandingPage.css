@@ -45,6 +45,7 @@ html, body {
 /* Video-only hero */
 .hero--video-only {
   padding: 0;
+  margin-top: 70px; /* offset for fixed navbar */
   margin-bottom: 2.5rem; /* space below hero before next cards */
   background: #000; /* fill bars when using contain */
 }
@@ -58,9 +59,13 @@ html, body {
   background: #000; /* ensure letterboxing looks intentional */
 }
 @media (max-width: 768px) {
+  .hero--video-only {
+    margin-top: 70px; /* ensure video is not hidden behind navbar on mobile */
+  }
   .hero--video-only .hero-header-video {
     width: 100vw;
     height: auto;
+    object-fit: contain;
     object-position: center center;
   }
 }
@@ -251,6 +256,21 @@ html, body {
   transition: opacity 0.3s ease;
 }
 
+.nav-logo-video {
+  display: block;
+  height: 40px;
+  width: auto;
+  max-width: 150px;
+  object-fit: contain;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.nav-logo-video[data-loaded="true"] {
+  opacity: 1;
+}
+
 .nav-logo:hover {
   opacity: 0.8;
 }
@@ -273,10 +293,9 @@ html, body {
   position: relative;
 }
 
-/* Scanner link: mobile only */
-.scanner-only { display: none; }
-@media (max-width: 768px) {
-  .scanner-only { display: inline-flex; }
+/* Scanner link: visible on all devices */
+.scanner-only { 
+  display: inline-flex; 
 }
 
 .nav-link::after {
@@ -578,11 +597,18 @@ html, body {
   gap: 0.75rem;
 }
 
-.footer-links a {
+.footer-links a,
+.footer-links span {
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   transition: all 0.3s ease;
   font-size: 0.95rem;
+}
+
+.footer-link-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .footer-links a:hover {
@@ -590,9 +616,17 @@ html, body {
   padding-left: 4px;
 }
 
+.footer-col-social {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+}
+
 .social-links {
   flex-direction: row;
   gap: 1.25rem;
+  justify-content: flex-end;
 }
 
 .social-icon {
@@ -800,6 +834,15 @@ html, body {
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 2.5rem;
+  }
+
+  .footer-col-social {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .social-links {
+    justify-content: flex-start;
   }
 
   .modal-content {

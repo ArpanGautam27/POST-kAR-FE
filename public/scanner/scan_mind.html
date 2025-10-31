@@ -9,82 +9,67 @@
     <style>
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            overflow: hidden;
         }
-        
-        .example-container {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 2;
-            background: rgba(0,0,0,0.8);
-            padding: 15px;
-            border-radius: 10px;
-            color: white;
-            max-width: 300px;
+        a-scene {
+            width: 100vw;
+            height: 100vh;
+            display: block;
         }
-        
-        .example-container h3 {
-            margin: 0 0 10px 0;
-            color: #4CAF50;
-        }
-        
-        .target-preview {
-            width: 150px;
-            border: 3px solid #4CAF50;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        
         #status {
             position: absolute;
-            bottom: 20px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.6);
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
             color: white;
-            padding: 10px 20px;
-            border-radius: 20px;
+            padding: 12px 24px;
+            border-radius: 25px;
             z-index: 2;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
         }
-        
-        .found { background: rgba(76, 175, 80, 0.9) !important; }
-        .lost { background: rgba(244, 67, 54, 0.9) !important; }
-        
-        #download-link {
-            color: #4CAF50;
-            text-decoration: none;
-            font-weight: bold;
-            display: block;
-            margin-top: 10px;
+        .found { 
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.95), rgba(56, 142, 60, 0.95)) !important;
+            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4) !important;
         }
-        
+        .lost { 
+            background: rgba(0, 0, 0, 0.75) !important;
+            backdrop-filter: blur(10px);
+        }
+
         #start-button {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #4CAF50;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
             color: white;
             border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
+            padding: 16px 36px;
+            border-radius: 30px;
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
             z-index: 10;
             display: none;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s ease;
         }
-        
         #start-button:hover {
-            background: #45a049;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            transform: translate(-50%, -50%) translateY(-2px);
+            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.5);
         }
     </style>
 </head>
 <body>
-    <div id="status">Initializing...</div>
-    <button id="start-button">Start AR Scanner</button>
+    <div id="status"></div>
+    <button id="start-button">🚀 Start AR Scanner</button>
 
     <a-scene 
         mindar-image="imageTargetSrc: ./Igas1.mind;"
@@ -103,165 +88,156 @@
                 crossorigin="anonymous"
                 playsinline
                 webkit-playsinline
-            >
-                <source src="./IgasVideo.mp4" type="video/mp4">
-            </video>
+            ></video>
         </a-assets>
 
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0" id="target">
-            <!-- Single video plane; no background plane to avoid size mismatch -->
             <a-plane 
                 id="video-plane"
-                position="0 0 0" 
-                height="1" 
+                position="0 0 0"
                 width="1"
+                height="1"
                 rotation="0 0 0"
-                material="shader: flat; src: #my-video; transparent: false;"
+                scale="0.95 0.95 1" 
+                material="shader: flat; src: #my-video; transparent: false; side: double;"
             ></a-plane>
         </a-entity>
     </a-scene>
 
     <script>
-        const statusEl = document.getElementById('status');
-        const video = document.getElementById('my-video');
-        const videoPlane = document.getElementById('video-plane');
-        
-        // Request camera permissions explicitly on mobile
-        async function requestCameraPermission() {
+    // ✅ Custom component that properly scales the video slightly smaller than target
+    AFRAME.registerComponent('video-fit', {
+      schema: {
+        target: { type: 'selector' },
+        scaleFactor: {type: 'number', default: 0.95}  // ~93% of original
+      },
+      init() {
+        this.video = this.data.target;
+        this.video.addEventListener('loadedmetadata', () => this.fitVideo());
+      },
+      fitVideo() {
+        const vid = this.video;
+        if (!vid.videoWidth || !vid.videoHeight) return;
+
+        const videoAspect = vid.videoWidth / vid.videoHeight;
+        const plane = this.el;
+        const planeWidth = plane.getAttribute('width');
+        const planeHeight = plane.getAttribute('height');
+        const planeAspect = planeWidth / planeHeight;
+
+        let scaleX = 1, scaleY = 1;
+
+        if (videoAspect > planeAspect) {
+          scaleY = videoAspect / planeAspect;
+        } else if (videoAspect < planeAspect) {
+          scaleX = planeAspect / videoAspect;
+        }
+
+        // 👇 Apply your "slightly smaller" scaling here
+        const shrink = this.data.scaleFactor; 
+        plane.setAttribute('scale', `${scaleX * shrink} ${scaleY * shrink} 1`);
+        console.log(`🎥 Video scaled to ${Math.round(shrink * 100)}% of target area`);
+      }
+    });
+
+
+    // ===============================
+    // Existing Scanner / Status Logic
+    // ===============================
+    const statusEl = document.getElementById('status');
+    const video = document.getElementById('my-video');
+
+    async function requestCameraPermission() {
+        try {
+            statusEl.textContent = '';
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error('Camera API not supported');
+            }
+            let stream;
             try {
-                statusEl.textContent = '📱 Requesting camera permission...';
-                
-                // Check if getUserMedia is available
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    throw new Error('Camera API not supported');
-                }
-                
-                // Request camera permission explicitly with multiple fallback options
-                let stream;
-                try {
-                    // Try with environment camera first (back camera)
-                    stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { 
-                            facingMode: { ideal: 'environment' },
-                            width: { ideal: 1280 },
-                            height: { ideal: 720 }
-                        } 
-                    });
-                } catch (envError) {
-                    console.warn('Environment camera failed, trying any camera:', envError);
-                    // Fallback to any available camera
-                    stream = await navigator.mediaDevices.getUserMedia({ 
-                        video: true
-                    });
-                }
-                
-                // Stop the stream immediately - we just needed permission
-                stream.getTracks().forEach(track => track.stop());
-                
-                statusEl.textContent = '📹 Camera permission granted, starting AR...';
-                return true;
-            } catch (error) {
-                console.error('Camera permission denied:', error);
-                let errorMessage = '❌ Camera access required for AR scanning';
-                
-                if (error.name === 'NotAllowedError') {
-                    errorMessage = '❌ Camera permission denied. Please allow camera access and refresh.';
-                } else if (error.name === 'NotFoundError') {
-                    errorMessage = '❌ No camera found on this device.';
-                } else if (error.name === 'NotSupportedError') {
-                    errorMessage = '❌ Camera not supported on this browser.';
-                }
-                
-                statusEl.textContent = errorMessage;
-                return false;
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } }
+                });
+            } catch (envError) {
+                console.warn('Environment camera failed, trying any camera:', envError);
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
             }
+            stream.getTracks().forEach(track => track.stop());
+            statusEl.textContent = '';
+            return true;
+        } catch (error) {
+            console.error('Camera permission denied:', error);
+            statusEl.textContent = '❌ Camera access required';
+            return false;
         }
-        
-        // Initialize AR scanner
-        async function initializeScanner() {
-            const startButton = document.getElementById('start-button');
-            startButton.style.display = 'none';
-            
-            // Check if we're on mobile
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                const hasPermission = await requestCameraPermission();
-                if (!hasPermission) {
-                    startButton.style.display = 'block';
-                    startButton.textContent = 'Retry Camera Access';
-                    return; // Stop if no camera permission
-                }
-            }
-            
-            statusEl.textContent = '📹 Camera starting...';
-        }
-        
-        // Update status on load
-        document.addEventListener('DOMContentLoaded', () => {
-            const startButton = document.getElementById('start-button');
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                // Show start button on mobile to ensure user interaction
-                statusEl.textContent = '📱 Tap to start AR scanner';
+    }
+
+    async function initializeScanner() {
+        const startButton = document.getElementById('start-button');
+        startButton.style.display = 'none';
+
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        if (isMobile) {
+            const hasPermission = await requestCameraPermission();
+            if (!hasPermission) {
                 startButton.style.display = 'block';
-                startButton.addEventListener('click', initializeScanner);
-            } else {
-                // Auto-start on desktop
-                statusEl.textContent = '📹 Camera starting...';
+                startButton.textContent = 'Retry Camera Access';
+                return;
             }
-        });
+        }
+        statusEl.textContent = '';
+    }
 
-        // Scene loaded
-        document.querySelector('a-scene').addEventListener('loaded', () => {
-            console.log('Scene loaded');
-            statusEl.textContent = '🔍 Scanning for target...';
-            statusEl.classList.remove('found', 'lost');
-        });
+    document.addEventListener('DOMContentLoaded', () => {
+        const startButton = document.getElementById('start-button');
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-        // When video metadata is ready, set plane height to match exact aspect
-        video.addEventListener('loadedmetadata', () => {
-            try {
-                const vw = video.videoWidth || 1;
-                const vh = video.videoHeight || 1;
-                const aspect = vh / vw; // height per unit width
-                // Keep width = 1 unit, compute height to match video
-                videoPlane.setAttribute('width', 1);
-                videoPlane.setAttribute('height', aspect);
-            } catch (e) { console.warn('Aspect compute failed', e); }
-        });
+        if (isMobile) {
+            statusEl.textContent = '';
+            startButton.style.display = 'block';
+            startButton.addEventListener('click', initializeScanner);
+        } else {
+            statusEl.textContent = '';
+        }
+    });
 
-        // Target found
-        document.getElementById('target').addEventListener('targetFound', event => {
-            console.log('Target found!');
-            statusEl.textContent = '✅ Target Found! Video Playing';
-            statusEl.classList.add('found');
-            statusEl.classList.remove('lost');
-            
-            // Play video
-            video.play().catch(e => {
-                console.log('Play error:', e);
-                video.muted = true;
-                video.play();
+    document.querySelector('a-scene').addEventListener('loaded', () => {
+        console.log('Scene loaded');
+        statusEl.textContent = '';
+        statusEl.classList.remove('found', 'lost');
+        
+        // Preload video
+        video.load();
+    });
+
+    document.getElementById('target').addEventListener('targetFound', () => {
+        console.log('Target found!');
+        statusEl.textContent = '';
+        statusEl.classList.add('found');
+        statusEl.classList.remove('lost');
+        
+        // Force video to play with multiple attempts
+        const playVideo = () => {
+            video.muted = false;
+            video.play().then(() => {
+                console.log('Video playing successfully');
+            }).catch(e => {
+                console.log('Play attempt failed, retrying...', e);
+                setTimeout(playVideo, 100);
             });
-        });
+        };
+        playVideo();
+    });
 
-        // Target lost
-        document.getElementById('target').addEventListener('targetLost', event => {
-            console.log('Target lost');
-            statusEl.textContent = '❌ Target Lost - Keep scanning';
-            statusEl.classList.add('lost');
-            statusEl.classList.remove('found');
-        });
-
-        // Error handling
-        window.addEventListener('error', (e) => {
-            console.error('Error:', e);
-            statusEl.textContent = '⚠️ Error: ' + e.message;
-        });
+    document.getElementById('target').addEventListener('targetLost', () => {
+        console.log('Target lost');
+        statusEl.textContent = '';
+        statusEl.classList.add('lost');
+        statusEl.classList.remove('found');
+        video.pause();
+    });
     </script>
 </body>
 </html>

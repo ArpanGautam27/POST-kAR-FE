@@ -177,9 +177,10 @@
 
 .video-overlay-content {
   position: relative;
-  max-width: 90vw;
-  max-height: 90vh;
   width: 100%;
+  max-width: 640px;
+  aspect-ratio: 4/3;
+  margin: 0 auto;
 }
 
 .close-overlay {
@@ -208,7 +209,8 @@
 
 .overlay-video {
   width: 100%;
-  max-height: 70vh;
+  height: 100%;
+  object-fit: cover;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-2xl);
 }
@@ -546,6 +548,15 @@
   
   .btn {
     min-width: 140px;
+  }
+  
+  /* Ensure video overlay maintains aspect ratio on mobile */
+  .video-overlay-content {
+    max-width: 95vw;
+  }
+  
+  .camera-view {
+    max-width: 95vw;
   }
 }
 

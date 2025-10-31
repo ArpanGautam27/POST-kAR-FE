@@ -32,6 +32,7 @@ export const Navigation: React.FC<NavigationProps> = () => {
               loop
               playsInline
               autoPlay
+              onLoadedData={(e) => e.currentTarget.setAttribute('data-loaded', 'true')}
             />
           </Link>
           <div className="nav-links">

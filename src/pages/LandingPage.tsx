@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { LogIn, ShoppingCart } from 'lucide-react';
+import { LogIn, ShoppingCart, Phone, Mail, MapPin } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 import { AuthModal } from '../components/auth/AuthModal';
@@ -286,6 +286,7 @@ export default function LandingPage() {
               loop
               playsInline
               autoPlay
+              onLoadedData={(e) => e.currentTarget.setAttribute('data-loaded', 'true')}
             />
           </Link>
           <div className="nav-links">
@@ -620,12 +621,25 @@ export default function LandingPage() {
             <div className="footer-col">
               <p className="footer-title">Contact</p>
               <div className="footer-links">
-                <a href="tel:+917579122216">+91 7579122216</a>
-                <a href="mailto:postkar.info@gmail.com">postkar.info@gmail.com</a>
-                <span>Engineer's Enclave, GMS Rd, Kanwali, Dehradun, Uttarakhand 248171</span>
+                <a href="tel:+917579122216" className="footer-link-with-icon">
+                  <Phone size={16} />
+                  <span>+91 7579122216</span>
+                </a>
+                <a href="mailto:postkar.info@gmail.com" className="footer-link-with-icon">
+                  <Mail size={16} />
+                  <span>postkar.info@gmail.com</span>
+                </a>
+                <span className="footer-link-with-icon">
+                  <MapPin size={16} />
+                  <span>Engineer's Enclave, GMS Rd, Kanwali, Dehradun, Uttarakhand 248171</span>
+                </span>
+                <span className="footer-link-with-icon" style={{ marginTop: '0.5rem' }}>
+                  <MapPin size={16} />
+                  <span>Digital Address: Kondapur, Hitech City, Hyderabad</span>
+                </span>
               </div>
             </div>
-            <div className="footer-col">
+            <div className="footer-col footer-col-social">
               <p className="footer-title">Follow Us</p>
               <div className="footer-links social-links">
                 <a href="https://www.instagram.com/post._.kar?igsh=MWNqdGkxazJjM2xhdA==" target="_blank" rel="noopener noreferrer" title="Instagram">

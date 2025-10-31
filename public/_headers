@@ -1,7 +1,7 @@
 /*
-  Permissions-Policy: camera=(self "https://postkar-fe.netlify.app"), microphone=(self "https://postkar-fe.netlify.app"), geolocation=(self "https://postkar-fe.netlify.app")
+  Permissions-Policy: camera=*, microphone=*, geolocation=*
   Access-Control-Allow-Origin: *
 
 /scanner/*
-  Permissions-Policy: camera=(self "https://postkar-fe.netlify.app"), microphone=(self "https://postkar-fe.netlify.app"), geolocation=(self "https://postkar-fe.netlify.app")
+  Permissions-Policy: camera=*, microphone=*, geolocation=*
   Access-Control-Allow-Origin: *
