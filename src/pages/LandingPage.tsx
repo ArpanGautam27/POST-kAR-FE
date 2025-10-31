@@ -46,15 +46,24 @@ export default function LandingPage() {
 
   const toggleMute = (idx: number) => {
     setMuted(prev => {
-      const next = [...prev];
-      next[idx] = !next[idx];
-      const v = videoRefs.current[idx];
-      if (v) {
-        v.muted = next[idx];
-        if (!next[idx]) {
+      const next = prev.map(() => true);
+      const willUnmute = prev[idx]; // if previously muted, we will unmute this one
+      if (willUnmute) {
+        next[idx] = false; // unmute selected
+      } else {
+        next[idx] = true; // toggle back to muted
+      }
+
+      // Apply to DOM refs: ensure only one is unmuted
+      videoRefs.current.forEach((v, i) => {
+        if (!v) return;
+        const shouldMute = next[i];
+        v.muted = shouldMute;
+        if (!shouldMute) {
           v.play().catch(() => {});
         }
-      }
+      });
+
       return next;
     });
   };
