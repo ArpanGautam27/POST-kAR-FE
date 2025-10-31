@@ -33,6 +33,38 @@ html, body {
   overflow: hidden;
 }
 
+.hero-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Video-only hero */
+.hero--video-only {
+  padding: 0;
+  margin-bottom: 2.5rem; /* space below hero before next cards */
+  background: #000; /* fill bars when using contain */
+}
+.hero--video-only .hero-header-video {
+  display: block;
+  width: 100vw; /* fit screen width-wise */
+  max-width: 100%;
+  height: auto; /* scale height from width */
+  object-fit: contain; /* do not trim video */
+  object-position: center center; /* always center the content */
+  background: #000; /* ensure letterboxing looks intentional */
+}
+@media (max-width: 768px) {
+  .hero--video-only .hero-header-video {
+    width: 100vw;
+    height: auto;
+    object-position: center center;
+  }
+}
+
 .hero-inner {
   position: relative;
   z-index: 1;

@@ -22,12 +22,23 @@
 }
 
 .nav-logo {
-  font-size: 26px;
+  font-size: 1.75rem;
   font-weight: 800;
-  color: #ffffff;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   text-decoration: none;
-  letter-spacing: 1px;
-  transition: color 0.3s ease;
+  letter-spacing: -0.03em;
+  transition: opacity 0.3s ease;
+}
+
+.nav-logo-video {
+  display: block;
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  border-radius: 6px;
 }
 
 .nav-logo:hover {

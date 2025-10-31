@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { ProductCardProps } from '../../types';
 import './ProductCard.css';
+import comingSoonAnimUrl from '../../assets/coming_soon.json?url';
 
 /**
  * ProductCard component displays a product in a card format
@@ -79,7 +80,17 @@ export const ProductCard: React.FC<ProductCardProps> = ({
           <>
             <div className="product-card__overlay-mask" style={{ position: 'absolute', inset: 0, background: 'rgba(240,240,240,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} />
             <div className="product-card__coming-soon" style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none' }}>
-              <span style={{ color: '#ffffff', background: 'rgba(0,0,0,0.6)', padding: '10px 16px', borderRadius: 999, fontWeight: 700, letterSpacing: 0.5 }}>Coming Soon</span>
+              {/* Lottie animation for Coming Soon */}
+              {/* @ts-ignore - custom element */}
+              <lottie-player
+                autoplay
+                loop
+                mode="normal"
+                src={comingSoonAnimUrl}
+                style={{ width: 360, height: 280, display: 'block' }}
+                background="transparent"
+                speed="1"
+              />
             </div>
           </>
         )}

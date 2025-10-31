@@ -21,6 +21,8 @@ import cf8 from '../assets/customer_feedback_8.mp4';
 import cf9 from '../assets/customer_feedback_9.mp4';
 import cf10 from '../assets/customer_feedback_10.mp4';
 import cf11 from '../assets/customer_feedback_11.mp4';
+import headerLogoVideo from '../assets/logo_new.mp4';
+import heroSectionHeader from '../assets/hero_section_header.mp4';
 import xLogo from '../assets/x_logo.svg';
 import instagramLogo from '../assets/instagram_logo.svg';
 import linkedinLogo from '../assets/linkedin_logo.svg';
@@ -98,15 +100,24 @@ export default function LandingPage() {
 
   const toggleMute = (idx: number) => {
     setMuted(prev => {
-      const next = [...prev];
-      next[idx] = !next[idx];
-      const v = videoRefs.current[idx];
-      if (v) {
-        v.muted = next[idx];
-        if (!next[idx]) {
+      const next = prev.map(() => true);
+      const willUnmute = prev[idx]; // if previously muted, we will unmute this one
+      if (willUnmute) {
+        next[idx] = false; // unmute selected
+      } else {
+        next[idx] = true; // toggle back to muted
+      }
+
+      // Apply to DOM refs: ensure only one is unmuted
+      videoRefs.current.forEach((v, i) => {
+        if (!v) return;
+        const shouldMute = next[i];
+        v.muted = shouldMute;
+        if (!shouldMute) {
           v.play().catch(() => {});
         }
-      }
+      });
+
       return next;
     });
   };
@@ -267,7 +278,16 @@ export default function LandingPage() {
       {/* Navigation Bar */}
       <nav className="landing-nav">
         <div className="nav-container">
-          <Link to="/" className="nav-logo">POST-kAR</Link>
+          <Link to="/" className="nav-logo" aria-label="Home: POST-kAR">
+            <video
+              className="nav-logo-video"
+              src={headerLogoVideo}
+              muted
+              loop
+              playsInline
+              autoPlay
+            />
+          </Link>
           <div className="nav-links">
             <Link to="/free-experience" className="nav-link">Free Experience</Link>
             <Link to="/products" className="nav-link">Products</Link>
@@ -309,6 +329,16 @@ export default function LandingPage() {
         </div>
       </div>
 
+      {/* Minimal Hero Section: video only */}
+      <header className="hero hero--video-only" style={{ padding: 0 }}>
+        <video
+          className="hero-header-video"
+          src={heroSectionHeader}
+          muted
+          loop
+          playsInline
+          autoPlay
+        />
       {/* Minimal Hero Section */}
       <header className="hero">
         <div className="hero-inner">
