@@ -86,22 +86,14 @@
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity mindar-image-target="targetIndex: 0" id="target">
-            <!-- Video -->
-            <a-video 
-                src="#my-video" 
+            <!-- Single video plane; no background plane to avoid size mismatch -->
+            <a-plane 
+                id="video-plane"
                 position="0 0 0" 
-                height="0.552" 
+                height="1" 
                 width="1"
                 rotation="0 0 0"
-            ></a-video>
-            
-            <!-- Background plane for visibility -->
-            <a-plane 
-                position="0 0 -0.01" 
-                height="0.6" 
-                width="1.05"
-                color="#ffffff"
-                opacity="0.5"
+                material="shader: flat; src: #my-video; transparent: false;"
             ></a-plane>
         </a-entity>
     </a-scene>
@@ -109,6 +101,7 @@
     <script>
         const statusEl = document.getElementById('status');
         const video = document.getElementById('my-video');
+        const videoPlane = document.getElementById('video-plane');
         
         // Update status on load
         document.addEventListener('DOMContentLoaded', () => {
@@ -120,6 +113,18 @@
             console.log('Scene loaded');
             statusEl.textContent = '🔍 Scanning for target...';
             statusEl.classList.remove('found', 'lost');
+        });
+
+        // When video metadata is ready, set plane height to match exact aspect
+        video.addEventListener('loadedmetadata', () => {
+            try {
+                const vw = video.videoWidth || 1;
+                const vh = video.videoHeight || 1;
+                const aspect = vh / vw; // height per unit width
+                // Keep width = 1 unit, compute height to match video
+                videoPlane.setAttribute('width', 1);
+                videoPlane.setAttribute('height', aspect);
+            } catch (e) { console.warn('Aspect compute failed', e); }
         });
 
         // Target found

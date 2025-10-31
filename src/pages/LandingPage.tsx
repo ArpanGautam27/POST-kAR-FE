@@ -339,8 +339,8 @@ export default function LandingPage() {
           playsInline
           autoPlay
         />
-      {/* Minimal Hero Section */}
-      <header className="hero">
+      </header>
+      <header className="hero" style={{ display: 'none' }}>
         <div className="hero-inner">
           <h1 className="hero-title">post-kAR</h1>
           <p className="hero-subtitle">Beyond The Frame</p>
