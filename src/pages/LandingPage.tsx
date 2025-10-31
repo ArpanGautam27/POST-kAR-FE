@@ -21,6 +21,7 @@ import cf8 from '../assets/customer_feedback_8.mp4';
 import cf9 from '../assets/customer_feedback_9.mp4';
 import cf10 from '../assets/customer_feedback_10.mp4';
 import cf11 from '../assets/customer_feedback_11.mp4';
+import headerLogoVideo from '../assets/header_logo_video.mp4';
 import xLogo from '../assets/x_logo.svg';
 import instagramLogo from '../assets/instagram_logo.svg';
 import linkedinLogo from '../assets/linkedin_logo.svg';
@@ -211,7 +212,16 @@ export default function LandingPage() {
       {/* Navigation Bar */}
       <nav className="landing-nav">
         <div className="nav-container">
-          <Link to="/" className="nav-logo">POST-kAR</Link>
+          <Link to="/" className="nav-logo" aria-label="Home: POST-kAR">
+            <video
+              className="nav-logo-video"
+              src={headerLogoVideo}
+              muted
+              loop
+              playsInline
+              autoPlay
+            />
+          </Link>
           <div className="nav-links">
             <Link to="/free-experience" className="nav-link">Free Experience</Link>
             <Link to="/products" className="nav-link">Products</Link>

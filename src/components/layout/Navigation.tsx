@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
 import { ProfileDropdown } from '../auth/ProfileDropdown';
 import './Navigation.css';
+import headerLogoVideo from '../../assets/header_logo_video.mp4';
 
 interface NavigationProps {}
 
@@ -23,7 +24,16 @@ export const Navigation: React.FC<NavigationProps> = () => {
     <>
       <nav className="landing-nav">
         <div className="nav-container">
-          <Link to="/" className="nav-logo">POST-kAR</Link>
+          <Link to="/" className="nav-logo" aria-label="Home: POST-kAR">
+            <video
+              className="nav-logo-video"
+              src={headerLogoVideo}
+              muted
+              loop
+              playsInline
+              autoPlay
+            />
+          </Link>
           <div className="nav-links">
             <Link to="/free-experience" className="nav-link">Free Experience</Link>
             <Link to="/products" className="nav-link">Products</Link>

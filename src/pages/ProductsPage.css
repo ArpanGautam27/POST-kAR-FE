@@ -76,11 +76,11 @@
 
 @media (max-width: 768px) {
   .products-container {
-    padding: 20px 0;
+    padding: 40px 0;
   }
   
   .products-header {
-    margin-bottom: 40px;
+    margin-bottom: 64px;
   }
   
   .products-title {
