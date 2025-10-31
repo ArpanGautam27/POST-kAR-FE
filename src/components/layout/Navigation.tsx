@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
 import { ProfileDropdown } from '../auth/ProfileDropdown';
 import './Navigation.css';
-import headerLogoVideo from '../../assets/header_logo_video.mp4';
+import headerLogoVideo from '../../assets/logo_new.mp4';
 
 interface NavigationProps {}
 

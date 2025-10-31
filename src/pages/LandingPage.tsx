@@ -21,7 +21,8 @@ import cf8 from '../assets/customer_feedback_8.mp4';
 import cf9 from '../assets/customer_feedback_9.mp4';
 import cf10 from '../assets/customer_feedback_10.mp4';
 import cf11 from '../assets/customer_feedback_11.mp4';
-import headerLogoVideo from '../assets/header_logo_video.mp4';
+import headerLogoVideo from '../assets/logo_new.mp4';
+import heroSectionHeader from '../assets/hero_section_header.mp4';
 import xLogo from '../assets/x_logo.svg';
 import instagramLogo from '../assets/instagram_logo.svg';
 import linkedinLogo from '../assets/linkedin_logo.svg';
@@ -263,14 +264,16 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* Minimal Hero Section */}
-      <header className="hero">
-        <div className="hero-inner">
-          <h1 className="hero-title">POST-kAR</h1>
-          <p className="hero-subtitle">Beyond The Frame</p>
-          <p className="hero-desc">Scan posters and images to unlock immersive, interactive stories.</p>
-        </div>
-        <div className="hero-bg" />
+      {/* Minimal Hero Section: video only */}
+      <header className="hero hero--video-only" style={{ padding: 0 }}>
+        <video
+          className="hero-header-video"
+          src={heroSectionHeader}
+          muted
+          loop
+          playsInline
+          autoPlay
+        />
       </header>
 
       {/* Community Spotlight: Video Stories */}
