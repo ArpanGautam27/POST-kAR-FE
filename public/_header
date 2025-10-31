@@ -1,0 +1,5 @@
+/*
+  Permissions-Policy: camera=(self "https://postkar-fe.netlify.app"), microphone=(self "https://postkar-fe.netlify.app"), geolocation=(self "https://postkar-fe.netlify.app")
+  Cross-Origin-Embedder-Policy: require-corp
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Resource-Policy: same-origin

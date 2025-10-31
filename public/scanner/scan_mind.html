@@ -2,6 +2,8 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Permissions-Policy" content="camera=*, microphone=*, geolocation=*" />
+    <meta http-equiv="Feature-Policy" content="camera 'self'; microphone 'self'" />
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
@@ -57,10 +59,32 @@
             display: block;
             margin-top: 10px;
         }
+        
+        #start-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            display: none;
+        }
+        
+        #start-button:hover {
+            background: #45a049;
+        }
     </style>
 </head>
 <body>
     <div id="status">Initializing...</div>
+    <button id="start-button">Start AR Scanner</button>
 
     <a-scene 
         mindar-image="imageTargetSrc: ./Igas1.mind;"
@@ -72,6 +96,7 @@
         <a-assets>
             <video 
                 id="my-video" 
+                src="./IgasVideo.mp4"
                 loop="true"
                 preload="auto"
                 muted
@@ -79,7 +104,7 @@
                 playsinline
                 webkit-playsinline
             >
-                <source src="./IgasVideo.mp4">
+                <source src="./IgasVideo.mp4" type="video/mp4">
             </video>
         </a-assets>
 
@@ -103,9 +128,91 @@
         const video = document.getElementById('my-video');
         const videoPlane = document.getElementById('video-plane');
         
+        // Request camera permissions explicitly on mobile
+        async function requestCameraPermission() {
+            try {
+                statusEl.textContent = '📱 Requesting camera permission...';
+                
+                // Check if getUserMedia is available
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('Camera API not supported');
+                }
+                
+                // Request camera permission explicitly with multiple fallback options
+                let stream;
+                try {
+                    // Try with environment camera first (back camera)
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            facingMode: { ideal: 'environment' },
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 }
+                        } 
+                    });
+                } catch (envError) {
+                    console.warn('Environment camera failed, trying any camera:', envError);
+                    // Fallback to any available camera
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: true
+                    });
+                }
+                
+                // Stop the stream immediately - we just needed permission
+                stream.getTracks().forEach(track => track.stop());
+                
+                statusEl.textContent = '📹 Camera permission granted, starting AR...';
+                return true;
+            } catch (error) {
+                console.error('Camera permission denied:', error);
+                let errorMessage = '❌ Camera access required for AR scanning';
+                
+                if (error.name === 'NotAllowedError') {
+                    errorMessage = '❌ Camera permission denied. Please allow camera access and refresh.';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage = '❌ No camera found on this device.';
+                } else if (error.name === 'NotSupportedError') {
+                    errorMessage = '❌ Camera not supported on this browser.';
+                }
+                
+                statusEl.textContent = errorMessage;
+                return false;
+            }
+        }
+        
+        // Initialize AR scanner
+        async function initializeScanner() {
+            const startButton = document.getElementById('start-button');
+            startButton.style.display = 'none';
+            
+            // Check if we're on mobile
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                const hasPermission = await requestCameraPermission();
+                if (!hasPermission) {
+                    startButton.style.display = 'block';
+                    startButton.textContent = 'Retry Camera Access';
+                    return; // Stop if no camera permission
+                }
+            }
+            
+            statusEl.textContent = '📹 Camera starting...';
+        }
+        
         // Update status on load
         document.addEventListener('DOMContentLoaded', () => {
-            statusEl.textContent = '📹 Camera starting...';
+            const startButton = document.getElementById('start-button');
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                // Show start button on mobile to ensure user interaction
+                statusEl.textContent = '📱 Tap to start AR scanner';
+                startButton.style.display = 'block';
+                startButton.addEventListener('click', initializeScanner);
+            } else {
+                // Auto-start on desktop
+                statusEl.textContent = '📹 Camera starting...';
+            }
         });
 
         // Scene loaded
