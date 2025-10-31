@@ -249,4 +249,34 @@
       grid-template-columns: repeat(4, 1fr);
     }
   }
+
+  /* Netflix-style horizontal layout */
+.product-grid__container--horizontal {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 8px 1rem;
+}
+
+.product-grid__container--horizontal::-webkit-scrollbar {
+  height: 8px;
+}
+.product-grid__container--horizontal::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+}
+
+.product-grid__container--horizontal .product-grid__item {
+  flex: 0 0 calc((100% - 3 * 16px) / 4); /* 4 visible on desktop */
+  scroll-snap-align: start;
+}
+
+@media (max-width: 767px) {
+  .product-grid__container--horizontal .product-grid__item {
+    flex: 0 0 calc((100% - 2 * 12px) / 3); /* 3 visible on mobile */
+  }
+}
+
 }

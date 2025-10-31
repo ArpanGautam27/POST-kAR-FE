@@ -26,6 +26,7 @@ export default function ProductsPage() {
         setError(null);
         
         // Try real API first, fallback to mock if enabled
+        // This will load all 17 products from centralized data
         let productsData: Product[];
         try {
           productsData = await productService.getProducts();

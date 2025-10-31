@@ -897,3 +897,87 @@ a:focus-visible {
     opacity: 1;
   }
 }
+
+/* ============================================
+   Netflix-Style Services Scroll
+   ============================================ */
+
+   .section-services .container {
+    padding: 0 2.5rem;
+  }
+  @media (max-width: 768px) {
+    .section-services .container {
+      padding: 0 1.25rem;
+    }
+  }
+  
+  /* Horizontal scroll setup */
+  .services-scroll {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    padding: 1rem 0 1.5rem;
+  }
+  
+  /* Hide scrollbar (WebKit) */
+  .services-scroll::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Card sizing */
+  .services-scroll .service-card {
+    flex: 0 0 calc((100% - 3 * 16px) / 4);
+    scroll-snap-align: start;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+  @media (max-width: 768px) {
+    .services-scroll .service-card {
+      flex: 0 0 calc((100% - 2 * 12px) / 3);
+    }
+  }
+  
+  /* Hover glow effect */
+  .services-scroll .service-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.08),
+                0 12px 48px rgba(99,102,241,0.25),
+                0 4px 24px rgba(0,0,0,0.35);
+  }
+
+/* ============================================
+   Hide Scrollbars for Horizontal Scroll Sections
+   ============================================ */
+.video-cards,
+.product-grid__container,
+.services-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.video-cards::-webkit-scrollbar,
+.product-grid__container::-webkit-scrollbar,
+.services-scroll::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Drag feedback styling */
+.dragging {
+  cursor: grabbing !important;
+  user-select: none;
+}
+  
+/* ===== Hide global vertical scrollbar but keep scroll functionality ===== */
+html, body {
+  overflow-y: scroll; /* keep scroll enabled */
+  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* old Edge/IE */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* hide Chrome/Safari scrollbar */
+}
