@@ -293,9 +293,10 @@ html, body {
   position: relative;
 }
 
-/* Scanner link: visible on all devices */
-.scanner-only { 
-  display: inline-flex; 
+/* Scanner link: mobile only */
+.scanner-only { display: none; }
+@media (max-width: 768px) {
+  .scanner-only { display: inline-flex; }
 }
 
 .nav-link::after {
