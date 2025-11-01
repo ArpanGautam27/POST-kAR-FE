@@ -842,6 +842,7 @@ html, body {
   .footer-col-social {
     align-items: flex-start;
     text-align: left;
+    justify-self: start;
   }
 
   .social-links {

@@ -17,59 +17,10 @@
             height: 100vh;
             display: block;
         }
-        #status {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.75);
-            backdrop-filter: blur(10px);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 25px;
-            z-index: 2;
-            font-size: 15px;
-            font-weight: 500;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
-        }
-        .found { 
-            background: linear-gradient(135deg, rgba(76, 175, 80, 0.95), rgba(56, 142, 60, 0.95)) !important;
-            box-shadow: 0 4px 20px rgba(76, 175, 80, 0.4) !important;
-        }
-        .lost { 
-            background: rgba(0, 0, 0, 0.75) !important;
-            backdrop-filter: blur(10px);
-        }
 
-        #start-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
-            border: none;
-            padding: 16px 36px;
-            border-radius: 30px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            z-index: 10;
-            display: none;
-            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
-            transition: all 0.3s ease;
-        }
-        #start-button:hover {
-            background: linear-gradient(135deg, #4f46e5, #7c3aed);
-            transform: translate(-50%, -50%) translateY(-2px);
-            box-shadow: 0 12px 32px rgba(99, 102, 241, 0.5);
-        }
     </style>
 </head>
 <body>
-    <div id="status"></div>
-    <button id="start-button">🚀 Start AR Scanner</button>
 
     <a-scene 
         mindar-image="imageTargetSrc: ./IgasMarker.mind; filterMinCF: 0.0001; filterBeta: 0.001;"
@@ -145,14 +96,12 @@
 });
 
     // ===============================
-    // Existing Scanner / Status Logic
+    // Existing Scanner Logic
     // ===============================
-    const statusEl = document.getElementById('status');
     const video = document.getElementById('my-video');
 
     async function requestCameraPermission() {
         try {
-            statusEl.textContent = '';
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                 throw new Error('Camera API not supported');
             }
@@ -166,48 +115,31 @@
                 stream = await navigator.mediaDevices.getUserMedia({ video: true });
             }
             stream.getTracks().forEach(track => track.stop());
-            statusEl.textContent = '';
             return true;
         } catch (error) {
             console.error('Camera permission denied:', error);
-            statusEl.textContent = '❌ Camera access required';
             return false;
         }
     }
 
     async function initializeScanner() {
-        const startButton = document.getElementById('start-button');
-        startButton.style.display = 'none';
-
         const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         if (isMobile) {
             const hasPermission = await requestCameraPermission();
             if (!hasPermission) {
-                startButton.style.display = 'block';
-                startButton.textContent = 'Retry Camera Access';
+                console.warn('Camera access required. Please refresh and allow camera access.');
                 return;
             }
         }
-        statusEl.textContent = '';
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        const startButton = document.getElementById('start-button');
-        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-        if (isMobile) {
-            statusEl.textContent = '';
-            startButton.style.display = 'block';
-            startButton.addEventListener('click', initializeScanner);
-        } else {
-            statusEl.textContent = '';
-        }
+        // Auto-initialize scanner on page load
+        initializeScanner();
     });
 
     document.querySelector('a-scene').addEventListener('loaded', () => {
         console.log('Scene loaded');
-        statusEl.textContent = '';
-        statusEl.classList.remove('found', 'lost');
         
         // Preload video
         video.load();
@@ -215,9 +147,6 @@
 
     document.getElementById('target').addEventListener('targetFound', () => {
         console.log('Target found!');
-        statusEl.textContent = '';
-        statusEl.classList.add('found');
-        statusEl.classList.remove('lost');
         
         // Force video to play with multiple attempts
         const playVideo = () => {
@@ -234,9 +163,6 @@
 
     document.getElementById('target').addEventListener('targetLost', () => {
         console.log('Target lost');
-        statusEl.textContent = '';
-        statusEl.classList.add('lost');
-        statusEl.classList.remove('found');
         video.pause();
     });
     </script>

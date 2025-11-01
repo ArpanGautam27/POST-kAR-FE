@@ -85,7 +85,7 @@ export default function LandingPage() {
   const [activePanel, setActivePanel] = useState(0);
   const spotlightRef = useRef<HTMLDivElement | null>(null);
   const servicesRef = useRef<HTMLDivElement | null>(null);
-  const feedbackVideos = [cf8, cf1, cf2, cf3, cf4, cf5, cf6, cf7, cf9, cf10, cf11];
+  const feedbackVideos = [cf1, cf3, cf5, cf8, cf4, cf2, cf6, cf7, cf9, cf10, cf11];
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const [muted, setMuted] = useState<boolean[]>(() => feedbackVideos.map(() => true));
 
