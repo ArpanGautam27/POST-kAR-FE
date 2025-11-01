@@ -1,10 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { LogIn, ShoppingCart, Phone, Mail, MapPin } from 'lucide-react';
-import { useCart } from '../contexts/CartContext';
-import { useAuth } from '../contexts/AuthContext';
+import { Phone, Mail, MapPin } from 'lucide-react';
 import { AuthModal } from '../components/auth/AuthModal';
-import { ProfileDropdown } from '../components/auth/ProfileDropdown';
+import Navigation from '../components/layout/Navigation';
 import ProductGrid from '../components/product/ProductGrid';
 import { ProductService } from '../services/ProductService';
 import { MockProductService } from '../services/MockProductService';
@@ -21,7 +19,6 @@ import cf8 from '../assets/customer_feedback_8.mp4';
 import cf9 from '../assets/customer_feedback_9.mp4';
 import cf10 from '../assets/customer_feedback_10.mp4';
 import cf11 from '../assets/customer_feedback_11.mp4';
-import headerLogoVideo from '../assets/logo_new.mp4';
 import heroSectionHeader from '../assets/hero_section_header.mp4';
 import xLogo from '../assets/x_logo.svg';
 import instagramLogo from '../assets/instagram_logo.svg';
@@ -78,8 +75,6 @@ function useDragScroll(ref: React.RefObject<HTMLElement | null>) {
 }
 
 export default function LandingPage() {
-  const { totalItems } = useCart();
-  const { isAuthenticated } = useAuth();
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -275,43 +270,7 @@ export default function LandingPage() {
 
   return (
     <div className="app">
-      {/* Navigation Bar */}
-      <nav className="landing-nav">
-        <div className="nav-container">
-          <Link to="/" className="nav-logo" aria-label="Home: POST-kAR">
-            <video
-              className="nav-logo-video"
-              src={headerLogoVideo}
-              muted
-              loop
-              playsInline
-              autoPlay
-              onLoadedData={(e) => e.currentTarget.setAttribute('data-loaded', 'true')}
-            />
-          </Link>
-          <div className="nav-links">
-            <Link to="/free-experience" className="nav-link">Free Experience</Link>
-            <Link to="/products" className="nav-link">Products</Link>
-            <a href="/scanner/scan_mind.html" className="nav-link scanner-only" target="_blank" rel="noopener noreferrer">Scanner</a>
-            <Link to="/cart" className="nav-link nav-cart-link" style={{ display: 'none' }}>
-              <ShoppingCart size={20} />
-              {totalItems > 0 && (
-                <span className="cart-badge">{totalItems}</span>
-              )}
-            </Link>
-            <div style={{ display: 'none' }}>
-              {isAuthenticated ? (
-                <ProfileDropdown />
-              ) : (
-                <button className="nav-login-button" onClick={() => setIsAuthModalOpen(true)}>
-                  <LogIn size={16} />
-                  <span>Login</span>
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Top Image Slider */}
       <div className="image-strip">

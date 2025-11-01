@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Navigation from '../components/layout/Navigation';
 import ProductGrid from '../components/product/ProductGrid';
 import type { Product } from '../types';
-import ikaasFrame from '../assets/ikaas_frame.jpeg';
+import ikaasFrame from '../assets/ikaas_frame.jpg';
 
 export default function FreeExperiencePage() {
   const [open, setOpen] = useState(false);
@@ -53,21 +53,34 @@ export default function FreeExperiencePage() {
         <div className="products-header" style={{ marginBottom: 64, marginTop: 40 }}>
           <h1 className="products-title" style={{ color: '#ffffff' }}>Free Experience</h1>
         </div>
-        <ProductGrid
-          products={[freeExperienceProduct]}
-          loading={false}
-          onProductClick={() => setOpen(true)}
-          cardProps={{ hideCart: true }}
-        />
+        <div style={{ position: 'relative' }}>
+          <ProductGrid
+            products={[freeExperienceProduct]}
+            loading={false}
+            onProductClick={() => setOpen(true)}
+            cardProps={{ hideCart: true }}
+          />
+          {/* Transparent overlay to prevent marker detection in card */}
+          <div 
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'transparent',
+              zIndex: 1,
+              pointerEvents: 'none'
+            }}
+          />
+        </div>
         {open && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
             <button onClick={() => setOpen(false)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.15)', color: '#fff', border: 'none', width: 40, height: 40, borderRadius: 20, cursor: 'pointer' }}>×</button>
-            {/* Centered 7:12 container with only the image inside */}
+            {/* Fixed dimensions: 1029x1280 */}
             <div
               style={{
-                width: 'min(100vw, calc(100vh * (7/12)))',
-                height: 'min(100vh, calc(100vw * (12/7)))',
-                aspectRatio: '7 / 12',
+                width: '1029px',
+                height: '1280px',
+                maxWidth: '90vw',
+                maxHeight: '90vh',
                 position: 'relative',
               }}
             >

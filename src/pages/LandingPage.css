@@ -188,7 +188,7 @@ html, body {
 .services-grid .service-card { display: flex; flex-direction: column; justify-content: flex-start; transition: box-shadow .25s ease, transform .25s ease; }
 .services-grid .service-card:hover { 
   transform: translateY(-3px);
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.08), 0 12px 48px rgba(99,102,241,0.25), 0 4px 24px rgba(0,0,0,0.35);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.08), 0 12px 48px rgba(99,102,241,0.12), 0 4px 24px rgba(0,0,0,0.35);
 }
 .card-badge {
   align-self: flex-start;
@@ -963,7 +963,7 @@ a:focus-visible {
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none; /* Firefox */
-    padding: 1rem 0 1.5rem;
+    padding: 1rem 1.5rem 1.5rem 1.5rem;
   }
   
   /* Hide scrollbar (WebKit) */
@@ -987,7 +987,7 @@ a:focus-visible {
   .services-scroll .service-card:hover {
     transform: translateY(-3px);
     box-shadow: 0 0 0 2px rgba(255,255,255,0.08),
-                0 12px 48px rgba(99,102,241,0.25),
+                0 12px 48px rgba(99,102,241,0.12),
                 0 4px 24px rgba(0,0,0,0.35);
   }
 

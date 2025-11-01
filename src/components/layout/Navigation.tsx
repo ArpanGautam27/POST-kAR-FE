@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { LogIn, ShoppingCart } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
@@ -19,6 +19,44 @@ export const Navigation: React.FC<NavigationProps> = () => {
   const { totalItems } = useCart();
   const { isAuthenticated, isLoading } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleLoadedData = () => {
+      setVideoLoaded(true);
+      video.setAttribute('data-loaded', 'true');
+      // Ensure video plays after loading
+      video.play().catch(() => {
+        // Fallback: try playing again after a short delay
+        setTimeout(() => {
+          video.play().catch(() => {});
+        }, 100);
+      });
+    };
+
+    const handleCanPlay = () => {
+      if (!videoLoaded) {
+        video.play().catch(() => {});
+      }
+    };
+
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('canplay', handleCanPlay);
+
+    // Force load if video is already loaded
+    if (video.readyState >= 2) {
+      handleLoadedData();
+    }
+
+    return () => {
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('canplay', handleCanPlay);
+    };
+  }, [videoLoaded]);
 
   return (
     <>
@@ -26,13 +64,14 @@ export const Navigation: React.FC<NavigationProps> = () => {
         <div className="nav-container">
           <Link to="/" className="nav-logo" aria-label="Home: POST-kAR">
             <video
+              ref={videoRef}
               className="nav-logo-video"
               src={headerLogoVideo}
               muted
               loop
               playsInline
               autoPlay
-              onLoadedData={(e) => e.currentTarget.setAttribute('data-loaded', 'true')}
+              preload="metadata"
             />
           </Link>
           <div className="nav-links">

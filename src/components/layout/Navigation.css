@@ -40,12 +40,17 @@
   max-width: 150px;
   object-fit: contain;
   border-radius: 6px;
-  opacity: 0;
+  opacity: 0.8;
   transition: opacity 0.3s ease;
 }
 
 .nav-logo-video[data-loaded="true"] {
   opacity: 1;
+}
+
+/* Ensure video is visible even before loading completes */
+.nav-logo-video:not([data-loaded]) {
+  opacity: 0.6;
 }
 
 .nav-logo:hover {

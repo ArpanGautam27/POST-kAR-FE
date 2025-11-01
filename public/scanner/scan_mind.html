@@ -72,7 +72,7 @@
     <button id="start-button">🚀 Start AR Scanner</button>
 
     <a-scene 
-        mindar-image="imageTargetSrc: ./Igas1.mind;"
+        mindar-image="imageTargetSrc: ./IgasMarker.mind; filterMinCF: 0.0001; filterBeta: 0.001;"
         color-space="sRGB" 
         renderer="colorManagement: true, physicallyCorrectLights" 
         vr-mode-ui="enabled: false" 
@@ -97,10 +97,10 @@
             <a-plane 
                 id="video-plane"
                 position="0 0 0"
+                rotation="0 0 0"
                 width="1"
                 height="1"
-                rotation="0 0 0"
-                scale="0.95 0.95 1" 
+                scale="1 1.32 1"
                 material="shader: flat; src: #my-video; transparent: false; side: double;"
             ></a-plane>
         </a-entity>
@@ -109,39 +109,40 @@
     <script>
     // ✅ Custom component that properly scales the video slightly smaller than target
     AFRAME.registerComponent('video-fit', {
-      schema: {
-        target: { type: 'selector' },
-        scaleFactor: {type: 'number', default: 0.95}  // ~93% of original
-      },
-      init() {
-        this.video = this.data.target;
-        this.video.addEventListener('loadedmetadata', () => this.fitVideo());
-      },
-      fitVideo() {
-        const vid = this.video;
-        if (!vid.videoWidth || !vid.videoHeight) return;
+  schema: {
+    target: { type: 'selector' },
+    markerAspect: { type: 'number', default: 1.0 } // width / height of marker
+  },
+  init() {
+    const video = this.data.target;
+    if (!video) return;
+    video.addEventListener('loadedmetadata', () => this.adjustToAspect());
+  },
+  adjustToAspect() {
+    const video = this.data.target;
+    const plane = this.el;
 
-        const videoAspect = vid.videoWidth / vid.videoHeight;
-        const plane = this.el;
-        const planeWidth = plane.getAttribute('width');
-        const planeHeight = plane.getAttribute('height');
-        const planeAspect = planeWidth / planeHeight;
+    const videoAspect = video.videoWidth / video.videoHeight; // video ratio
+    const markerAspect = this.data.markerAspect;
 
-        let scaleX = 1, scaleY = 1;
+    let width = 1;
+    let height = 1;
 
-        if (videoAspect > planeAspect) {
-          scaleY = videoAspect / planeAspect;
-        } else if (videoAspect < planeAspect) {
-          scaleX = planeAspect / videoAspect;
-        }
+    // Case 1: video is wider than marker → fit width, crop height
+    if (videoAspect > markerAspect) {
+      height = markerAspect / videoAspect;
+    }
+    // Case 2: video is taller → fit height, crop width
+    else {
+      width = videoAspect / markerAspect;
+    }
 
-        // 👇 Apply your "slightly smaller" scaling here
-        const shrink = this.data.scaleFactor; 
-        plane.setAttribute('scale', `${scaleX * shrink} ${scaleY * shrink} 1`);
-        console.log(`🎥 Video scaled to ${Math.round(shrink * 100)}% of target area`);
-      }
-    });
+    plane.setAttribute('width', width);
+    plane.setAttribute('height', height);
 
+    console.log(`🎥 Adjusted plane to ${width.toFixed(3)} x ${height.toFixed(3)} | videoAspect=${videoAspect.toFixed(3)} markerAspect=${markerAspect}`);
+  }
+});
 
     // ===============================
     // Existing Scanner / Status Logic
