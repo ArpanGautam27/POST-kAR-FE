@@ -6,7 +6,7 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: './',
+  base: '/',
   plugins: [react(), basicSsl()],
   server: {
     host: true,  // expose on network (0.0.0.0)
