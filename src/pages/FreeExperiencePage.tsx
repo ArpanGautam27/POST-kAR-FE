@@ -3,6 +3,7 @@ import Navigation from '../components/layout/Navigation';
 import ProductGrid from '../components/product/ProductGrid';
 import type { Product } from '../types';
 import ikaasFrame from '../assets/ikaas_frame.jpg';
+import './FreeExperiencePage.css';
 
 export default function FreeExperiencePage() {
   const [open, setOpen] = useState(false);
@@ -33,8 +34,23 @@ export default function FreeExperiencePage() {
     if (!open) return;
     computeContainedBox();
     const onResize = () => computeContainedBox();
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpen(false);
+      }
+    };
+    
     window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    document.addEventListener('keydown', onKeyDown);
+    
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      window.removeEventListener('resize', onResize);
+      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = '';
+    };
   }, [open]);
   const freeExperienceProduct: Product = {
     id: 'free-exp',
@@ -62,8 +78,23 @@ export default function FreeExperiencePage() {
           />
         </div>
         {open && (
-          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
-            <button onClick={() => setOpen(false)} style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.15)', color: '#fff', border: 'none', width: 40, height: 40, borderRadius: 20, cursor: 'pointer' }}>×</button>
+          <div 
+            className="free-experience-modal"
+            onClick={(e) => {
+              // Close modal when clicking on backdrop
+              if (e.target === e.currentTarget) {
+                setOpen(false);
+              }
+            }}
+          >
+            <button 
+              className="free-experience-close-btn"
+              onClick={() => setOpen(false)}
+              aria-label="Close modal"
+              type="button"
+            >
+              ×
+            </button>
             {/* Fixed dimensions: 1029x1280 */}
             <div
               style={{
