@@ -569,14 +569,15 @@ html, body {
 .container {
   max-width: none;
   margin: 0 auto;
-  padding: 0 0.75rem;
+  padding: 0 2rem;
 }
 
 .footer-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 3rem;
   margin-bottom: 3rem;
+  justify-items: start;
 }
 
 .footer-col {
@@ -620,14 +621,15 @@ html, body {
 .footer-col-social {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
+  align-items: flex-start;
+  text-align: left;
+  justify-self: end;
 }
 
 .social-links {
   flex-direction: row;
   gap: 1.25rem;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .social-icon {

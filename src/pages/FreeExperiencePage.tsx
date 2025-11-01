@@ -60,16 +60,6 @@ export default function FreeExperiencePage() {
             onProductClick={() => setOpen(true)}
             cardProps={{ hideCart: true }}
           />
-          {/* Transparent overlay to prevent marker detection in card */}
-          <div 
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'transparent',
-              zIndex: 1,
-              pointerEvents: 'none'
-            }}
-          />
         </div>
         {open && (
           <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
