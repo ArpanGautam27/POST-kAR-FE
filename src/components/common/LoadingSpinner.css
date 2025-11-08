@@ -6,6 +6,13 @@
   padding: 2rem;
 }
 
+/* Ensure page-level spinners are centered in the viewport */
+.loading-spinner--medium,
+.loading-spinner--large {
+  /* Deduct approx header height (80px) to visually center */
+  min-height: calc(100vh - 80px);
+}
+
 .loading-spinner__circle {
   border: 3px solid #f3f3f3;
   border-top: 3px solid #007bff;

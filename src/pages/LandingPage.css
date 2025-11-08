@@ -25,6 +25,33 @@ html, body {
 }
 
 /* ============================================
+   MASCOT STYLES (NEW)
+   ============================================ */
+#mascot {
+  position: fixed;
+  bottom: 0px;
+  right: 20px;
+  width: 180px; /* Adjust size as needed */
+  height: 240px; /* Adjust size as needed */
+  z-index: 9999; /* Ensure it is on top of everything */
+  pointer-events: none; /* Make non-interactive */
+}
+@media (max-width: 768px) {
+  #mascot {
+    right: 12px;
+    width: 140px;
+    height: 188px;
+  }
+}
+@media (max-width: 480px) {
+  #mascot {
+    right: 8px;
+    width: 120px;
+    height: 160px;
+  }
+}
+
+/* ============================================
    MINIMAL LANDING (VERTICAL)
    ============================================ */
 .hero {

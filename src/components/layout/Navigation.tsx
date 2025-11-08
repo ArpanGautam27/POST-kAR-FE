@@ -7,6 +7,7 @@ import { AuthModal } from '../auth/AuthModal';
 import { ProfileDropdown } from '../auth/ProfileDropdown';
 import './Navigation.css';
 import headerLogoVideo from '../../assets/logo_new.mp4';
+import scannerButtonAnim from '../../assets/scanner_button.json?url';
 
 interface NavigationProps {}
 
@@ -77,7 +78,21 @@ export const Navigation: React.FC<NavigationProps> = () => {
           <div className="nav-links">
             <Link to="/free-experience" className="nav-link">Free Experience</Link>
             <Link to="/products" className="nav-link">Products</Link>
-            <a href="/scanner/scan_mind.html" className="nav-link scanner-only">Scanner</a>
+            <a href="/scanner/scan_mind.html" className="nav-link" aria-label="Scanner" title="Scanner">
+              {(() => {
+                const LottiePlayer = 'lottie-player' as any;
+                return (
+                  <LottiePlayer
+                    src={scannerButtonAnim}
+                    background="transparent"
+                    speed="1"
+                    loop
+                    autoplay
+                    style={{ width: 50, height: 50 }}
+                  />
+                );
+              })()}
+            </a>
             <Link to="/cart" className="nav-link nav-cart-link" style={{ display: 'none' }}>
               <ShoppingCart size={18} />
               {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}

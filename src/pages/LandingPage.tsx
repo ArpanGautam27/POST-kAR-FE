@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { AuthModal } from '../components/auth/AuthModal';
@@ -266,11 +268,111 @@ export default function LandingPage() {
     };
   }, [totalPanels]);
 
+  // --- CORRECTED MASCOT EFFECT ---
+  useEffect(() => {
+    let mixer: any;
+    let clock: any;
+    let renderer: any = null;
+    let camera: any = null;
+    let animationFrameId: number;
+    let handleResize: (() => void) | null = null;
+
+    const container = document.getElementById('mascot');
+    if (!container) return;
+    
+    // Build scene using local Three.js imports
+    const scene = new THREE.Scene();
+    scene.background = null;
+
+    camera = new THREE.PerspectiveCamera(30, container.clientWidth / container.clientHeight, 0.1, 100);
+    camera.position.set(0, 1.2, 3);
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    // Lighting
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
+    scene.add(hemi);
+    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+    dir.position.set(2, 3, 4);
+    scene.add(dir);
+
+    // GLTF Loader
+    const loader = new GLTFLoader();
+    const modelUrl = new URL('../assets/menaquin.glb', import.meta.url).href;
+    loader.load(modelUrl, (gltf: any) => {
+        const model = gltf.scene;
+        scene.add(model);
+
+        // Animation setup
+        mixer = new THREE.AnimationMixer(model);
+        const clips = gltf.animations;
+        const idleClip = THREE.AnimationClip.findByName(clips, 'mixamo.com') || clips[0];
+        const idleAction = mixer.clipAction(idleClip);
+        idleAction.play();
+
+        // Click interaction removed to keep mascot non-interactive
+    }, undefined, (error: any) => {
+        console.error('Failed to load mascot GLB:', error);
+    });
+
+    // Animation loop
+    clock = new THREE.Clock();
+    const animate = () => {
+        animationFrameId = requestAnimationFrame(animate);
+        if (renderer && camera) {
+            const delta = clock.getDelta();
+            if (mixer) mixer.update(delta);
+            renderer.render(scene, camera);
+        }
+    };
+    animate();
+
+    // Responsive resize handler
+    handleResize = () => {
+        if (camera && renderer && container) {
+            const w = container.clientWidth, h = container.clientHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+        }
+    };
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup function - this runs when component unmounts
+    return () => {
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        if (handleResize) window.removeEventListener('resize', handleResize);
+        if (renderer && container && container.contains(renderer.domElement)) {
+            container.removeChild(renderer.domElement);
+            renderer.dispose();
+        }
+    };
+
+  }, []); // Empty dependency array means this runs once on mount
+  // --- END CORRECTED MASCOT EFFECT ---
+
+
   const translateVW = -(scrollProgress * (totalPanels - 1) * 100);
 
   return (
     <div className="app">
       <Navigation />
+
+      {/* Minimal Hero Section: video only */}
+      <header className="hero hero--video-only" style={{ padding: 0 }}>
+        <video
+          className="hero-header-video"
+          src={heroSectionHeader}
+          muted
+          loop
+          playsInline
+          autoPlay
+          preload="auto"
+        />
+      </header>
 
       {/* Top Image Slider */}
       <div className="image-strip">
@@ -288,18 +390,6 @@ export default function LandingPage() {
           <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1495562569060-2eec283d3391?w=1200&q=80)` }} />
         </div>
       </div>
-
-      {/* Minimal Hero Section: video only */}
-      <header className="hero hero--video-only" style={{ padding: 0 }}>
-        <video
-          className="hero-header-video"
-          src={heroSectionHeader}
-          muted
-          loop
-          playsInline
-          autoPlay
-        />
-      </header>
       <header className="hero" style={{ display: 'none' }}>
         <div className="hero-inner">
           <h1 className="hero-title">post-kAR</h1>
@@ -674,6 +764,9 @@ export default function LandingPage() {
           </div>
         </div>
       )}
+
+      {/* === MASCOT CONTAINER === */}
+      <div id="mascot"></div>
 
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
