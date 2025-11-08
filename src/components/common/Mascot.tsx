@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import homeMascot from '../../assets/menaquin.glb?url';
 import productsMascot from '../../assets/product_page_mascot.glb?url';
 import freeMascot from '../../assets/free_page_mascot.glb?url';
+import dogLoader from '../../assets/happy_dog_loader.json?url';
 import './Mascot.css';
 
 interface MascotProps {
@@ -11,6 +12,7 @@ interface MascotProps {
 }
 
 export default function Mascot({ model = 'home' }: MascotProps) {
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     let mixer: any;
     let clock: any;
@@ -58,10 +60,12 @@ export default function Mascot({ model = 'home' }: MascotProps) {
           const idleClip = THREE.AnimationClip.findByName(clips, 'mixamo.com') || clips[0];
           const idleAction = mixer.clipAction(idleClip);
           idleAction.play();
+          setIsLoading(false);
         },
         undefined,
         (error: any) => {
           console.error('Failed to load mascot GLB:', error);
+          setIsLoading(false);
         }
       );
     };
@@ -106,5 +110,34 @@ export default function Mascot({ model = 'home' }: MascotProps) {
     };
   }, [model]);
 
-  return <div id="mascot" />;
+  return (
+    <div id="mascot">
+      {isLoading && (
+        <div style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '120px',
+          height: '120px',
+          pointerEvents: 'none',
+          zIndex: 1
+        }}>
+          {(() => {
+            const LottiePlayer = 'lottie-player' as any;
+            return (
+              <LottiePlayer
+                src={dogLoader}
+                background="transparent"
+                speed="1"
+                style={{ width: '100%', height: '100%' }}
+                loop
+                autoplay
+              />
+            );
+          })()}
+        </div>
+      )}
+    </div>
+  );
 }
