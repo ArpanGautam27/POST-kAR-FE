@@ -213,6 +213,9 @@ html, body {
   background: #fff;
   transform: translateY(0);
   transition: transform .25s ease, box-shadow .25s ease;
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 .card:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(0,0,0,.08); }
 
@@ -565,6 +568,10 @@ html, body {
   position: relative;
   overflow: hidden;
   border-radius: 2px;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .scroll-progress-fill {

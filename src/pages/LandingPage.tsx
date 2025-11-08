@@ -91,6 +91,9 @@ export default function LandingPage() {
   const feedbackVideos = [cf1, cf3, cf5, cf8, cf4, cf2, cf6, cf7, cf9, cf10, cf11];
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const [muted, setMuted] = useState<boolean[]>(() => feedbackVideos.map(() => true));
+  const [fullscreenVideo, setFullscreenVideo] = useState<{ src: string; index: number } | null>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const fullscreenVideoRef = useRef<HTMLVideoElement>(null);
 
   // Apply drag scroll to horizontal sections
   useDragScroll(spotlightRef);
@@ -362,6 +365,14 @@ export default function LandingPage() {
                       style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.55)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', width: 34, height: 34, borderRadius: 17, cursor: 'pointer', display: 'grid', placeItems: 'center', backdropFilter: 'blur(6px)' as any }}
                     >
                       {muted[idx] ? '🔇' : '🔊'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFullscreenVideo({ src, index: idx })}
+                      aria-label="Expand video"
+                      style={{ position: 'absolute', top: 8, right: 50, background: 'rgba(0,0,0,0.55)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', width: 34, height: 34, borderRadius: 17, cursor: 'pointer', display: 'grid', placeItems: 'center', backdropFilter: 'blur(6px)' as any, fontSize: '18px' }}
+                    >
+                      ⛶
                     </button>
                     <div style={{ position: 'absolute', left: 12, bottom: 12, background: 'rgba(0,0,0,0.6)', color: '#fff', padding: '6px 10px', borderRadius: 999, fontSize: 12 }}>#postkar</div>
                   </div>
@@ -866,6 +877,110 @@ export default function LandingPage() {
 
       {/* === MASCOT === */}
       <Mascot model="home" />
+
+      {/* Fullscreen Video Modal */}
+      {fullscreenVideo && (
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.95)',
+            zIndex: 10000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '1rem'
+          }}
+          onClick={() => setFullscreenVideo(null)}
+        >
+          <div style={{ position: 'relative', width: '100%', maxWidth: '800px', aspectRatio: '9/16' }} onClick={(e) => e.stopPropagation()}>
+            <video
+              ref={fullscreenVideoRef}
+              src={fullscreenVideo.src}
+              autoPlay
+              loop
+              playsInline
+              muted={muted[fullscreenVideo.index]}
+              style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '12px' }}
+            />
+            {/* Close button */}
+            <button
+              onClick={() => setFullscreenVideo(null)}
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'rgba(0,0,0,0.7)',
+                color: '#fff',
+                border: 'none',
+                width: '40px',
+                height: '40px',
+                borderRadius: '20px',
+                cursor: 'pointer',
+                fontSize: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              ×
+            </button>
+            {/* Mute button - bottom right */}
+            <button
+              onClick={() => toggleMute(fullscreenVideo.index)}
+              style={{
+                position: 'absolute',
+                bottom: '1rem',
+                right: '1rem',
+                background: 'rgba(0,0,0,0.7)',
+                color: '#fff',
+                border: 'none',
+                width: '40px',
+                height: '40px',
+                borderRadius: '20px',
+                cursor: 'pointer',
+                fontSize: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {muted[fullscreenVideo.index] ? '🔇' : '🔊'}
+            </button>
+            {/* Play/Pause button - above mute button */}
+            <button
+              onClick={() => {
+                if (fullscreenVideoRef.current) {
+                  if (isPlaying) {
+                    fullscreenVideoRef.current.pause();
+                  } else {
+                    fullscreenVideoRef.current.play();
+                  }
+                  setIsPlaying(!isPlaying);
+                }
+              }}
+              style={{
+                position: 'absolute',
+                bottom: '4rem',
+                right: '1rem',
+                background: 'rgba(0,0,0,0.7)',
+                color: '#fff',
+                border: 'none',
+                width: '50px',
+                height: '50px',
+                borderRadius: '25px',
+                cursor: 'pointer',
+                fontSize: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {isPlaying ? '⏸' : '▶'}
+            </button>
+          </div>
+        </div>
+      )}
 
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>

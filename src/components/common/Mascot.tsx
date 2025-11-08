@@ -18,6 +18,7 @@ export default function Mascot({ model = 'home' }: MascotProps) {
     let camera: any = null;
     let animationFrameId: number;
     let handleResize: (() => void) | null = null;
+    let loadTimeout: any;
 
     const container = document.getElementById('mascot');
     if (!container) return;
@@ -39,28 +40,38 @@ export default function Mascot({ model = 'home' }: MascotProps) {
     dir.position.set(2, 3, 4);
     scene.add(dir);
 
-    const loader = new GLTFLoader();
-    const modelUrl = model === 'free'
-      ? freeMascot
-      : model === 'products'
-        ? productsMascot
-        : homeMascot;
-    loader.load(
-      modelUrl,
-      (gltf: any) => {
-        const model = gltf.scene;
-        scene.add(model);
-        mixer = new THREE.AnimationMixer(model);
-        const clips = gltf.animations;
-        const idleClip = THREE.AnimationClip.findByName(clips, 'mixamo.com') || clips[0];
-        const idleAction = mixer.clipAction(idleClip);
-        idleAction.play();
-      },
-      undefined,
-      (error: any) => {
-        console.error('Failed to load mascot GLB:', error);
-      }
-    );
+    // Defer model loading to not block scrolling
+    const loadModel = () => {
+      const loader = new GLTFLoader();
+      const modelUrl = model === 'free'
+        ? freeMascot
+        : model === 'products'
+          ? productsMascot
+          : homeMascot;
+      loader.load(
+        modelUrl,
+        (gltf: any) => {
+          const model = gltf.scene;
+          scene.add(model);
+          mixer = new THREE.AnimationMixer(model);
+          const clips = gltf.animations;
+          const idleClip = THREE.AnimationClip.findByName(clips, 'mixamo.com') || clips[0];
+          const idleAction = mixer.clipAction(idleClip);
+          idleAction.play();
+        },
+        undefined,
+        (error: any) => {
+          console.error('Failed to load mascot GLB:', error);
+        }
+      );
+    };
+
+    // Use requestIdleCallback if available, otherwise setTimeout
+    if ('requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(loadModel, { timeout: 2000 });
+    } else {
+      loadTimeout = setTimeout(loadModel, 100);
+    }
 
     clock = new THREE.Clock();
     const animate = () => {
@@ -86,6 +97,7 @@ export default function Mascot({ model = 'home' }: MascotProps) {
 
     return () => {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
+      if (loadTimeout) clearTimeout(loadTimeout);
       if (handleResize) window.removeEventListener('resize', handleResize);
       if (renderer && container && container.contains(renderer.domElement)) {
         container.removeChild(renderer.domElement);
