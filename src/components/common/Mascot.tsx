@@ -1,9 +1,16 @@
 import { useEffect } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import homeMascot from '../../assets/menaquin.glb?url';
+import productsMascot from '../../assets/product_page_mascot.glb?url';
+import freeMascot from '../../assets/free_page_mascot.glb?url';
 import './Mascot.css';
 
-export default function Mascot() {
+interface MascotProps {
+  model?: 'home' | 'products' | 'free';
+}
+
+export default function Mascot({ model = 'home' }: MascotProps) {
   useEffect(() => {
     let mixer: any;
     let clock: any;
@@ -33,7 +40,11 @@ export default function Mascot() {
     scene.add(dir);
 
     const loader = new GLTFLoader();
-    const modelUrl = new URL('../../assets/menaquin.glb', import.meta.url).href;
+    const modelUrl = model === 'free'
+      ? freeMascot
+      : model === 'products'
+        ? productsMascot
+        : homeMascot;
     loader.load(
       modelUrl,
       (gltf: any) => {
@@ -81,7 +92,7 @@ export default function Mascot() {
         renderer.dispose();
       }
     };
-  }, []);
+  }, [model]);
 
   return <div id="mascot" />;
 }

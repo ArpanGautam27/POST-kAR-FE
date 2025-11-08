@@ -85,6 +85,20 @@ html, body {
   object-position: center center; /* always center the content */
   background: #000; /* ensure letterboxing looks intentional */
 }
+.hero--video-only::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  pointer-events: none;
+  background: linear-gradient(180deg,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0.15) 30%,
+    rgba(0,0,0,0.45) 65%,
+    rgba(0,0,0,0.9) 100%);
+}
 @media (max-width: 768px) {
   .hero--video-only {
     margin-top: 70px; /* ensure video is not hidden behind navbar on mobile */
@@ -636,8 +650,17 @@ html, body {
 
 .footer-link-with-icon {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
+}
+.footer-link-with-icon svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  margin-top: 2px;
+}
+.footer-link-with-icon span {
+  line-height: 1.6;
 }
 
 .footer-links a:hover {
@@ -681,6 +704,48 @@ html, body {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.9rem;
+}
+
+.footer-bottom-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-made-with {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  justify-content: center;
+}
+
+.footer-copyright {
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .footer-bottom-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    position: relative;
+  }
+  
+  .footer-made-with {
+    position: static;
+    transform: none;
+    order: 1;
+  }
+  
+  .footer-copyright {
+    text-align: left;
+    order: -1;
+  }
 }
 
 /* ============================================
@@ -993,7 +1058,7 @@ a:focus-visible {
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none; /* Firefox */
-    padding: 1rem 1.5rem 1.5rem 1.5rem;
+    padding: 1rem 0 1.5rem 0;
   }
   
   /* Hide scrollbar (WebKit) */
@@ -1001,24 +1066,120 @@ a:focus-visible {
     display: none;
   }
   
-  /* Card sizing */
+  /* Card sizing - Desktop: 4 cards visible */
   .services-scroll .service-card {
-    flex: 0 0 calc((100% - 3 * 16px) / 4);
+    flex: 0 0 calc((100% - 4.5rem) / 4);
     scroll-snap-align: start;
     transition: box-shadow 0.25s ease, transform 0.25s ease;
   }
+  
+  /* First card left padding */
+  .services-scroll .service-card:first-child {
+    margin-left: 1.5rem;
+  }
+  
+  /* Last card right padding */
+  .services-scroll .service-card:last-child {
+    margin-right: 1.5rem;
+  }
+  
   @media (max-width: 768px) {
+    .services-scroll {
+      flex-direction: column;
+      overflow-x: visible;
+      scroll-snap-type: none;
+      padding: 1rem 0;
+      gap: 1rem;
+    }
+    
     .services-scroll .service-card {
-      flex: 0 0 calc((100% - 2 * 12px) / 3);
+      flex: 1 1 auto;
+      width: 100%;
+      scroll-snap-align: none;
+    }
+    
+    .services-scroll .service-card:first-child,
+    .services-scroll .service-card:last-child {
+      margin-left: 0;
+      margin-right: 0;
     }
   }
   
-  /* Hover glow effect */
-  .services-scroll .service-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.08),
-                0 12px 48px rgba(99,102,241,0.12),
-                0 4px 24px rgba(0,0,0,0.35);
+  /* Border-only style with quote marks */
+  .services-scroll .service-card {
+    position: relative;
+    box-shadow: none !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 16px;
+    overflow: visible;
+  }
+  .services-scroll .service-card:hover { transform: translateY(-2px); }
+  
+  /* Border frame with gaps at top-right and bottom-left */
+  .services-scroll .service-card::before {
+    --gap: 44px;
+    --line: rgba(255,255,255,0.95);
+    --thickness: 2px;
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    pointer-events: none;
+    background:
+      linear-gradient(var(--line),var(--line)) top left / calc(100% - var(--gap)) var(--thickness) no-repeat,
+      linear-gradient(var(--line),var(--line)) bottom right / calc(100% - var(--gap)) var(--thickness) no-repeat,
+      linear-gradient(var(--line),var(--line)) top left / var(--thickness) calc(100% - var(--gap)) no-repeat,
+      linear-gradient(var(--line),var(--line)) bottom right / var(--thickness) calc(100% - var(--gap)) no-repeat;
+  }
+  
+  /* Top-right quote - positioned outside at corner */
+  .services-scroll .service-card::after {
+    content: "";
+    position: absolute;
+    right: -8px;
+    top: -8px;
+    width: 32px;
+    height: 32px;
+    background-image: url("../assets/top_right_quote.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: brightness(0) invert(1);
+  }
+  
+  .services-scroll .service-card .card-body {
+    position: relative;
+    padding: 1.5rem 1.5rem 2rem 1.5rem;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  @media (max-width: 768px) {
+    .services-scroll .service-card .card-body {
+      padding: 1rem 1rem 1.5rem 1rem;
+      min-height: 100px;
+    }
+  }
+  
+  /* Bottom-left quote - positioned at card's bottom-left corner */
+  .services-scroll .service-card .card-body::after {
+    content: "";
+    position: absolute;
+    left: -8px;
+    bottom: -8px;
+    width: 32px;
+    height: 32px;
+    background-image: url("../assets/bottom_left_quote.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: brightness(0) invert(1);
+    transform: translate(-1.5rem, calc(100% ));
   }
 
 /* ============================================

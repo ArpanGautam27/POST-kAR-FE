@@ -55,7 +55,7 @@ export default function FreeExperiencePage() {
   }, [open]);
   const freeExperienceProduct: Product = {
     id: 'free-exp',
-    name: 'Free Experience',
+    name: 'Freeverse',
     description: 'Try a sample AR experience for free',
     thumbnail_url: ikaasFrame,
     image_url: ikaasFrame,
@@ -68,7 +68,7 @@ export default function FreeExperiencePage() {
       <Navigation />
       <div className="products-container" style={{ paddingTop: 80 }}>
         <div className="products-header" style={{ marginBottom: 64, marginTop: 40 }}>
-          <h1 className="products-title" style={{ color: '#ffffff' }}>Free Experience</h1>
+          <h1 className="products-title" style={{ color: '#ffffff' }}>Freeverse</h1>
         </div>
         <div style={{ position: 'relative' }}>
           <ProductGrid
@@ -152,7 +152,7 @@ export default function FreeExperiencePage() {
           </div>
         )}
       </div>
-      <Mascot />
+      <Mascot model="free" />
     </div>
   );
 }

@@ -1,6 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { AuthModal } from '../components/auth/AuthModal';
@@ -22,9 +20,12 @@ import cf9 from '../assets/customer_feedback_9.mp4';
 import cf10 from '../assets/customer_feedback_10.mp4';
 import cf11 from '../assets/customer_feedback_11.mp4';
 import heroSectionHeader from '../assets/hero_section_header.mp4';
+import Mascot from '../components/common/Mascot';
 import xLogo from '../assets/x_logo.svg';
 import instagramLogo from '../assets/instagram_logo.svg';
 import linkedinLogo from '../assets/linkedin_logo.svg';
+import lovePng from '../assets/love.png';
+import indianFlagAnim from '../assets/indian_flag.json?url';
 import './LandingPage.css';
 
 // Simple drag-to-scroll hook
@@ -268,91 +269,6 @@ export default function LandingPage() {
     };
   }, [totalPanels]);
 
-  // --- CORRECTED MASCOT EFFECT ---
-  useEffect(() => {
-    let mixer: any;
-    let clock: any;
-    let renderer: any = null;
-    let camera: any = null;
-    let animationFrameId: number;
-    let handleResize: (() => void) | null = null;
-
-    const container = document.getElementById('mascot');
-    if (!container) return;
-    
-    // Build scene using local Three.js imports
-    const scene = new THREE.Scene();
-    scene.background = null;
-
-    camera = new THREE.PerspectiveCamera(30, container.clientWidth / container.clientHeight, 0.1, 100);
-    camera.position.set(0, 1.2, 3);
-
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(container.clientWidth, container.clientHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    container.appendChild(renderer.domElement);
-
-    // Lighting
-    const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1.2);
-    scene.add(hemi);
-    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
-    dir.position.set(2, 3, 4);
-    scene.add(dir);
-
-    // GLTF Loader
-    const loader = new GLTFLoader();
-    const modelUrl = new URL('../assets/menaquin.glb', import.meta.url).href;
-    loader.load(modelUrl, (gltf: any) => {
-        const model = gltf.scene;
-        scene.add(model);
-
-        // Animation setup
-        mixer = new THREE.AnimationMixer(model);
-        const clips = gltf.animations;
-        const idleClip = THREE.AnimationClip.findByName(clips, 'mixamo.com') || clips[0];
-        const idleAction = mixer.clipAction(idleClip);
-        idleAction.play();
-
-        // Click interaction removed to keep mascot non-interactive
-    }, undefined, (error: any) => {
-        console.error('Failed to load mascot GLB:', error);
-    });
-
-    // Animation loop
-    clock = new THREE.Clock();
-    const animate = () => {
-        animationFrameId = requestAnimationFrame(animate);
-        if (renderer && camera) {
-            const delta = clock.getDelta();
-            if (mixer) mixer.update(delta);
-            renderer.render(scene, camera);
-        }
-    };
-    animate();
-
-    // Responsive resize handler
-    handleResize = () => {
-        if (camera && renderer && container) {
-            const w = container.clientWidth, h = container.clientHeight;
-            camera.aspect = w / h;
-            camera.updateProjectionMatrix();
-            renderer.setSize(w, h);
-        }
-    };
-    window.addEventListener('resize', handleResize);
-
-    // Cleanup function - this runs when component unmounts
-    return () => {
-        if (animationFrameId) cancelAnimationFrame(animationFrameId);
-        if (handleResize) window.removeEventListener('resize', handleResize);
-        if (renderer && container && container.contains(renderer.domElement)) {
-            container.removeChild(renderer.domElement);
-            renderer.dispose();
-        }
-    };
-
-  }, []); // Empty dependency array means this runs once on mount
-  // --- END CORRECTED MASCOT EFFECT ---
 
 
   const translateVW = -(scrollProgress * (totalPanels - 1) * 100);
@@ -501,10 +417,12 @@ export default function LandingPage() {
           {
             title: 'Creator Tools',
             meta: 'Upload artworks and publish AR layers',
+            comingSoon: true,
           },
           {
             title: 'Mobile App',
             meta: 'Native app for scanning & collectibles',
+            comingSoon: true,
           },
           {
             title: 'Virtual Tours',
@@ -519,14 +437,26 @@ export default function LandingPage() {
             key={i}
             className="card service-card"
             style={{
-              background: 'rgba(255,255,255,0.06)',
+              background: 'transparent',
               border: 'none',
-              borderRadius: 12,
+              borderRadius: 16,
               flex: '0 0 auto',
             }}
           >
             <div className="card-body">
-              <h3 className="card-title">{service.title}</h3>
+              <h3 className="card-title">
+                {service.title}
+                {service.comingSoon && (
+                  <span style={{ 
+                    fontSize: '0.7rem', 
+                    marginLeft: '0.5rem', 
+                    color: 'rgba(255,255,255,0.6)',
+                    fontWeight: 400 
+                  }}>
+                    (Coming Soon)
+                  </span>
+                )}
+              </h3>
               <p className="card-meta">{service.meta}</p>
             </div>
           </div>
@@ -536,7 +466,154 @@ export default function LandingPage() {
   </div>
 </section>
 
+{/* Join Our Growing Community Section */}
+<section className="section section-community reveal in" style={{ padding: '4rem 0' }}>
+  <div className="container">
+    <div
+      className="card"
+      style={{
+        background: 'rgba(255,255,255,0.08)',
+        border: 'none',
+        borderRadius: 12,
+        padding: '3rem 2rem',
+        textAlign: 'center',
+      }}
+    >
+      <h2 style={{ 
+        fontSize: 'clamp(2rem, 4vw, 2.5rem)', 
+        fontWeight: 700, 
+        marginBottom: '1rem',
+        color: '#fff'
+      }}>
+        Join Our Growing Community
+      </h2>
+      <p style={{ 
+        fontSize: 'clamp(1rem, 2vw, 1.1rem)', 
+        color: 'rgba(255,255,255,0.7)',
+        marginBottom: '3rem',
+        maxWidth: '600px',
+        margin: '0 auto 3rem'
+      }}>
+        A little luxury never hurts anyone
+      </p>
 
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+        gap: '1.5rem',
+        marginBottom: '2rem',
+        maxWidth: '800px',
+        margin: '0 auto 2rem'
+      }}>
+        <div style={{
+          background: 'rgba(255,255,255,0.05)',
+          borderRadius: '12px',
+          padding: '2rem 1.5rem',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <div style={{ 
+            width: '48px', 
+            height: '48px', 
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 1rem',
+            fontSize: '1.5rem'
+          }}>
+            👁️
+          </div>
+          <div style={{ 
+            fontSize: '2.5rem', 
+            fontWeight: 700, 
+            color: '#fff',
+            marginBottom: '0.5rem'
+          }}>
+            635
+          </div>
+          <div style={{ 
+            fontSize: '0.9rem', 
+            color: 'rgba(255,255,255,0.6)',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+          }}>
+            Total Visits
+          </div>
+        </div>
+
+        <div style={{
+          background: 'rgba(255,255,255,0.05)',
+          borderRadius: '12px',
+          padding: '2rem 1.5rem',
+          border: '1px solid rgba(255,255,255,0.1)'
+        }}>
+          <div style={{ 
+            width: '48px', 
+            height: '48px', 
+            borderRadius: '50%',
+            background: 'rgba(255,255,255,0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            margin: '0 auto 1rem',
+            fontSize: '1.5rem'
+          }}>
+            👥
+          </div>
+          <div style={{ 
+            fontSize: '2.5rem', 
+            fontWeight: 700, 
+            color: '#fff',
+            marginBottom: '0.5rem'
+          }}>
+            1
+          </div>
+          <div style={{ 
+            fontSize: '0.9rem', 
+            color: 'rgba(255,255,255,0.6)',
+            textTransform: 'uppercase',
+            letterSpacing: '1px'
+          }}>
+            Active Now
+          </div>
+        </div>
+      </div>
+
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        gap: '0.5rem',
+        color: 'rgba(255,255,255,0.5)',
+        fontSize: '0.85rem',
+        marginBottom: '1rem'
+      }}>
+        <span style={{ 
+          width: '8px', 
+          height: '8px', 
+          borderRadius: '50%',
+          background: '#4ade80',
+          display: 'inline-block'
+        }} />
+        Live tracking • Updated in real-time
+      </div>
+
+      <button 
+        onClick={() => setIsAuthModalOpen(true)}
+        className="submit-btn"
+        style={{ 
+          padding: '1rem 2.5rem',
+          fontSize: '1rem',
+          fontWeight: 600,
+          marginTop: '1rem'
+        }}
+      >
+        Join Waitlist
+      </button>
+    </div>
+  </div>
+</section>
 
 
       {/* Reviews removed as requested */}
@@ -704,7 +781,29 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="footer-bottom">
-            &copy; 2025 NitiNex Studio. All rights reserved.
+            <div className="footer-bottom-content">
+              <div className="footer-made-with">
+                <span>Made with</span>
+                <img src={lovePng} alt="love" style={{ width: '16px', height: '16px', display: 'inline-block', verticalAlign: 'middle' }} />
+                <span>from</span>
+                {(() => {
+                  const LottiePlayer = 'lottie-player' as any;
+                  return (
+                    <LottiePlayer
+                      src={indianFlagAnim}
+                      background="transparent"
+                      speed="1"
+                      style={{ width: '24px', height: '24px', display: 'inline-block', verticalAlign: 'middle' }}
+                      loop
+                      autoplay
+                    />
+                  );
+                })()}
+              </div>
+              <div className="footer-copyright">
+                &copy; 2025 NitiNex Studio. All rights reserved.
+              </div>
+            </div>
           </div>
         </div>
       </footer>
@@ -765,8 +864,8 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* === MASCOT CONTAINER === */}
-      <div id="mascot"></div>
+      {/* === MASCOT === */}
+      <Mascot model="home" />
 
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>

@@ -92,7 +92,7 @@ export default function ProductsPage() {
           />
         </div>
       </div>
-      <Mascot />
+      <Mascot model="products" />
     </div>
   );
 }

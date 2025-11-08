@@ -76,7 +76,7 @@ export const Navigation: React.FC<NavigationProps> = () => {
             />
           </Link>
           <div className="nav-links">
-            <Link to="/free-experience" className="nav-link">Free Experience</Link>
+            <Link to="/free-experience" className="nav-link">Freeverse</Link>
             <Link to="/products" className="nav-link">Products</Link>
             <a href="/scanner/scan_mind.html" className="nav-link" aria-label="Scanner" title="Scanner">
               {(() => {
