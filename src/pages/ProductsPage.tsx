@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import Navigation from '../components/layout/Navigation';
+import Mascot from '../components/common/Mascot';
 import ProductGrid from '../components/product/ProductGrid';
 import { ProductService } from '../services/ProductService';
 import { MockProductService } from '../services/MockProductService';
@@ -91,6 +92,7 @@ export default function ProductsPage() {
           />
         </div>
       </div>
+      <Mascot />
     </div>
   );
 }

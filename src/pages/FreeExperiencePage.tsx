@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Navigation from '../components/layout/Navigation';
+import Mascot from '../components/common/Mascot';
 import ProductGrid from '../components/product/ProductGrid';
 import type { Product } from '../types';
 import ikaasFrame from '../assets/ikaas_frame.jpg';
@@ -151,6 +152,7 @@ export default function FreeExperiencePage() {
           </div>
         )}
       </div>
+      <Mascot />
     </div>
   );
 }
