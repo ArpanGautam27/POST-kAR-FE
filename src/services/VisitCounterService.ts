@@ -21,6 +21,9 @@ export interface RecordVisitResponse {
   sessionId?: string;
 }
 
+// Global flag to prevent multiple initializations across all instances
+let globalIsInitialized = false;
+
 class VisitCounterService {
   private baseURL: string;
   private sessionId: string | null = null;
@@ -77,6 +80,8 @@ class VisitCounterService {
     try {
       const url = `${this.baseURL}/api/visits/record`;
       
+      console.log('🔵 Recording visit with sessionId:', this.sessionId);
+      
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -113,13 +118,30 @@ class VisitCounterService {
    * @param callback - Optional callback to receive stats updates
    */
   startPeriodicSync(callback?: (stats: VisitStats) => void): void {
+    // Prevent duplicate initialization using GLOBAL flag
+    if (globalIsInitialized) {
+      console.log('⚠️ Visit counter already initialized, skipping...');
+      if (callback) {
+        this.listeners.add(callback);
+      }
+      return;
+    }
+
+    console.log('✅ Initializing visit counter service...');
+
+    // Mark as initialized FIRST to prevent race conditions
+    globalIsInitialized = true;
+
     // Add callback to listeners if provided
     if (callback) {
       this.listeners.add(callback);
     }
 
-    // Clear existing interval if any
-    this.stopPeriodicSync();
+    // Clear existing interval if any (but don't reset isInitialized)
+    if (this.syncInterval !== null) {
+      clearInterval(this.syncInterval);
+      this.syncInterval = null;
+    }
 
     // Record initial visit
     this.recordVisit().catch(console.error);
@@ -141,6 +163,7 @@ class VisitCounterService {
       clearInterval(this.syncInterval);
       this.syncInterval = null;
     }
+    globalIsInitialized = false;
   }
 
   /**
@@ -221,13 +244,30 @@ class VisitCounterService {
    * @param callback - Optional callback to receive stats updates
    */
   startPeriodicSyncMock(callback?: (stats: VisitStats) => void): void {
+    // Prevent duplicate initialization using GLOBAL flag
+    if (globalIsInitialized) {
+      console.log('⚠️ Visit counter already initialized (mock), skipping...');
+      if (callback) {
+        this.listeners.add(callback);
+      }
+      return;
+    }
+
+    console.log('✅ Initializing visit counter service (mock)...');
+
+    // Mark as initialized FIRST to prevent race conditions
+    globalIsInitialized = true;
+
     // Add callback to listeners if provided
     if (callback) {
       this.listeners.add(callback);
     }
 
-    // Clear existing interval if any
-    this.stopPeriodicSync();
+    // Clear existing interval if any (but don't reset isInitialized)
+    if (this.syncInterval !== null) {
+      clearInterval(this.syncInterval);
+      this.syncInterval = null;
+    }
 
     // Record initial visit
     this.recordVisitMock().catch(console.error);

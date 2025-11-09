@@ -282,15 +282,67 @@ The backend should:
    - `lastUpdated`: Current timestamp
 
 #### Example Implementation
+
+**IMPORTANT: Backend must handle duplicate sessionIds properly!**
+
 ```java
-public VisitStats getStats() {
-    long totalVisits = visitRepository.count();
+@Service
+public class VisitService {
     
-    // Active users: sessions active in last 5 minutes
-    Date fiveMinutesAgo = new Date(System.currentTimeMillis() - 5 * 60 * 1000);
-    long activeNow = visitRepository.countByLastActivityAfter(fiveMinutesAgo);
+    @Autowired
+    private VisitRepository visitRepository;
     
-    return new VisitStats(totalVisits, activeNow, new Date());
+    /**
+     * Record or update a visit
+     * If sessionId exists, update lastActivity timestamp
+     * If sessionId is null or doesn't exist, create new visit
+     */
+    public RecordVisitResponse recordVisit(RecordVisitRequest request) {
+        String sessionId = request.getSessionId();
+        
+        Visit visit;
+        if (sessionId != null && !sessionId.isEmpty()) {
+            // Try to find existing session
+            Optional<Visit> existingVisit = visitRepository.findBySessionId(sessionId);
+            if (existingVisit.isPresent()) {
+                // UPDATE existing visit - don't create duplicate
+                visit = existingVisit.get();
+                visit.setLastActivity(new Date());
+                visitRepository.save(visit);
+                
+                return new RecordVisitResponse(true, "Visit updated", sessionId);
+            }
+        }
+        
+        // CREATE new visit
+        visit = new Visit();
+        visit.setSessionId(UUID.randomUUID().toString());
+        visit.setTimestamp(new Date());
+        visit.setLastActivity(new Date());
+        visit.setIpAddress(request.getIpAddress());
+        visit.setUserAgent(request.getUserAgent());
+        visitRepository.save(visit);
+        
+        return new RecordVisitResponse(true, "Visit recorded", visit.getSessionId());
+    }
+    
+    public VisitStats getStats() {
+        long totalVisits = visitRepository.count();
+        
+        // Active users: sessions active in last 5 minutes
+        Date fiveMinutesAgo = new Date(System.currentTimeMillis() - 5 * 60 * 1000);
+        long activeNow = visitRepository.countByLastActivityAfter(fiveMinutesAgo);
+        
+        return new VisitStats(totalVisits, activeNow, new Date());
+    }
+}
+```
+
+**Repository:**
+```java
+public interface VisitRepository extends MongoRepository<Visit, String> {
+    Optional<Visit> findBySessionId(String sessionId);
+    long countByLastActivityAfter(Date date);
 }
 ```
 

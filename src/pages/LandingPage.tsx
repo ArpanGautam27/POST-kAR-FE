@@ -204,41 +204,59 @@ export default function LandingPage() {
   const productService = config.enableMockData ? MockProductService.getInstance() : ProductService.getInstance();
 
   useEffect(() => {
+    let isMounted = true;
+
     // Load first 6 products for the home page (featured products)
     (async () => {
       try {
         setLoadingProducts(true);
         let data = await productService.getProducts();
         // Always show first 6 products as featured on landing page
-        setProducts(Array.isArray(data) ? data.slice(0, 6) : []);
+        if (isMounted) {
+          setProducts(Array.isArray(data) ? data.slice(0, 6) : []);
+        }
       } catch (e) {
         if (config.enableMockData) {
           const mock = MockProductService.getInstance();
           const data = await mock.getProducts();
           // Always show first 6 products as featured on landing page
-          setProducts(Array.isArray(data) ? data.slice(0, 6) : []);
+          if (isMounted) {
+            setProducts(Array.isArray(data) ? data.slice(0, 6) : []);
+          }
         } else {
-          setProducts([]);
+          if (isMounted) {
+            setProducts([]);
+          }
         }
       } finally {
-        setLoadingProducts(false);
+        if (isMounted) {
+          setLoadingProducts(false);
+        }
       }
     })();
 
     // Start visit counter periodic sync
     if (config.enableMockData) {
       visitCounterService.startPeriodicSyncMock((stats) => {
-        setVisitStats(stats);
+        if (isMounted) {
+          setVisitStats(stats);
+        }
       });
     } else {
       visitCounterService.startPeriodicSync((stats) => {
-        setVisitStats(stats);
+        if (isMounted) {
+          setVisitStats(stats);
+        }
       });
     }
 
-    // Cleanup on unmount
+    // Cleanup on unmount - DON'T stop the service in development (Strict Mode)
     return () => {
-      visitCounterService.stopPeriodicSync();
+      isMounted = false;
+      // Only stop in production or when actually unmounting
+      if (!config.isDevelopment) {
+        visitCounterService.stopPeriodicSync();
+      }
     };
     // Reveal-on-scroll animations
     const io = new IntersectionObserver(
