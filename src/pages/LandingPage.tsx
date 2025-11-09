@@ -6,6 +6,8 @@ import Navigation from '../components/layout/Navigation';
 import ProductGrid from '../components/product/ProductGrid';
 import { ProductService } from '../services/ProductService';
 import { MockProductService } from '../services/MockProductService';
+import { visitCounterService } from '../services/VisitCounterService';
+import type { VisitStats } from '../services/VisitCounterService';
 import { config } from '../config/environment';
 import type { Product } from '../types';
 import cf1 from '../assets/customer_feedback_1.mp4';
@@ -81,6 +83,11 @@ export default function LandingPage() {
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [visitStats, setVisitStats] = useState<VisitStats>({
+    totalVisits: 635,
+    activeNow: 1,
+    lastUpdated: new Date().toISOString()
+  });
   
   // Cinematic scroll states
   const containerRef = useRef(null);
@@ -217,6 +224,22 @@ export default function LandingPage() {
         setLoadingProducts(false);
       }
     })();
+
+    // Start visit counter periodic sync
+    if (config.enableMockData) {
+      visitCounterService.startPeriodicSyncMock((stats) => {
+        setVisitStats(stats);
+      });
+    } else {
+      visitCounterService.startPeriodicSync((stats) => {
+        setVisitStats(stats);
+      });
+    }
+
+    // Cleanup on unmount
+    return () => {
+      visitCounterService.stopPeriodicSync();
+    };
     // Reveal-on-scroll animations
     const io = new IntersectionObserver(
       (entries) => {
@@ -266,10 +289,13 @@ export default function LandingPage() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-    return () => {
+    
+    const cleanupScroll = () => {
       window.removeEventListener('scroll', handleScroll);
       io.disconnect();
     };
+    
+    return cleanupScroll;
   }, [totalPanels]);
 
 
@@ -541,7 +567,7 @@ export default function LandingPage() {
             color: '#fff',
             marginBottom: '0.5rem'
           }}>
-            635
+            {visitStats.totalVisits.toLocaleString()}
           </div>
           <div style={{ 
             fontSize: '0.9rem', 
@@ -578,7 +604,7 @@ export default function LandingPage() {
             color: '#fff',
             marginBottom: '0.5rem'
           }}>
-            1
+            {visitStats.activeNow}
           </div>
           <div style={{ 
             fontSize: '0.9rem', 

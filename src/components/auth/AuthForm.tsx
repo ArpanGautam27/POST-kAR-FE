@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Loader2, Phone, KeyRound } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { authService } from '../../services/AuthService';
+import { waitlistService } from '../../services/WaitlistService';
+import { config } from '../../config/environment';
 
 interface AuthFormProps {
   onSuccess: () => void;
@@ -87,6 +89,19 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
 
       if (response.success && response.token && response.user) {
         login(response.token, response.user);
+        
+        // Join waitlist after successful authentication
+        try {
+          if (config.enableMockData) {
+            await waitlistService.joinMock({ mobileNumber });
+          } else {
+            await waitlistService.join({ mobileNumber });
+          }
+        } catch (waitlistError) {
+          // Log error but don't block the flow
+          console.error('Failed to join waitlist:', waitlistError);
+        }
+        
         onSuccess();
       } else {
         setError(response.message);
