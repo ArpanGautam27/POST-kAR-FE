@@ -21,6 +21,9 @@ export interface RecordVisitResponse {
   sessionId?: string;
 }
 
+// Base visit count offset - added to backend count to show total visits
+const BASE_VISIT_OFFSET = 963;
+
 // Global flag to prevent multiple initializations across all instances
 let globalIsInitialized = false;
 
@@ -114,7 +117,7 @@ class VisitCounterService {
   }
 
   /**
-   * Start periodic sync with backend (every 10 seconds)
+   * Initialize visit counter - fetches data once on page load/reload
    * @param callback - Optional callback to receive stats updates
    */
   startPeriodicSync(callback?: (stats: VisitStats) => void): void {
@@ -137,22 +140,11 @@ class VisitCounterService {
       this.listeners.add(callback);
     }
 
-    // Clear existing interval if any (but don't reset isInitialized)
-    if (this.syncInterval !== null) {
-      clearInterval(this.syncInterval);
-      this.syncInterval = null;
-    }
-
     // Record initial visit
     this.recordVisit().catch(console.error);
 
-    // Fetch initial stats
+    // Fetch initial stats (only once on page load)
     this.getStats().catch(console.error);
-
-    // Set up periodic sync every 10 seconds
-    this.syncInterval = window.setInterval(() => {
-      this.getStats().catch(console.error);
-    }, 10000);
   }
 
   /**
@@ -183,9 +175,15 @@ class VisitCounterService {
    * @param stats - Updated visit statistics
    */
   private notifyListeners(stats: VisitStats): void {
+    // Add base offset to totalVisits from backend
+    const adjustedStats: VisitStats = {
+      ...stats,
+      totalVisits: stats.totalVisits + BASE_VISIT_OFFSET
+    };
+    
     this.listeners.forEach(listener => {
       try {
-        listener(stats);
+        listener(adjustedStats);
       } catch (error) {
         console.error('Error in visit stats listener:', error);
       }
@@ -200,18 +198,17 @@ class VisitCounterService {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    // Generate mock data with some randomness
-    const baseVisits = 635;
-    const randomVisits = Math.floor(Math.random() * 50);
+    // Generate mock data with some randomness (simulating DB count)
+    const dbVisits = Math.floor(Math.random() * 50);
     const activeNow = Math.floor(Math.random() * 10) + 1;
 
     const stats: VisitStats = {
-      totalVisits: baseVisits + randomVisits,
+      totalVisits: dbVisits, // This will be adjusted by notifyListeners
       activeNow: activeNow,
       lastUpdated: new Date().toISOString(),
     };
 
-    // Notify listeners
+    // Notify listeners (will add BASE_VISIT_OFFSET)
     this.notifyListeners(stats);
 
     return {
@@ -240,7 +237,7 @@ class VisitCounterService {
   }
 
   /**
-   * Start periodic sync with mock data (for development)
+   * Initialize visit counter with mock data - fetches data once on page load/reload
    * @param callback - Optional callback to receive stats updates
    */
   startPeriodicSyncMock(callback?: (stats: VisitStats) => void): void {
@@ -263,22 +260,11 @@ class VisitCounterService {
       this.listeners.add(callback);
     }
 
-    // Clear existing interval if any (but don't reset isInitialized)
-    if (this.syncInterval !== null) {
-      clearInterval(this.syncInterval);
-      this.syncInterval = null;
-    }
-
     // Record initial visit
     this.recordVisitMock().catch(console.error);
 
-    // Fetch initial stats
+    // Fetch initial stats (only once on page load)
     this.getStatsMock().catch(console.error);
-
-    // Set up periodic sync every 10 seconds
-    this.syncInterval = window.setInterval(() => {
-      this.getStatsMock().catch(console.error);
-    }, 10000);
   }
 }
 

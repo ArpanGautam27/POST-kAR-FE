@@ -3,7 +3,7 @@
  */
 
 // Replace with your actual R2 bucket URL
-const R2_BASE_URL = import.meta.env.VITE_R2_BASE_URL || 'https://pub-ddfac7c751fa4e7284d0063174f69f5a.community';
+const R2_BASE_URL = import.meta.env.VITE_R2_BASE_URL || 'https://media.post-kar.com';
 
 /**
  * Customer Feedback Videos
@@ -40,7 +40,15 @@ export const scannerVideos = {
 };
 
 /**
- * Product Images Base URL
+ * 3D Mascot Models (GLB files)
+ */
+export const mascotModels = {
+  home: `${R2_BASE_URL}/mascots/menaquin.glb`,
+  products: `${R2_BASE_URL}/mascots/product_page_mascot.glb`,
+  free: `${R2_BASE_URL}/mascots/free_page_mascot.glb`,
+};
+
+/*ascotsProduct Images Base URL
  */
 export const getProductImageUrl = (filename: string): string => {
   return `${R2_BASE_URL}/products/${filename}`;

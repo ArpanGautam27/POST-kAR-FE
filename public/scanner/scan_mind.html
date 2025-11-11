@@ -23,7 +23,7 @@
 <body>
 
     <a-scene 
-        mindar-image="imageTargetSrc: ./IgasMarker.mind; filterMinCF: 0.0001; filterBeta: 0.001;"
+        mindar-image="imageTargetSrc: ./FreeVerse.mind; filterMinCF: 0.0001; filterBeta: 0.001;"
         color-space="sRGB" 
         renderer="colorManagement: true, physicallyCorrectLights" 
         vr-mode-ui="enabled: false" 
@@ -32,7 +32,7 @@
         <a-assets>
             <video 
                 id="my-video" 
-                src="./IgasVideo.mp4"
+                src="https://media.post-kar.com/videos/FreeVerse1.mp4"
                 loop="true"
                 preload="auto"
                 muted
@@ -141,18 +141,26 @@
     document.querySelector('a-scene').addEventListener('loaded', () => {
         console.log('Scene loaded');
         
-        // Preload video
+        // Immediately load and start buffering the video
         video.load();
+        
+        // Start playing muted to preload the video
+        video.muted = true;
+        video.play().then(() => {
+            console.log('Video preloaded and playing (muted)');
+        }).catch(e => {
+            console.log('Preload play failed, will retry on marker detection', e);
+        });
     });
 
     document.getElementById('target').addEventListener('targetFound', () => {
         console.log('Target found!');
         
-        // Force video to play with multiple attempts
+        // Unmute and ensure video is playing
         const playVideo = () => {
             video.muted = false;
             video.play().then(() => {
-                console.log('Video playing successfully');
+                console.log('Video playing with sound');
             }).catch(e => {
                 console.log('Play attempt failed, retrying...', e);
                 setTimeout(playVideo, 100);
@@ -163,7 +171,8 @@
 
     document.getElementById('target').addEventListener('targetLost', () => {
         console.log('Target lost');
-        video.pause();
+        // Mute but keep playing to maintain buffer
+        video.muted = true;
     });
     </script>
 </body>

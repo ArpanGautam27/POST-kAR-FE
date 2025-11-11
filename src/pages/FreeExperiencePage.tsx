@@ -3,7 +3,7 @@ import Navigation from '../components/layout/Navigation';
 import Mascot from '../components/common/Mascot';
 import ProductGrid from '../components/product/ProductGrid';
 import type { Product } from '../types';
-import ikaasFrame from '../assets/ikaas_frame.jpg';
+import FreeVerse1 from '../assets/FreeVerse1.jpg';
 import './FreeExperiencePage.css';
 
 export default function FreeExperiencePage() {
@@ -55,10 +55,10 @@ export default function FreeExperiencePage() {
   }, [open]);
   const freeExperienceProduct: Product = {
     id: 'free-exp',
-    name: 'Freeverse',
+    name: `मेरा भारत महान`,
     description: 'Try a sample AR experience for free',
-    thumbnail_url: ikaasFrame,
-    image_url: ikaasFrame,
+    thumbnail_url: FreeVerse1,
+    image_url: FreeVerse1,
     image_id: 'free_exp_placeholder',
     video_url: ''
   };

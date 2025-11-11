@@ -36,7 +36,7 @@
     
     <!-- Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <!-- X-Frame-Options must be set via HTTP header in Spring Boot, not meta tag -->
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
     
     <!-- Preconnect to external domains for performance -->
@@ -48,8 +48,14 @@
     <!-- Lottie web component -->
     <script type="module" src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     
-    <!-- Preload hero video for faster first paint -->
-    <link rel="preload" as="video" href="/src/assets/hero_section_header.mp4" type="video/mp4" />
+    <!-- Preconnect to R2 CDN for faster video loading -->
+    <link rel="preconnect" href="https://pub-ddfac7c751fa4e7284d0063174f69f5a.r2.dev" crossorigin />
+    <link rel="dns-prefetch" href="https://pub-ddfac7c751fa4e7284d0063174f69f5a.r2.dev" />
+    
+    <!-- Preload critical videos for immediate playback -->
+    <!-- Note: 'as=video' is not widely supported, using fetch instead -->
+    <link rel="preload" as="fetch" href="https://pub-ddfac7c751fa4e7284d0063174f69f5a.r2.dev/hero/hero_section_header.mp4" type="video/mp4" crossorigin />
+    <link rel="preload" as="fetch" href="https://pub-ddfac7c751fa4e7284d0063174f69f5a.r2.dev/hero/logo_new.mp4" type="video/mp4" crossorigin />
     
     <!-- DNS Prefetch for future API calls -->
     <link rel="dns-prefetch" href="https://api.postkar.com" />

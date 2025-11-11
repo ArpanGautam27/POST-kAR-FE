@@ -33,23 +33,21 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Manual chunk splitting for better caching
-        manualChunks: {
+        manualChunks: (id) => {
           // Vendor chunks
-          'react-vendor': ['react', 'react-dom'],
-          'router-vendor': ['react-router-dom'],
-          'ui-vendor': ['lucide-react'],
-          // App chunks
-          'components': [
-            './src/components/product/ProductCard.tsx',
-            './src/components/product/ProductGrid.tsx',
-            './src/components/layout/Navigation.tsx'
-          ],
-          'pages': [
-            './src/pages/ProductsPage.tsx',
-            './src/pages/ProductDetailPage.tsx',
-            './src/pages/ScannerPage.tsx'
-          ],
-          'services': ['./src/services/MockProductService.ts']
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-vendor';
+            }
+            if (id.includes('react-router-dom')) {
+              return 'router-vendor';
+            }
+            if (id.includes('lucide-react')) {
+              return 'ui-vendor';
+            }
+            // Other node_modules go to vendor
+            return 'vendor';
+          }
         },
         // Optimize asset naming for better caching
         assetFileNames: (assetInfo) => {

@@ -1,27 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin } from 'lucide-react';
-import { AuthModal } from '../components/auth/AuthModal';
+import { WaitlistModal } from '../components/common/WaitlistModal';
 import Navigation from '../components/layout/Navigation';
 import ProductGrid from '../components/product/ProductGrid';
 import { ProductService } from '../services/ProductService';
-import { MockProductService } from '../services/MockProductService';
 import { visitCounterService } from '../services/VisitCounterService';
 import type { VisitStats } from '../services/VisitCounterService';
 import { config } from '../config/environment';
 import type { Product } from '../types';
-import cf1 from '../assets/customer_feedback_1.mp4';
-import cf2 from '../assets/customer_feedback_2.mp4';
-import cf3 from '../assets/customer_feedback_3.mp4';
-import cf4 from '../assets/customer_feedback_4.mp4';
-import cf5 from '../assets/customer_feedback_5.mp4';
-import cf6 from '../assets/customer_feedback_6.mp4';
-import cf7 from '../assets/customer_feedback_7.mp4';
-import cf8 from '../assets/customer_feedback_8.mp4';
-import cf9 from '../assets/customer_feedback_9.mp4';
-import cf10 from '../assets/customer_feedback_10.mp4';
-import cf11 from '../assets/customer_feedback_11.mp4';
-import heroSectionHeader from '../assets/hero_section_header.mp4';
+// NEW - R2 URLs
+import { getFeedbackVideosArray, heroVideos } from '../config/r2-media';
+import { LazyVideo } from '../components/LazyVideo';
 import Mascot from '../components/common/Mascot';
 import xLogo from '../assets/x_logo.svg';
 import instagramLogo from '../assets/instagram_logo.svg';
@@ -82,9 +72,9 @@ function useDragScroll(ref: React.RefObject<HTMLElement | null>) {
 export default function LandingPage() {
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
   const [visitStats, setVisitStats] = useState<VisitStats>({
-    totalVisits: 635,
+    totalVisits: 963,
     activeNow: 1,
     lastUpdated: new Date().toISOString()
   });
@@ -95,7 +85,7 @@ export default function LandingPage() {
   const [activePanel, setActivePanel] = useState(0);
   const spotlightRef = useRef<HTMLDivElement | null>(null);
   const servicesRef = useRef<HTMLDivElement | null>(null);
-  const feedbackVideos = [cf1, cf3, cf5, cf8, cf4, cf2, cf6, cf7, cf9, cf10, cf11];
+  const feedbackVideos = getFeedbackVideosArray();
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const [muted, setMuted] = useState<boolean[]>(() => feedbackVideos.map(() => true));
   const [fullscreenVideo, setFullscreenVideo] = useState<{ src: string; index: number } | null>(null);
@@ -201,7 +191,7 @@ export default function LandingPage() {
   // Products for home
   const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState<boolean>(true);
-  const productService = config.enableMockData ? MockProductService.getInstance() : ProductService.getInstance();
+  const productService = ProductService.getInstance();
 
   useEffect(() => {
     let isMounted = true;
@@ -210,23 +200,16 @@ export default function LandingPage() {
     (async () => {
       try {
         setLoadingProducts(true);
-        let data = await productService.getProducts();
+        // ProductService handles API call with R2 URL transformation and automatic fallback
+        const data = await productService.getProducts();
         // Always show first 6 products as featured on landing page
         if (isMounted) {
           setProducts(Array.isArray(data) ? data.slice(0, 6) : []);
         }
       } catch (e) {
-        if (config.enableMockData) {
-          const mock = MockProductService.getInstance();
-          const data = await mock.getProducts();
-          // Always show first 6 products as featured on landing page
-          if (isMounted) {
-            setProducts(Array.isArray(data) ? data.slice(0, 6) : []);
-          }
-        } else {
-          if (isMounted) {
-            setProducts([]);
-          }
+        console.error('Error loading products:', e);
+        if (isMounted) {
+          setProducts([]);
         }
       } finally {
         if (isMounted) {
@@ -328,7 +311,7 @@ export default function LandingPage() {
       <header className="hero hero--video-only" style={{ padding: 0 }}>
         <video
           className="hero-header-video"
-          src={heroSectionHeader}
+          src={heroVideos.heroSectionHeader}
           muted
           loop
           playsInline
@@ -340,17 +323,17 @@ export default function LandingPage() {
       {/* Top Image Slider */}
       <div className="image-strip">
         <div className="image-strip__track">
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1520975922284-9bcd8dac1512?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1496302662116-35cc4f36df92?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1495562569060-2eec283d3391?w=1200&q=80)` }} />
+          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=60&auto=format)` }} />
+          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1520975922284-9bcd8dac1512?w=600&q=60&auto=format)` }} />
+          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=60&auto=format)` }} />
+          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1496302662116-35cc4f36df92?w=600&q=60&auto=format)` }} />
+          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1495562569060-2eec283d3391?w=600&q=60&auto=format)` }} />
           {/* duplicate for seamless loop */}
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1520975922284-9bcd8dac1512?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1496302662116-35cc4f36df92?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1495562569060-2eec283d3391?w=1200&q=80)` }} />
+          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=60&auto=format)` }} />
+          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1520975922284-9bcd8dac1512?w=600&q=60&auto=format)` }} />
+          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=600&q=60&auto=format)` }} />
+          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1496302662116-35cc4f36df92?w=600&q=60&auto=format)` }} />
+          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1495562569060-2eec283d3391?w=600&q=60&auto=format)` }} />
         </div>
       </div>
       <header className="hero" style={{ display: 'none' }}>
@@ -393,13 +376,14 @@ export default function LandingPage() {
               >
                 {feedbackVideos.map((src, idx) => (
                   <div key={idx} className="video-card" style={{ background: '#111', borderRadius: 12, overflow: 'hidden', position: 'relative', aspectRatio: '2 / 3', boxShadow: '0 6px 24px rgba(0,0,0,0.25)' }}>
-                    <video
-                      ref={(el) => { if (el) videoRefs.current[idx] = el; }}
+                    <LazyVideo
                       src={src}
+                      priority={false}
                       muted={muted[idx]}
                       loop
                       playsInline
                       autoPlay
+                      onVideoRef={(el) => { if (el) videoRefs.current[idx] = el; }}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                     <button
@@ -655,7 +639,7 @@ export default function LandingPage() {
       </div>
 
       <button 
-        onClick={() => setIsAuthModalOpen(true)}
+        onClick={() => setIsWaitlistModalOpen(true)}
         className="submit-btn"
         style={{ 
           padding: '1rem 2.5rem',
@@ -1026,7 +1010,7 @@ export default function LandingPage() {
         </div>
       )}
 
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <WaitlistModal isOpen={isWaitlistModalOpen} onClose={() => setIsWaitlistModalOpen(false)} />
     </div>
   );
 }

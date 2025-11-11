@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
 import { ProfileDropdown } from '../auth/ProfileDropdown';
 import './Navigation.css';
-import headerLogoVideo from '../../assets/logo_new.mp4';
+import { heroVideos } from '../../config/r2-media';
 import scannerButtonAnim from '../../assets/scanner_button.json?url';
 
 interface NavigationProps {}
@@ -67,12 +67,12 @@ export const Navigation: React.FC<NavigationProps> = () => {
             <video
               ref={videoRef}
               className="nav-logo-video"
-              src={headerLogoVideo}
+              src={heroVideos.logoNew}
               muted
               loop
               playsInline
               autoPlay
-              preload="metadata"
+              preload="auto"
             />
           </Link>
           <div className="nav-links">

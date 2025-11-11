@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import homeMascot from '../../assets/menaquin.glb?url';
-import productsMascot from '../../assets/product_page_mascot.glb?url';
-import freeMascot from '../../assets/free_page_mascot.glb?url';
+import { mascotModels } from '../../config/r2-media';
 import dogLoader from '../../assets/happy_dog_loader.json?url';
 import './Mascot.css';
 
@@ -46,10 +44,10 @@ export default function Mascot({ model = 'home' }: MascotProps) {
     const loadModel = () => {
       const loader = new GLTFLoader();
       const modelUrl = model === 'free'
-        ? freeMascot
+        ? mascotModels.free
         : model === 'products'
-          ? productsMascot
-          : homeMascot;
+          ? mascotModels.products
+          : mascotModels.home;
       loader.load(
         modelUrl,
         (gltf: any) => {

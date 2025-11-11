@@ -1,5 +1,5 @@
 import type { Product } from '../types';
-
+import { getProductImageUrl } from '../config/r2-media';
 /**
  * Centralized Products Data
  * Contains all 17 products with their corresponding images from public/images/products/
@@ -10,8 +10,8 @@ export const products: Product[] = [
     id: 'prod-001',
     name: 'Amber Tongue Elixir',
     description: 'A mystical AR poster that brings ancient alchemy to life. Scan to witness the transformation of amber essence into liquid gold with mesmerizing visual effects.',
-    thumbnail_url: '/images/products/Amber Tongue Elixir.jpg',
-    image_url: '/images/products/Amber Tongue Elixir.jpg',
+    thumbnail_url: getProductImageUrl('Amber Tongue Elixir.jpg'),
+    image_url: getProductImageUrl('Amber Tongue Elixir.jpg'),
     image_id: 'img-001',
     video_url: 'https://example.com/videos/amber-elixir-demo.mp4',
     metadata: {
@@ -24,8 +24,8 @@ export const products: Product[] = [
     id: 'prod-002',
     name: 'Astral Nataraja Surge',
     description: 'Experience the cosmic dance of Lord Nataraja in augmented reality. This poster transforms into a swirling galaxy of divine energy and celestial movements.',
-    thumbnail_url: '/images/products/Astral Nataraja Surge.jpg',
-    image_url: '/images/products/Astral Nataraja Surge.jpg',
+    thumbnail_url: getProductImageUrl('Astral Nataraja Surge.jpg'),
+    image_url: getProductImageUrl('Astral Nataraja Surge.jpg'),    
     image_id: 'img-002',
     video_url: 'https://example.com/videos/nataraja-demo.mp4',
     metadata: {
@@ -38,8 +38,8 @@ export const products: Product[] = [
     id: 'prod-003',
     name: 'Baba Yaga Silhouette',
     description: 'Step into Slavic folklore with this haunting AR poster. Watch as Baba Yaga\'s hut comes alive with mystical creatures and enchanted forest spirits.',
-    thumbnail_url: '/images/products/Baba Yaga Silhouette.jpg',
-    image_url: '/images/products/Baba Yaga Silhouette.jpg',
+    thumbnail_url: getProductImageUrl('Baba Yaga Silhouette.jpg'),
+    image_url: getProductImageUrl('Baba Yaga Silhouette.jpg'),
     image_id: 'img-003',
     video_url: 'https://example.com/videos/baba-yaga-demo.mp4',
     metadata: {
@@ -52,8 +52,8 @@ export const products: Product[] = [
     id: 'prod-004',
     name: 'Delhi Verse Velocity',
     description: 'Urban poetry meets AR technology. This poster showcases the vibrant street art and cultural rhythm of Delhi through dynamic visual storytelling.',
-    thumbnail_url: '/images/products/Delhi Verse Velocity.webp',
-    image_url: '/images/products/Delhi Verse Velocity.webp',
+    thumbnail_url: getProductImageUrl('Delhi Verse Velocity.webp'),
+    image_url: getProductImageUrl('Delhi Verse Velocity.webp'),
     image_id: 'img-004',
     video_url: 'https://example.com/videos/delhi-verse-demo.mp4',
     metadata: {
@@ -66,8 +66,8 @@ export const products: Product[] = [
     id: 'prod-005',
     name: 'Eternal Strike Zenith',
     description: 'Martial arts mastery in AR form. Watch as ancient fighting techniques come alive with energy trails and power demonstrations.',
-    thumbnail_url: '/images/products/Eternal Strike Zenith.webp',
-    image_url: '/images/products/Eternal Strike Zenith.webp',
+    thumbnail_url: getProductImageUrl('Eternal Strike Zenith.webp'),
+    image_url: getProductImageUrl('Eternal Strike Zenith.webp'),
     image_id: 'img-005',
     video_url: 'https://example.com/videos/eternal-strike-demo.mp4',
     metadata: {
@@ -80,8 +80,8 @@ export const products: Product[] = [
     id: 'prod-006',
     name: 'Gilded Smile Paradox',
     description: 'A surreal AR experience that explores the duality of joy and mystery. The golden smile transforms into intricate patterns and hidden meanings.',
-    thumbnail_url: '/images/products/Gilded Smile Paradox.jpg',
-    image_url: '/images/products/Gilded Smile Paradox.jpg',
+    thumbnail_url: getProductImageUrl('Gilded Smile Paradox.jpg'),
+    image_url: getProductImageUrl('Gilded Smile Paradox.jpg'),
     image_id: 'img-006',
     video_url: 'https://example.com/videos/gilded-smile-demo.mp4',
     metadata: {
@@ -94,8 +94,8 @@ export const products: Product[] = [
     id: 'prod-007',
     name: 'Heritage Portrait Collection',
     description: 'Traditional portraiture meets modern AR technology. These classic portraits come alive with historical context and cultural stories.',
-    thumbnail_url: '/images/products/IMG-20250517-WA0034.jpg',
-    image_url: '/images/products/IMG-20250517-WA0034.jpg',
+    thumbnail_url: getProductImageUrl('IMG-20250517-WA0034.jpg'),
+    image_url: getProductImageUrl('IMG-20250517-WA0034.jpg'),
     image_id: 'img-007',
     video_url: 'https://example.com/videos/heritage-portrait-demo.mp4',
     metadata: {
@@ -108,8 +108,8 @@ export const products: Product[] = [
     id: 'prod-008',
     name: 'Cultural Mosaic Experience',
     description: 'A vibrant celebration of cultural diversity through AR. Multiple cultural elements blend and interact in a beautiful digital tapestry.',
-    thumbnail_url: '/images/products/IMG-20250517-WA0048.jpg',
-    image_url: '/images/products/IMG-20250517-WA0048.jpg',
+    thumbnail_url: getProductImageUrl('IMG-20250517-WA0048.jpg'),
+    image_url: getProductImageUrl('IMG-20250517-WA0048.jpg'),
     image_id: 'img-008',
     video_url: 'https://example.com/videos/cultural-mosaic-demo.mp4',
     metadata: {
@@ -122,8 +122,8 @@ export const products: Product[] = [
     id: 'prod-009',
     name: 'Jetstream Hyperforge',
     description: 'Futuristic technology visualization in AR. Experience the power of advanced engineering with dynamic particle effects and holographic displays.',
-    thumbnail_url: '/images/products/Jetstream Hyperforge.jpg',
-    image_url: '/images/products/Jetstream Hyperforge.jpg',
+    thumbnail_url: getProductImageUrl('Jetstream Hyperforge.jpg'),
+    image_url: getProductImageUrl('Jetstream Hyperforge.jpg'),
     image_id: 'img-009',
     video_url: 'https://example.com/videos/jetstream-demo.mp4',
     metadata: {
@@ -136,8 +136,8 @@ export const products: Product[] = [
     id: 'prod-010',
     name: 'Marlboro Mirth Pack',
     description: 'A nostalgic AR journey through vintage advertising aesthetics. Classic design elements come alive with retro animations and period-appropriate effects.',
-    thumbnail_url: '/images/products/Marlboro Mirth Pack.jpg',
-    image_url: '/images/products/Marlboro Mirth Pack.jpg',
+    thumbnail_url: getProductImageUrl('Marlboro Mirth Pack.jpg'),
+    image_url: getProductImageUrl('Marlboro Mirth Pack.jpg'),
     image_id: 'img-010',
     video_url: 'https://example.com/videos/marlboro-demo.mp4',
     metadata: {
@@ -150,8 +150,8 @@ export const products: Product[] = [
     id: 'prod-011',
     name: 'Phantom Field Devourer',
     description: 'Dark fantasy meets AR technology. Witness otherworldly creatures emerge from shadowy realms with spine-chilling visual effects.',
-    thumbnail_url: '/images/products/Phantom Field Devourer.jpg',
-    image_url: '/images/products/Phantom Field Devourer.jpg',
+    thumbnail_url: getProductImageUrl('Phantom Field Devourer.jpg'),
+    image_url: getProductImageUrl('Phantom Field Devourer.jpg'),
     image_id: 'img-011',
     video_url: 'https://example.com/videos/phantom-field-demo.mp4',
     metadata: {
@@ -164,8 +164,8 @@ export const products: Product[] = [
     id: 'prod-012',
     name: 'Prancing Heart Ignition',
     description: 'Love and passion visualized through AR. Hearts burst into flames of emotion with romantic particle effects and warm color palettes.',
-    thumbnail_url: '/images/products/Prancing Heart Ignition.jpg',
-    image_url: '/images/products/Prancing Heart Ignition.jpg',
+    thumbnail_url: getProductImageUrl('Prancing Heart Ignition.jpg'),
+    image_url: getProductImageUrl('Prancing Heart Ignition.jpg'),
     image_id: 'img-012',
     video_url: 'https://example.com/videos/prancing-heart-demo.mp4',
     metadata: {
@@ -178,8 +178,8 @@ export const products: Product[] = [
     id: 'prod-013',
     name: 'Red Devil Dynasty Ember',
     description: 'Fiery AR experience with demonic aesthetics. Red flames and ember effects create an intense visual spectacle of power and mystery.',
-    thumbnail_url: '/images/products/Red Devil Dynasty Ember.jpg',
-    image_url: '/images/products/Red Devil Dynasty Ember.jpg',
+    thumbnail_url: getProductImageUrl('Red Devil Dynasty Ember.jpg'),
+    image_url: getProductImageUrl('Red Devil Dynasty Ember.jpg'),
     image_id: 'img-013',
     video_url: 'https://example.com/videos/red-devil-demo.mp4',
     metadata: {
@@ -192,8 +192,8 @@ export const products: Product[] = [
     id: 'prod-014',
     name: 'Rubber Dawn Cataclysm',
     description: 'Post-apocalyptic AR visualization with industrial aesthetics. Experience the beauty in destruction through dynamic environmental effects.',
-    thumbnail_url: '/images/products/Rubber Dawn Cataclysm.jpg',
-    image_url: '/images/products/Rubber Dawn Cataclysm.jpg',
+    thumbnail_url: getProductImageUrl('Rubber Dawn Cataclysm.jpg'),
+    image_url: getProductImageUrl('Rubber Dawn Cataclysm.jpg'),
     image_id: 'img-014',
     video_url: 'https://example.com/videos/rubber-dawn-demo.mp4',
     metadata: {
@@ -206,8 +206,8 @@ export const products: Product[] = [
     id: 'prod-015',
     name: 'Titanium Apex Symphony',
     description: 'Metallic elegance in AR form. Watch as titanium structures morph and dance to create a symphony of geometric beauty and industrial grace.',
-    thumbnail_url: '/images/products/Titanium Apex Symphony.jpg',
-    image_url: '/images/products/Titanium Apex Symphony.jpg',
+    thumbnail_url: getProductImageUrl('Titanium Apex Symphony.jpg'),
+    image_url: getProductImageUrl('Titanium Apex Symphony.jpg'),
     image_id: 'img-015',
     video_url: 'https://example.com/videos/titanium-symphony-demo.mp4',
     metadata: {
@@ -220,8 +220,8 @@ export const products: Product[] = [
     id: 'prod-016',
     name: 'Urban Chakra Sunrise',
     description: 'Spiritual awakening meets urban landscape. Chakra energy flows through city scenes creating a harmonious blend of modern life and ancient wisdom.',
-    thumbnail_url: '/images/products/Urban Chakra Sunrise.jpg',
-    image_url: '/images/products/Urban Chakra Sunrise.jpg',
+    thumbnail_url: getProductImageUrl('Urban Chakra Sunrise.jpg'),
+    image_url: getProductImageUrl('Urban Chakra Sunrise.jpg'),
     image_id: 'img-016',
     video_url: 'https://example.com/videos/urban-chakra-demo.mp4',
     metadata: {
@@ -234,8 +234,8 @@ export const products: Product[] = [
     id: 'prod-017',
     name: 'Verdigris Void Oracle',
     description: 'Ancient wisdom meets cosmic mystery. Green copper patina effects swirl around mystical symbols revealing hidden knowledge through AR.',
-    thumbnail_url: '/images/products/Verdigris Void Oracle.jpg',
-    image_url: '/images/products/Verdigris Void Oracle.jpg',
+    thumbnail_url: getProductImageUrl('Verdigris Void Oracle.jpg'),
+    image_url: getProductImageUrl('Verdigris Void Oracle.jpg'),
     image_id: 'img-017',
     video_url: 'https://example.com/videos/verdigris-oracle-demo.mp4',
     metadata: {

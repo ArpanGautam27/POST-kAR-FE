@@ -1,7 +1,73 @@
-import React, { useRef } from 'react';
-import type { ProductGridProps } from '../../types';
+import React, { useRef, useState, useEffect } from 'react';
+import type { ProductGridProps, Product } from '../../types';
 import ProductCard from './ProductCard';
 import './ProductGrid.css';
+
+/**
+ * LazyProductItem - Lazy loads individual product cards
+ */
+interface LazyProductItemProps {
+  product: Product;
+  onProductClick: (id: string) => void;
+  cardProps?: any;
+  priority?: boolean;
+}
+
+const LazyProductItem: React.FC<LazyProductItemProps> = ({ 
+  product, 
+  onProductClick, 
+  cardProps,
+  priority = false 
+}) => {
+  const [isInView, setIsInView] = useState(priority);
+  const itemRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (priority) {
+      setIsInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      {
+        rootMargin: '100px',
+        threshold: 0.01
+      }
+    );
+
+    if (itemRef.current) {
+      observer.observe(itemRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [priority]);
+
+  return (
+    <div ref={itemRef} className="product-grid__item">
+      {isInView ? (
+        <>
+          <ProductCard
+            product={product}
+            onClick={onProductClick}
+            loading={false}
+            {...cardProps}
+          />
+          <div className="product-grid__caption">
+            <span className="product-grid__name" title={product.name}>{product.name}</span>
+          </div>
+        </>
+      ) : (
+        <div style={{ minHeight: '300px' }} />
+      )}
+    </div>
+  );
+};
 
 /**
  * ProductGrid component displays products in a responsive grid layout
@@ -107,18 +173,14 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
         </>
       )}
       <div ref={containerRef} className={containerClasses}>
-        {products.map((product) => (
-          <div key={product.id} className="product-grid__item">
-            <ProductCard
-              product={product}
-              onClick={onProductClick}
-              loading={false}
-              {...cardProps}
-            />
-            <div className="product-grid__caption">
-              <span className="product-grid__name" title={product.name}>{product.name}</span>
-            </div>
-          </div>
+        {products.map((product, idx) => (
+          <LazyProductItem
+            key={product.id}
+            product={product}
+            onProductClick={onProductClick}
+            cardProps={cardProps}
+            priority={idx < 6}
+          />
         ))}
       </div>
     </div>
