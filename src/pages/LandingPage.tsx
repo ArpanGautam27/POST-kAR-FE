@@ -27,6 +27,8 @@ import Hyperspeed from '../components/ui/Hyperspeed';
 import Particles from '../components/ui/Particles';
 import Galaxy from '../components/ui/Galaxy';
 import Orb from '../components/ui/Orb';
+import { useCounter } from '../hooks/useCounter';
+import arFurnitureAnimation from '../assets/AR Furniture Viewer.json';
 import '../components/ui/HeroParallax.css';
 import xLogo from '../assets/x_logo.svg';
 import instagramLogo from '../assets/instagram_logo.svg';
@@ -102,29 +104,9 @@ export default function LandingPage() {
   const [isPlaying, setIsPlaying] = useState(true);
   const fullscreenVideoRef = useRef<HTMLVideoElement>(null);
 
-  // Counter stats state
-  const [totalVisits, setTotalVisits] = useState(0);
-  const [activeUsers, setActiveUsers] = useState(0);
-
-  // Fetch counter stats
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const response = await fetch('https://postkar.nithex.com/api/analytics/stats');
-        const data = await response.json();
-        setTotalVisits(data.totalVisits || 0);
-        setActiveUsers(data.activeUsers || 0);
-      } catch (error) {
-        console.error('Failed to fetch stats:', error);
-        setTotalVisits(1112);
-        setActiveUsers(0);
-      }
-    };
-    
-    fetchStats();
-    const interval = setInterval(fetchStats, 30000); // Update every 30s
-    return () => clearInterval(interval);
-  }, []);
+  // Animated counter hooks for community stats
+  const visitsCount = useCounter(1200, 2500);
+  const activeUsersCount = useCounter(24, 2000);
 
   // Apply drag scroll to horizontal sections
   useDragScroll(spotlightRef);
@@ -464,9 +446,14 @@ export default function LandingPage() {
               gap: '1.5rem'
             }}>
               {[
-                { icon: '🎨', title: 'Custom AR', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+                { 
+                  title: 'AR Interior Designer', 
+                  gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  hasAnimation: true,
+                  comingSoon: false
+                },
                 { icon: '🛠️', title: 'Creator Tools', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-                { icon: '📱', title: 'Mobile App', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+                { icon: '📱', title: 'Mobile App', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', comingSoon: true },
                 { icon: '✨', title: 'Mixed Reality', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
               ].map((service, i) => (
                 <div key={i} style={{
@@ -477,11 +464,29 @@ export default function LandingPage() {
                   textAlign: 'center',
                   transition: 'transform 0.3s ease',
                   cursor: 'pointer',
-                  border: '1px solid rgba(255,255,255,0.2)'
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  position: 'relative'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-10px)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
                 >
+                  {service.comingSoon && (
+                    <div style={{
+                      position: 'absolute',
+                      top: '1rem',
+                      right: '1rem',
+                      background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                      color: '#fff',
+                      padding: '0.25rem 0.75rem',
+                      borderRadius: '50px',
+                      fontSize: '0.7rem',
+                      fontWeight: '700',
+                      letterSpacing: '0.5px',
+                      textTransform: 'uppercase'
+                    }}>
+                      Coming Soon
+                    </div>
+                  )}
                   <div style={{
                     width: '80px',
                     height: '80px',
@@ -492,9 +497,24 @@ export default function LandingPage() {
                     justifyContent: 'center',
                     fontSize: '2.5rem',
                     margin: '0 auto 1rem',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+                    overflow: 'hidden'
                   }}>
-                    {service.icon}
+                    {service.hasAnimation ? (
+                      (() => {
+                        const LottiePlayer = 'lottie-player' as any;
+                        return (
+                          <LottiePlayer
+                            src={JSON.stringify(arFurnitureAnimation)}
+                            background="transparent"
+                            speed="1"
+                            loop
+                            autoplay
+                            style={{ width: '100%', height: '100%' }}
+                          />
+                        );
+                      })()
+                    ) : service.icon}
                   </div>
                   <h3 style={{
                     fontSize: '1.25rem',
@@ -531,13 +551,12 @@ export default function LandingPage() {
           visual={
             <div style={{ 
               display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
+              gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '1.5rem'
             }}>
               {[
-                { icon: '👁️', value: totalVisits || '1.2k', label: 'Visits', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-                { icon: '👥', value: activeUsers || '24', label: 'Active', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-                { icon: '📱', value: 'Soon', label: 'App', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+                { icon: '👁️', value: visitsCount, label: 'Visits', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+                { icon: '👥', value: activeUsersCount, label: 'Active Users', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
                 { icon: '🔗', value: '100%', label: 'Connected', gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
               ].map((stat, i) => (
                 <div key={i} style={{
