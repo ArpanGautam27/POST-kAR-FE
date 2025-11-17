@@ -18,7 +18,6 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -87,8 +86,9 @@ export default function ProductsPage() {
           <ProductGrid 
             products={products}
             loading={loading}
-            onProductClick={() => { /* disabled while coming soon */ }}
-            cardProps={{ comingSoon: true, hideCart: true, hidePrice: true }}
+            onProductClick={(id) => { window.location.href = `/product/${id}`; }}
+            cardProps={{ hideCart: true, hidePrice: true }}
+            forceFourColumns={true}
           />
         </div>
       </div>

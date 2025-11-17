@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import type { ProductGridProps } from '../../types';
 import ProductCard from './ProductCard';
 import './ProductGrid.css';
@@ -70,6 +71,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   }
 
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  
+  // Parallax scroll setup
+  const { scrollYProgress } = useScroll();
 
   const containerClasses = [
     'product-grid__container',
@@ -82,6 +87,13 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     if (!el) return;
     const amount = el.clientWidth * 0.8;
     el.scrollBy({ left: dir === 'left' ? -amount : amount, behavior: 'smooth' });
+  };
+  
+  // Create parallax transforms for different columns (4 columns total)
+  const getParallaxY = (index: number) => {
+    const columnIndex = index % 4; // 4 columns
+    const speeds = [0, -50, 50, -30]; // Different speeds for each column
+    return useTransform(scrollYProgress, [0, 1], [0, speeds[columnIndex]]);
   };
 
   return (
@@ -107,19 +119,39 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
         </>
       )}
       <div ref={containerRef} className={containerClasses}>
-        {products.map((product) => (
-          <div key={product.id} className="product-grid__item">
-            <ProductCard
-              product={product}
-              onClick={onProductClick}
-              loading={false}
-              {...cardProps}
-            />
-            <div className="product-grid__caption">
-              <span className="product-grid__name" title={product.name}>{product.name}</span>
-            </div>
-          </div>
-        ))}
+        {products.map((product, index) => {
+          const parallaxY = getParallaxY(index);
+          const isOtherHovered = hoveredIndex !== null && hoveredIndex !== index;
+          return (
+            <motion.div 
+              key={product.id} 
+              className="product-grid__item"
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
+              style={{
+                y: parallaxY,
+              }}
+              animate={{
+                scale: isOtherHovered ? 0.98 : 1,
+                filter: isOtherHovered ? 'blur(4px)' : 'blur(0px)',
+              }}
+              transition={{
+                duration: 0.3,
+                ease: 'easeOut'
+              }}
+            >
+              <ProductCard
+                product={product}
+                onClick={onProductClick}
+                loading={false}
+                {...cardProps}
+              />
+              <div className="product-grid__caption">
+                <span className="product-grid__name" title={product.name}>{product.name}</span>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );

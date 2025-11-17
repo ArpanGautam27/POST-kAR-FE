@@ -9,6 +9,19 @@ const STORAGE_KEY = 'pk_addresses_v1';
 export default function CheckoutPage() {
   const { items, totalItems, totalPrice, clearCart } = useCart();
   const [placing, setPlacing] = useState(false);
+  
+  // Guest checkout form data
+  const [formData, setFormData] = useState({
+    email: '',
+    fullName: '',
+    phone: '',
+    line1: '',
+    line2: '',
+    city: '',
+    state: '',
+    postalCode: '',
+    country: 'United States'
+  });
 
   const addresses = useMemo(() => {
     try {
@@ -23,12 +36,22 @@ export default function CheckoutPage() {
     if (!addresses?.length) return null;
     return addresses.find((a: any) => a.isDefault) ?? addresses[0];
   }, [addresses]);
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
+  };
+  
+  const isFormValid = formData.email && formData.fullName && formData.phone && 
+                      formData.line1 && formData.city && formData.state && formData.postalCode;
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
 
   const placeOrder = async () => {
-    if (!defaultAddress) return;
+    if (!isFormValid) return;
     setPlacing(true);
     try {
       // Simulate order placement
@@ -42,7 +65,8 @@ export default function CheckoutPage() {
         paymentMethod: 'COD',
         placedAt,
         eta,
-        address: defaultAddress,
+        address: formData,
+        email: formData.email,
         items: items.map((it) => ({
           id: it.product.id,
           name: it.product.name,
@@ -84,24 +108,128 @@ export default function CheckoutPage() {
 
         <div className="checkout-grid">
           <section className="checkout-section">
-            <h2 className="section-title">Delivery Address</h2>
-            {defaultAddress ? (
-              <div className="address-card">
-                <div className="address-name">{defaultAddress.fullName}</div>
-                <div className="address-lines">
-                  <div>{defaultAddress.line1}{defaultAddress.line2 ? `, ${defaultAddress.line2}` : ''}</div>
-                  <div>{defaultAddress.city}, {defaultAddress.state} {defaultAddress.postalCode}</div>
-                  <div>{defaultAddress.country}</div>
+            <h2 className="section-title">Contact & Delivery Information</h2>
+            <div className="checkout-form">
+              <div className="form-group">
+                <label htmlFor="email">Email *</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="your@email.com"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="fullName">Full Name *</label>
+                <input
+                  type="text"
+                  id="fullName"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
+                  placeholder="John Doe"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="phone">Phone Number *</label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  placeholder="+1 (555) 000-0000"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="line1">Address Line 1 *</label>
+                <input
+                  type="text"
+                  id="line1"
+                  name="line1"
+                  value={formData.line1}
+                  onChange={handleInputChange}
+                  placeholder="123 Main Street"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="line2">Address Line 2</label>
+                <input
+                  type="text"
+                  id="line2"
+                  name="line2"
+                  value={formData.line2}
+                  onChange={handleInputChange}
+                  placeholder="Apt 4B (optional)"
+                />
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="city">City *</label>
+                  <input
+                    type="text"
+                    id="city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleInputChange}
+                    placeholder="New York"
+                    required
+                  />
                 </div>
-                <div className="address-phone">{defaultAddress.phone}</div>
-                <a className="address-manage" href="/addresses?return=/checkout">Change / Manage Addresses</a>
+                
+                <div className="form-group">
+                  <label htmlFor="state">State *</label>
+                  <input
+                    type="text"
+                    id="state"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleInputChange}
+                    placeholder="NY"
+                    required
+                  />
+                </div>
               </div>
-            ) : (
-              <div className="empty-address">
-                <p>No delivery address found.</p>
-                <a className="manage-btn" href="/addresses?return=/checkout">Add Address</a>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="postalCode">Postal Code *</label>
+                  <input
+                    type="text"
+                    id="postalCode"
+                    name="postalCode"
+                    value={formData.postalCode}
+                    onChange={handleInputChange}
+                    placeholder="10001"
+                    required
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="country">Country *</label>
+                  <input
+                    type="text"
+                    id="country"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleInputChange}
+                    placeholder="United States"
+                    required
+                  />
+                </div>
               </div>
-            )}
+            </div>
           </section>
 
           <section className="checkout-section">
@@ -145,7 +273,7 @@ export default function CheckoutPage() {
               <span>Total</span>
               <span>{formatPrice(totalPrice)}</span>
             </div>
-            <button className="place-order-btn" disabled={!defaultAddress || placing || items.length === 0} onClick={placeOrder}>
+            <button className="place-order-btn" disabled={!isFormValid || placing || items.length === 0} onClick={placeOrder}>
               {placing ? 'Placing Order…' : 'Place Order (COD)'}
             </button>
           </section>

@@ -93,13 +93,13 @@ export const Navigation: React.FC<NavigationProps> = () => {
                 );
               })()}
             </a>
-            <Link to="/cart" className="nav-link nav-cart-link" style={{ display: 'none' }}>
+            <Link to="/cart" className="nav-link nav-cart-link">
               <ShoppingCart size={18} />
               {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
             </Link>
             
             {/* Authentication Section */}
-            <div className="nav-auth" style={{ display: 'none' }}>
+            <div className="nav-auth">
               {!isLoading && (
                 isAuthenticated ? (
                   <ProfileDropdown />

@@ -1,0 +1,102 @@
+.hero-parallax-container {
+  height: 150vh;
+  position: relative;
+  perspective: 1000px;
+  background: linear-gradient(180deg, #000 0%, #1a1a2e 100%);
+}
+
+.hero-parallax-header {
+  max-width: 7xl;
+  margin: 0 auto;
+  padding: 2rem 1rem 10rem;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.hero-parallax-title {
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  letter-spacing: -0.05em;
+}
+
+.hero-parallax-subtitle {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.hero-parallax-description {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.hero-parallax-grid {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 0 2rem;
+}
+
+.hero-parallax-card {
+  position: relative;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  width: 400px;
+  height: 500px;
+  flex-shrink: 0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.hero-parallax-card:hover {
+  box-shadow: 0 30px 80px rgba(99, 102, 241, 0.4);
+}
+
+.hero-parallax-card-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-parallax-card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.hero-parallax-card-link:hover .hero-parallax-card-image {
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .hero-parallax-container {
+    height: 100vh;
+    padding-bottom: 10rem;
+  }
+
+  .hero-parallax-header {
+    padding: 2rem 1rem 5rem;
+  }
+
+  .hero-parallax-card {
+    width: 250px;
+    height: 350px;
+  }
+
+  .hero-parallax-grid {
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+}

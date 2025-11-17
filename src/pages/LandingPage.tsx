@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { AuthModal } from '../components/auth/AuthModal';
 import Navigation from '../components/layout/Navigation';
-import ProductGrid from '../components/product/ProductGrid';
 import { ProductService } from '../services/ProductService';
 import { MockProductService } from '../services/MockProductService';
 import { config } from '../config/environment';
@@ -19,8 +18,16 @@ import cf8 from '../assets/customer_feedback_8.mp4';
 import cf9 from '../assets/customer_feedback_9.mp4';
 import cf10 from '../assets/customer_feedback_10.mp4';
 import cf11 from '../assets/customer_feedback_11.mp4';
-import heroSectionHeader from '../assets/hero_section_header.mp4';
 import Mascot from '../components/common/Mascot';
+import { HeroParallax } from '../components/ui/HeroParallax';
+import { ParallaxSection, SectionCard } from '../components/ui/ParallaxSection';
+import { AnimatedTestimonials } from '../components/ui/AnimatedTestimonials';
+import CardSwap, { Card } from '../components/ui/CardSwap';
+import Hyperspeed from '../components/ui/Hyperspeed';
+import Particles from '../components/ui/Particles';
+import Galaxy from '../components/ui/Galaxy';
+import Orb from '../components/ui/Orb';
+import '../components/ui/HeroParallax.css';
 import xLogo from '../assets/x_logo.svg';
 import instagramLogo from '../assets/instagram_logo.svg';
 import linkedinLogo from '../assets/linkedin_logo.svg';
@@ -94,6 +101,30 @@ export default function LandingPage() {
   const [fullscreenVideo, setFullscreenVideo] = useState<{ src: string; index: number } | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const fullscreenVideoRef = useRef<HTMLVideoElement>(null);
+
+  // Counter stats state
+  const [totalVisits, setTotalVisits] = useState(0);
+  const [activeUsers, setActiveUsers] = useState(0);
+
+  // Fetch counter stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('https://postkar.nithex.com/api/analytics/stats');
+        const data = await response.json();
+        setTotalVisits(data.totalVisits || 0);
+        setActiveUsers(data.activeUsers || 0);
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+        setTotalVisits(1112);
+        setActiveUsers(0);
+      }
+    };
+    
+    fetchStats();
+    const interval = setInterval(fetchStats, 30000); // Update every 30s
+    return () => clearInterval(interval);
+  }, []);
 
   // Apply drag scroll to horizontal sections
   useDragScroll(spotlightRef);
@@ -193,14 +224,12 @@ export default function LandingPage() {
   const totalPanels = cinematicPanels.length; // 9 slides
   // Products for home
   const [products, setProducts] = useState<Product[]>([]);
-  const [loadingProducts, setLoadingProducts] = useState<boolean>(true);
   const productService = config.enableMockData ? MockProductService.getInstance() : ProductService.getInstance();
 
   useEffect(() => {
     // Load first 6 products for the home page (featured products)
     (async () => {
       try {
-        setLoadingProducts(true);
         let data = await productService.getProducts();
         // Always show first 6 products as featured on landing page
         setProducts(Array.isArray(data) ? data.slice(0, 6) : []);
@@ -213,8 +242,6 @@ export default function LandingPage() {
         } else {
           setProducts([]);
         }
-      } finally {
-        setLoadingProducts(false);
       }
     })();
     // Reveal-on-scroll animations
@@ -274,358 +301,298 @@ export default function LandingPage() {
 
 
 
+  // Prepare products for HeroParallax (ensure we always have products)
+  const heroProducts = products.length > 0 
+    ? products.slice(0, 15).map((product) => ({
+        title: product.name,
+        link: `/product/${product.id}`,
+        thumbnail: product.thumbnail_url || product.image_url,
+      }))
+    : Array(15).fill(null).map((_, i) => ({
+        title: `Product ${i + 1}`,
+        link: '#',
+        thumbnail: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80',
+      }));
+
+  // Ensure we have products for the featured section
+  const featuredProducts = products.length > 0 ? products : Array(4).fill(null).map((_, i) => ({
+    id: `placeholder-${i}`,
+    name: `Poster ${i + 1}`,
+    thumbnail_url: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80',
+    image_url: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80',
+  }));
+
   const translateVW = -(scrollProgress * (totalPanels - 1) * 100);
 
   return (
-    <div className="app">
+    <div className="app" style={{ background: '#000', minHeight: '100vh' }}>
       <Navigation />
 
-      {/* Minimal Hero Section: video only */}
-      <header className="hero hero--video-only" style={{ padding: 0 }}>
-        <video
-          className="hero-header-video"
-          src={heroSectionHeader}
-          muted
-          loop
-          playsInline
-          autoPlay
-          preload="auto"
-        />
-      </header>
+      {/* Hero Parallax Section */}
+      <HeroParallax products={heroProducts} />
 
-      {/* Top Image Slider */}
-      <div className="image-strip">
-        <div className="image-strip__track">
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1520975922284-9bcd8dac1512?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1496302662116-35cc4f36df92?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1495562569060-2eec283d3391?w=1200&q=80)` }} />
-          {/* duplicate for seamless loop */}
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1520975922284-9bcd8dac1512?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1496302662116-35cc4f36df92?w=1200&q=80)` }} />
-          <div className="image-strip__item" style={{ backgroundImage: `url(https://images.unsplash.com/photo-1495562569060-2eec283d3391?w=1200&q=80)` }} />
+      {/* Stacked Parallax Sections */}
+      <div>
+        {/* Community Spotlight: Video Stories */}
+        <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={0}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+          <Particles
+            particleColors={['#f093fb', '#f5576c']}
+            particleCount={200}
+            particleSpread={10}
+            speed={0.1}
+            particleBaseSize={100}
+            moveParticlesOnHover={true}
+            alphaParticles={false}
+            disableRotation={false}
+          />
         </div>
-      </div>
-      <header className="hero" style={{ display: 'none' }}>
-        <div className="hero-inner">
-          <h1 className="hero-title">post-kAR</h1>
-          <p className="hero-subtitle">Beyond The Frame</p>
-          <p className="hero-desc">Link your clicks</p>
-        </div>
-        <div className="hero-bg" />
-      </header>
-
-      {/* Community Spotlight: Video Stories */}
-      <section className="section section-video-reviews reveal in" style={{ paddingTop: '2rem' }}>
-        <div className="container">
-          <div className="card" style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 12, padding: '1rem', position: 'relative', overflow: 'visible' }}>
-            <div className="section-head" style={{ marginBottom: '1rem' }}>
-              <h2 className="section-title">Community Spotlight</h2>
-            </div>
-            <div style={{ position: 'relative' }}>
-              <button
-                type="button"
-                aria-label="Scroll left"
-                onClick={() => spotlightRef.current?.scrollBy({ left: -((spotlightRef.current?.clientWidth || 0) * 0.8), behavior: 'smooth' })}
-                style={{ position: 'absolute', left: -8, top: '50%', transform: 'translateY(-50%)', zIndex: 2, background: 'rgba(255,255,255,0.18)', color: '#ddd', border: 'none', width: 36, height: 36, borderRadius: 18, cursor: 'pointer' }}
-              >
-                ‹
-              </button>
-              <button
-                type="button"
-                aria-label="Scroll right"
-                onClick={() => spotlightRef.current?.scrollBy({ left: +((spotlightRef.current?.clientWidth || 0) * 0.8), behavior: 'smooth' })}
-                style={{ position: 'absolute', right: -8, top: '50%', transform: 'translateY(-50%)', zIndex: 2, background: 'rgba(255,255,255,0.18)', color: '#ddd', border: 'none', width: 36, height: 36, borderRadius: 18, cursor: 'pointer' }}
-              >
-                ›
-              </button>
-              <div
-                ref={spotlightRef}
-                className="video-cards"
-                style={{ WebkitOverflowScrolling: 'touch' as any }}
-              >
-                {feedbackVideos.map((src, idx) => (
-                  <div key={idx} className="video-card" style={{ background: '#111', borderRadius: 12, overflow: 'hidden', position: 'relative', aspectRatio: '2 / 3', boxShadow: '0 6px 24px rgba(0,0,0,0.25)' }}>
-                    <video
-                      ref={(el) => { if (el) videoRefs.current[idx] = el; }}
-                      src={src}
-                      muted={muted[idx]}
-                      loop
-                      playsInline
-                      autoPlay
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => toggleMute(idx)}
-                      aria-label={muted[idx] ? 'Unmute video' : 'Mute video'}
-                      style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.55)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', width: 34, height: 34, borderRadius: 17, cursor: 'pointer', display: 'grid', placeItems: 'center', backdropFilter: 'blur(6px)' as any }}
-                    >
-                      {muted[idx] ? '🔇' : '🔊'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setFullscreenVideo({ src, index: idx })}
-                      aria-label="Expand video"
-                      style={{ position: 'absolute', top: 8, right: 50, background: 'rgba(0,0,0,0.55)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', width: 34, height: 34, borderRadius: 17, cursor: 'pointer', display: 'grid', placeItems: 'center', backdropFilter: 'blur(6px)' as any, fontSize: '18px' }}
-                    >
-                      ⛶
-                    </button>
-                    <div style={{ position: 'absolute', left: 12, bottom: 12, background: 'rgba(0,0,0,0.6)', color: '#fff', padding: '6px 10px', borderRadius: 999, fontSize: 12 }}>#postkar</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Products (from catalog) */}
-      <section className="section section-products reveal in">
-        <div className="container">
-          <div className="card" style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 12, padding: '1rem', overflow: 'visible' }}>
-            <div className="section-head" style={{ marginBottom: '1rem' }}>
-              <h2 className="section-title">Featured Products</h2>
-            </div>
-            <ProductGrid 
-              products={products} 
-              loading={loadingProducts} 
-              onProductClick={(id) => { window.location.href = `/product/${id}`; }}
-              horizontal={true}
-              showArrows={true}
-              cardProps={{ comingSoon: true, hideCart: true, hidePrice: true }}
+        
+        <div style={{ position: 'relative', zIndex: 1 }}>
+        <SectionCard
+          tag="Community Spotlight"
+          title="See POST-kAR in Action"
+          description="Watch how our community brings their spaces to life with augmented reality experiences. Real stories, real transformations."
+          visual={
+            <AnimatedTestimonials 
+              testimonials={feedbackVideos.map((src, idx) => ({
+                src,
+                isVideo: true,
+                muted: muted[idx]
+              }))}
+              autoplay={true}
             />
-          </div>
+          }
+        />
         </div>
-      </section>
+      </ParallaxSection>
 
-{/* Services Section (Netflix-style scroll) */}
-<section className="section section-services reveal in">
-  <div className="container">
-    <div
-      className="card"
-      style={{
-        background: 'rgba(255,255,255,0.08)',
-        border: 'none',
-        borderRadius: 12,
-        padding: '1.5rem',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <h2 className="section-title">Services</h2>
-
-      {/* Horizontal Scrollable Cards */}
-      <div ref={servicesRef} className="services-scroll">
-        {[
-          {
-            title: 'Custom AR Campaigns',
-            meta: 'Branded AR experiences for culture & retail',
-          },
-          {
-            title: 'Creator Tools',
-            meta: 'Upload artworks and publish AR layers',
-            comingSoon: true,
-          },
-          {
-            title: 'Mobile App',
-            meta: 'Native app for scanning & collectibles',
-            comingSoon: true,
-          },
-          {
-            title: 'Virtual Tours',
-            meta: 'Interactive 3D & VR experiences for spaces',
-          },
-          {
-            title: 'Mixed Reality',
-            meta: 'Blend real and virtual worlds seamlessly',
-          },
-        ].map((service, i) => (
-          <div
-            key={i}
-            className="card service-card"
-            style={{
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 16,
-              flex: '0 0 auto',
+      {/* Featured Products */}
+      <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={1}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+          <Hyperspeed
+            effectOptions={{
+              distortion: 'turbulentDistortion',
+              length: 400,
+              roadWidth: 10,
+              islandWidth: 2,
+              lanesPerRoad: 4,
+              fov: 90,
+              colors: {
+                roadColor: 0x080808,
+                islandColor: 0x0a0a0a,
+                background: 0x000000,
+                shoulderLines: 0xFFFFFF,
+                brokenLines: 0xFFFFFF,
+                leftCars: [0xD856BF, 0x6750A2, 0xC247AC],
+                rightCars: [0x03B3C3, 0x0E5EA5, 0x324555],
+                sticks: 0x03B3C3,
+              }
             }}
-          >
-            <div className="card-body">
-              <h3 className="card-title">
-                {service.title}
-                {service.comingSoon && (
-                  <span style={{ 
-                    fontSize: '0.7rem', 
-                    marginLeft: '0.5rem', 
-                    color: 'rgba(255,255,255,0.6)',
-                    fontWeight: 400 
-                  }}>
-                    (Coming Soon)
-                  </span>
-                )}
-              </h3>
-              <p className="card-meta">{service.meta}</p>
+          />
+        </div>
+        
+        {/* Content on top */}
+        <div style={{ position: 'relative', zIndex: 1 }}>
+        <SectionCard
+          tag="Featured Products"
+          title="Premium AR Posters"
+          description="Discover our curated collection of premium posters. Each design comes to life with augmented reality, telling unique stories."
+          reverse={true}
+          visual={
+            <div style={{ height: '500px', position: 'relative', width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <CardSwap
+                width={350}
+                height={400}
+                cardDistance={50}
+                verticalDistance={60}
+                delay={5000}
+                pauseOnHover={false}
+                easing="elastic"
+                onCardClick={(idx) => {
+                  const product = featuredProducts.slice(0, 4)[idx];
+                  if (product) {
+                    window.location.href = `/product/${product.id}`;
+                  }
+                }}
+              >
+                {featuredProducts.slice(0, 4).map((product) => (
+                  <Card key={product.id}>
+                    <img 
+                      src={product.thumbnail_url || product.image_url}
+                      alt={product.name}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        display: 'block',
+                        borderRadius: '8px'
+                      }}
+                    />
+                  </Card>
+                ))}
+              </CardSwap>
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-</section>
-
-{/* Join Our Growing Community Section */}
-<section className="section section-community reveal in" style={{ padding: '4rem 0' }}>
-  <div className="container">
-    <div
-      className="card"
-      style={{
-        background: 'rgba(255,255,255,0.08)',
-        border: 'none',
-        borderRadius: 12,
-        padding: '3rem 2rem',
-        textAlign: 'center',
-      }}
-    >
-      <h2 style={{ 
-        fontSize: 'clamp(2rem, 4vw, 2.5rem)', 
-        fontWeight: 700, 
-        marginBottom: '1rem',
-        color: '#fff'
-      }}>
-        Join Our Growing Community
-      </h2>
-      <p style={{ 
-        fontSize: 'clamp(1rem, 2vw, 1.1rem)', 
-        color: 'rgba(255,255,255,0.7)',
-        marginBottom: '3rem',
-        maxWidth: '600px',
-        margin: '0 auto 3rem'
-      }}>
-        A little luxury never hurts anyone
-      </p>
-
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '2rem',
-        maxWidth: '800px',
-        margin: '0 auto 2rem'
-      }}>
-        <div style={{
-          background: 'rgba(255,255,255,0.05)',
-          borderRadius: '12px',
-          padding: '2rem 1.5rem',
-          border: '1px solid rgba(255,255,255,0.1)'
-        }}>
-          <div style={{ 
-            width: '48px', 
-            height: '48px', 
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 1rem',
-            fontSize: '1.5rem'
-          }}>
-            👁️
-          </div>
-          <div style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            color: '#fff',
-            marginBottom: '0.5rem'
-          }}>
-            635
-          </div>
-          <div style={{ 
-            fontSize: '0.9rem', 
-            color: 'rgba(255,255,255,0.6)',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-          }}>
-            Total Visits
-          </div>
+          }
+        />
         </div>
+      </ParallaxSection>
 
-        <div style={{
-          background: 'rgba(255,255,255,0.05)',
-          borderRadius: '12px',
-          padding: '2rem 1.5rem',
-          border: '1px solid rgba(255,255,255,0.1)'
-        }}>
-          <div style={{ 
-            width: '48px', 
-            height: '48px', 
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 1rem',
-            fontSize: '1.5rem'
-          }}>
-            👥
-          </div>
-          <div style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            color: '#fff',
-            marginBottom: '0.5rem'
-          }}>
-            1
-          </div>
-          <div style={{ 
-            fontSize: '0.9rem', 
-            color: 'rgba(255,255,255,0.6)',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-          }}>
-            Active Now
-          </div>
+      {/* Services */}
+      <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={2}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+          <Galaxy 
+            mouseRepulsion={true}
+            mouseInteraction={true}
+            density={1.5}
+            glowIntensity={0.5}
+            saturation={0.8}
+            hueShift={140}
+            transparent={true}
+          />
         </div>
+        
+        <div style={{ position: 'relative', zIndex: 1 }}>
+        <SectionCard
+          tag="Our Services"
+          title="AR Solutions for Everyone"
+          description="From custom AR campaigns to creator tools, we provide innovative solutions that blend reality with imagination."
+          visual={
+            <div style={{ 
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '1.5rem'
+            }}>
+              {[
+                { icon: '🎨', title: 'Custom AR', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+                { icon: '🛠️', title: 'Creator Tools', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+                { icon: '📱', title: 'Mobile App', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+                { icon: '✨', title: 'Mixed Reality', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
+              ].map((service, i) => (
+                <div key={i} style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  backdropFilter: 'blur(20px)',
+                  borderRadius: '20px',
+                  padding: '2rem',
+                  textAlign: 'center',
+                  transition: 'transform 0.3s ease',
+                  cursor: 'pointer',
+                  border: '1px solid rgba(255,255,255,0.2)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-10px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                  <div style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '20px',
+                    background: service.gradient,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '2.5rem',
+                    margin: '0 auto 1rem',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+                  }}>
+                    {service.icon}
+                  </div>
+                  <h3 style={{
+                    fontSize: '1.25rem',
+                    fontWeight: '700',
+                    color: '#fff'
+                  }}>
+                    {service.title}
+                  </h3>
+                </div>
+              ))}
+            </div>
+          }
+        />
+        </div>
+      </ParallaxSection>
+
+      {/* Join Our Growing Community */}
+      <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={3}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+          <Orb
+            hoverIntensity={0.5}
+            rotateOnHover={true}
+            hue={260}
+            forceHoverState={false}
+          />
+        </div>
+        
+        <div style={{ position: 'relative', zIndex: 1 }}>
+        <SectionCard
+          tag="Join Us"
+          title="Growing Together"
+          description="Be part of our thriving community. Experience the future of augmented reality with POST-kAR."
+          reverse={true}
+          visual={
+            <div style={{ 
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '1.5rem'
+            }}>
+              {[
+                { icon: '👁️', value: totalVisits || '1.2k', label: 'Visits', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
+                { icon: '👥', value: activeUsers || '24', label: 'Active', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
+                { icon: '📱', value: 'Soon', label: 'App', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' },
+                { icon: '🔗', value: '100%', label: 'Connected', gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
+              ].map((stat, i) => (
+                <div key={i} style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  backdropFilter: 'blur(20px)',
+                  borderRadius: '20px',
+                  padding: '2rem',
+                  textAlign: 'center',
+                  transition: 'transform 0.3s ease',
+                  cursor: 'pointer',
+                  border: '1px solid rgba(255,255,255,0.2)'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-10px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                >
+                  <div style={{ 
+                    width: '60px', 
+                    height: '60px', 
+                    borderRadius: '15px',
+                    background: stat.gradient,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 1rem',
+                    fontSize: '1.8rem',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+                  }}>
+                    {stat.icon}
+                  </div>
+                  <div style={{ 
+                    fontSize: '2.5rem', 
+                    fontWeight: '800', 
+                    color: '#fff',
+                    marginBottom: '0.5rem'
+                  }}>
+                    {stat.value}
+                  </div>
+                  <div style={{ 
+                    fontSize: '0.9rem', 
+                    color: 'rgba(255,255,255,0.8)',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1px',
+                    fontWeight: '600'
+                  }}>
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          }
+        />
+        </div>
+      </ParallaxSection>
       </div>
-
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        gap: '0.5rem',
-        color: 'rgba(255,255,255,0.5)',
-        fontSize: '0.85rem',
-        marginBottom: '1rem'
-      }}>
-        <span style={{ 
-          width: '8px', 
-          height: '8px', 
-          borderRadius: '50%',
-          background: '#4ade80',
-          display: 'inline-block'
-        }} />
-        Live tracking • Updated in real-time
-      </div>
-
-      <button 
-        onClick={() => setIsAuthModalOpen(true)}
-        className="submit-btn"
-        style={{ 
-          padding: '1rem 2.5rem',
-          fontSize: '1rem',
-          fontWeight: 600,
-          marginTop: '1rem'
-        }}
-      >
-        Join Waitlist
-      </button>
-    </div>
-  </div>
-</section>
-
+      {/* End Stacked Parallax Sections */}
 
       {/* Reviews removed as requested */}
 
