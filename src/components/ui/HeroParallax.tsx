@@ -8,6 +8,8 @@ import {
   MotionValue,
 } from "framer-motion";
 import { Link } from "react-router-dom";
+import GradientText from "./GradientText";
+import { EncryptedText } from "./encrypted-text";
 
 export const HeroParallax = ({
   products,
@@ -112,13 +114,29 @@ export const Header = () => {
   return (
     <div className="hero-parallax-header">
       <h1 className="hero-parallax-title">
-        POST-kAR
+        <GradientText
+          colors={["#40ffaa", "#4079ff", "#40ffaa", "#4079ff", "#40ffaa"]}
+          animationSpeed={3}
+          showBorder={false}
+        >
+          POST-kAR
+        </GradientText>
       </h1>
       <p className="hero-parallax-subtitle">
-        Beyond The Frame: Link your clicks
+        <EncryptedText
+          text="Beyond The Frame: Link your clicks"
+          encryptedClassName="text-neutral-500"
+          revealedClassName="text-white"
+          revealDelayMs={100}
+        />
       </p>
       <p className="hero-parallax-description">
-        Experience Culture Through Augmented Reality
+        <EncryptedText
+          text="Experience Culture Through Augmented Reality"
+          encryptedClassName="text-neutral-600"
+          revealedClassName="text-neutral-300"
+          revealDelayMs={500}
+        />
       </p>
     </div>
   );

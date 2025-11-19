@@ -11,7 +11,7 @@ html, body {
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   overflow-x: hidden;
-  scroll-behavior: smooth;
+  /* Performance: Removed smooth scroll behavior - causes lag with sticky parallax sections */
 }
 
 * {
@@ -1265,4 +1265,239 @@ html::-webkit-scrollbar,
 body::-webkit-scrollbar {
   width: 0px;
   background: transparent; /* hide Chrome/Safari scrollbar */
+}
+
+/* ============================================
+   MOBILE RESPONSIVE - SERVICE & COMMUNITY CARDS
+   ============================================ */
+
+/* Services Grid Responsive */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.service-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.service-card:hover {
+  transform: translateY(-10px);
+}
+
+/* Community Stats Grid Responsive */
+.community-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.stat-card:hover {
+  transform: translateY(-10px);
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .services-grid {
+    gap: 1.25rem;
+  }
+  
+  .service-card,
+  .stat-card {
+    padding: 1.5rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .community-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .service-card,
+  .stat-card {
+    padding: 1.5rem;
+  }
+
+  .service-card h3,
+  .stat-card h3 {
+    font-size: 1.1rem !important;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .service-card,
+  .stat-card {
+    padding: 1.25rem;
+  }
+}
+
+/* Featured Products Wrapper */
+.featured-products-wrapper {
+  height: 500px;
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .featured-products-wrapper {
+    height: 400px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .featured-products-wrapper {
+    height: 400px;
+    justify-content: center;
+  }
+  
+  /* Scale down card stack to fit mobile */
+  .featured-products-wrapper > div {
+    transform: scale(0.75);
+    transform-origin: center center;
+  }
+}
+
+/* Orbiting Services Container */
+.orbiting-services-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 550px;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem !important;
+  overflow: visible;
+}
+
+/* Orbit Path Animation */
+.orbit-path {
+  animation: orbit-pulse 4s ease-in-out infinite;
+}
+
+@keyframes orbit-pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+}
+
+@media (max-width: 768px) {
+  .orbiting-services-wrapper {
+    min-height: 500px;
+    padding: 2rem !important;
+  }
+  
+  /* Scale down service card content on tablet */
+  .orbiting-services-wrapper .orbit-icon > div {
+    transform: scale(0.85);
+  }
+  
+  /* Smaller orbit path on tablet */
+  .orbiting-services-wrapper .orbit-path {
+    width: 320px !important;
+    height: 320px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .orbiting-services-wrapper {
+    min-height: 500px;
+    padding: 2rem !important;
+  }
+  
+  /* Scale down for mobile */
+  .orbiting-services-wrapper .orbit-icon > div {
+    transform: scale(0.7);
+  }
+  
+  /* Smaller orbit icon containers */
+  .orbiting-services-wrapper .orbit-icon {
+    width: 90px !important;
+    height: 90px !important;
+  }
+  
+  /* Smaller orbit path on mobile */
+  .orbiting-services-wrapper .orbit-path {
+    width: 200px !important;
+    height: 200px !important;
+  }
+}
+
+/* Join Us Orb Container - Center behind glass icons on mobile */
+@media (max-width: 480px) {
+  .join-us-orb-container {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    padding-top: 8rem !important;
+  }
+  
+  .join-us-orb-container > * {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: scale(0.8) !important;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .service-card,
+  .stat-card,
+  .card {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .service-card:active,
+  .stat-card:active {
+    transform: translateY(-5px);
+  }
+}
+
+/* Ensure proper viewport sizing on mobile */
+@supports (-webkit-touch-callout: none) {
+  .parallax-section {
+    min-height: -webkit-fill-available;
+  }
 }

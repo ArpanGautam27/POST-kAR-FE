@@ -179,6 +179,43 @@ export const AnimatedTestimonials: React.FC<AnimatedTestimonialsProps> = ({
           width: 20px;
           height: 20px;
         }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+          .testimonials-grid {
+            height: 400px;
+          }
+
+          .nav-button {
+            width: 40px;
+            height: 40px;
+          }
+
+          .nav-button svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .testimonials-grid {
+            height: 350px;
+          }
+
+          .testimonials-content {
+            gap: 1.5rem;
+          }
+
+          .nav-button {
+            width: 36px;
+            height: 36px;
+          }
+
+          .nav-button svg {
+            width: 14px;
+            height: 14px;
+          }
+        }
       `}</style>
     </div>
   );

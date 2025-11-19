@@ -1,0 +1,65 @@
+.orbiting-circles {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Performance optimizations */
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.orbit-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size, 120px);
+  height: var(--size, 120px);
+  animation-name: orbit;
+  animation-duration: var(--duration, 13.33s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  animation-delay: var(--delay, 0s);
+  animation-play-state: running;
+  animation-fill-mode: both;
+  /* Hardware acceleration */
+  will-change: transform;
+  backface-visibility: hidden;
+  transform-origin: 0% 0%;
+  margin: calc(var(--size, 120px) / -2) 0 0 calc(var(--size, 120px) / -2);
+  /* Visual indicator */
+  filter: drop-shadow(0 4px 12px rgba(255, 255, 255, 0.3));
+}
+
+.orbit-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes orbit {
+  0% {
+    transform: rotate(0deg) translateX(var(--radius, 180px)) rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg) translateX(var(--radius, 180px)) rotate(-360deg);
+  }
+}
+
+/* Keep content upright while orbiting - no need for counter rotation since orbit already handles it */
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .orbiting-circles {
+    --radius: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .orbiting-circles {
+    --radius: 100px;
+  }
+}

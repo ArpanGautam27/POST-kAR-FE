@@ -24,4 +24,20 @@
 
 .card img {
   border-radius: 8px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .card-swap-container {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  }
 }

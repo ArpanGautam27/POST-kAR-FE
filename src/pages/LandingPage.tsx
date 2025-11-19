@@ -27,8 +27,13 @@ import Hyperspeed from '../components/ui/Hyperspeed';
 import Particles from '../components/ui/Particles';
 import Galaxy from '../components/ui/Galaxy';
 import Orb from '../components/ui/Orb';
+import { OrbitingCircles } from '../components/ui/OrbitingCircles';
+import GlassIcons from '../components/ui/GlassIcons';
 import { useCounter } from '../hooks/useCounter';
 import arFurnitureAnimation from '../assets/AR Furniture Viewer.json';
+import studioAnimation from '../assets/studio.json';
+import phoneAnimation from '../assets/phone.json';
+import xrAnimation from '../assets/xr.json';
 import '../components/ui/HeroParallax.css';
 import xLogo from '../assets/x_logo.svg';
 import instagramLogo from '../assets/instagram_logo.svg';
@@ -317,14 +322,14 @@ export default function LandingPage() {
       <div>
         {/* Community Spotlight: Video Stories */}
         <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={0}>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
           <Particles
             particleColors={['#f093fb', '#f5576c']}
-            particleCount={200}
+            particleCount={window.innerWidth < 768 ? 100 : 200}
             particleSpread={10}
             speed={0.1}
             particleBaseSize={100}
-            moveParticlesOnHover={true}
+            moveParticlesOnHover={window.innerWidth >= 768}
             alphaParticles={false}
             disableRotation={false}
           />
@@ -382,7 +387,7 @@ export default function LandingPage() {
           description="Discover our curated collection of premium posters. Each design comes to life with augmented reality, telling unique stories."
           reverse={true}
           visual={
-            <div style={{ height: '500px', position: 'relative', width: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+            <div className="featured-products-wrapper">
               <CardSwap
                 width={350}
                 height={400}
@@ -440,92 +445,126 @@ export default function LandingPage() {
           title="AR Solutions for Everyone"
           description="From custom AR campaigns to creator tools, we provide innovative solutions that blend reality with imagination."
           visual={
-            <div style={{ 
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: '1.5rem'
-            }}>
-              {[
+            (() => {
+              const LottiePlayer = 'lottie-player' as any;
+              
+              const services = [
                 { 
                   title: 'AR Interior Designer', 
-                  gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  hasAnimation: true,
+                  animation: arFurnitureAnimation,
                   comingSoon: false
                 },
-                { icon: '🛠️', title: 'Creator Tools', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-                { icon: '📱', title: 'Mobile App', gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', comingSoon: true },
-                { icon: '✨', title: 'Mixed Reality', gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' },
-              ].map((service, i) => (
+                { 
+                  title: 'Creator Tools', 
+                  animation: studioAnimation,
+                  comingSoon: true
+                },
+                { 
+                  title: 'Mobile App', 
+                  animation: phoneAnimation,
+                  comingSoon: true
+                },
+                { 
+                  title: 'Mixed Reality', 
+                  animation: xrAnimation,
+                  comingSoon: false
+                },
+              ];
+
+              const serviceCards = services.map((service, i) => (
                 <div key={i} style={{
-                  background: 'rgba(255,255,255,0.15)',
-                  backdropFilter: 'blur(20px)',
-                  borderRadius: '20px',
-                  padding: '2rem',
-                  textAlign: 'center',
-                  transition: 'transform 0.3s ease',
-                  cursor: 'pointer',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  position: 'relative'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-10px)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
+                  position: 'relative',
+                  width: '120px',
+                  height: '120px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  textAlign: 'center'
+                }}>
                   {service.comingSoon && (
                     <div style={{
                       position: 'absolute',
-                      top: '1rem',
-                      right: '1rem',
+                      top: '-8px',
+                      right: '-8px',
                       background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
                       color: '#fff',
-                      padding: '0.25rem 0.75rem',
+                      padding: '0.25rem 0.5rem',
                       borderRadius: '50px',
-                      fontSize: '0.7rem',
+                      fontSize: '0.6rem',
                       fontWeight: '700',
                       letterSpacing: '0.5px',
-                      textTransform: 'uppercase'
+                      textTransform: 'uppercase',
+                      boxShadow: '0 4px 15px rgba(240, 147, 251, 0.6)',
+                      zIndex: 10
                     }}>
-                      Coming Soon
+                      Soon
                     </div>
                   )}
                   <div style={{
-                    width: '80px',
-                    height: '80px',
-                    borderRadius: '20px',
-                    background: service.gradient,
+                    width: '100px',
+                    height: '100px',
+                    borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.08)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '2px solid rgba(255,255,255,0.2)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '2.5rem',
-                    margin: '0 auto 1rem',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
-                    overflow: 'hidden'
+                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                    overflow: 'visible',
+                    padding: '1.2rem',
+                    marginBottom: '0.5rem'
                   }}>
-                    {service.hasAnimation ? (
-                      (() => {
-                        const LottiePlayer = 'lottie-player' as any;
-                        return (
-                          <LottiePlayer
-                            src={JSON.stringify(arFurnitureAnimation)}
-                            background="transparent"
-                            speed="1"
-                            loop
-                            autoplay
-                            style={{ width: '100%', height: '100%' }}
-                          />
-                        );
-                      })()
-                    ) : service.icon}
+                    <LottiePlayer
+                      src={JSON.stringify(service.animation)}
+                      background="transparent"
+                      speed="1"
+                      loop
+                      autoplay
+                      style={{ width: '100%', height: '100%' }}
+                    />
                   </div>
                   <h3 style={{
-                    fontSize: '1.25rem',
+                    fontSize: '0.75rem',
                     fontWeight: '700',
-                    color: '#fff'
+                    color: '#fff',
+                    lineHeight: '1.2',
+                    textShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                    margin: 0
                   }}>
                     {service.title}
                   </h3>
                 </div>
-              ))}
-            </div>
+              ));
+
+              return (
+                <div className="orbiting-services-wrapper" style={{ padding: '2rem', position: 'relative' }}>
+                  {/* Visible Orbit Path */}
+                  <div className="orbit-path" style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '400px',
+                    height: '400px',
+                    borderRadius: '50%',
+                    border: '2px dashed rgba(255,255,255,0.25)',
+                    boxShadow: '0 0 20px rgba(255,255,255,0.1), inset 0 0 20px rgba(255,255,255,0.05)',
+                    pointerEvents: 'none',
+                    zIndex: 0
+                  }} />
+                  
+                  <OrbitingCircles iconSize={120} radius={180} speed={1.5}>
+                    {serviceCards[0]}
+                    {serviceCards[1]}
+                    {serviceCards[2]}
+                    {serviceCards[3]}
+                  </OrbitingCircles>
+                </div>
+              );
+            })()
           }
         />
         </div>
@@ -533,7 +572,7 @@ export default function LandingPage() {
 
       {/* Join Our Growing Community */}
       <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={3}>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+        <div className="join-us-orb-container" style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
           <Orb
             hoverIntensity={0.5}
             rotateOnHover={true}
@@ -549,63 +588,47 @@ export default function LandingPage() {
           description="Be part of our thriving community. Experience the future of augmented reality with POST-kAR."
           reverse={true}
           visual={
-            <div style={{ 
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '1.5rem'
-            }}>
-              {[
-                { icon: '👁️', value: visitsCount, label: 'Visits', gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' },
-                { icon: '👥', value: activeUsersCount, label: 'Active Users', gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' },
-                { icon: '🔗', value: '100%', label: 'Connected', gradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' },
-              ].map((stat, i) => (
-                <div key={i} style={{
-                  background: 'rgba(255,255,255,0.15)',
-                  backdropFilter: 'blur(20px)',
-                  borderRadius: '20px',
-                  padding: '2rem',
-                  textAlign: 'center',
-                  transition: 'transform 0.3s ease',
-                  cursor: 'pointer',
-                  border: '1px solid rgba(255,255,255,0.2)'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-10px)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                >
-                  <div style={{ 
-                    width: '60px', 
-                    height: '60px', 
-                    borderRadius: '15px',
-                    background: stat.gradient,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 1rem',
-                    fontSize: '1.8rem',
-                    boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-                  }}>
-                    {stat.icon}
-                  </div>
-                  <div style={{ 
-                    fontSize: '2.5rem', 
-                    fontWeight: '800', 
-                    color: '#fff',
-                    marginBottom: '0.5rem'
-                  }}>
-                    {stat.value}
-                  </div>
-                  <div style={{ 
-                    fontSize: '0.9rem', 
-                    color: 'rgba(255,255,255,0.8)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '1px',
-                    fontWeight: '600'
-                  }}>
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <GlassIcons 
+              className="community-glass-icons"
+              items={[
+                { 
+                  icon: (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
+                      <span style={{ fontSize: '2.5rem' }}>👁️</span>
+                      <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+                        {visitsCount}
+                      </div>
+                    </div>
+                  ), 
+                  color: 'purple', 
+                  label: 'Visits'
+                },
+                { 
+                  icon: (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
+                      <span style={{ fontSize: '2.5rem' }}>👥</span>
+                      <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+                        {activeUsersCount}
+                      </div>
+                    </div>
+                  ), 
+                  color: 'red', 
+                  label: 'Active Users'
+                },
+                { 
+                  icon: (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
+                      <span style={{ fontSize: '2.5rem' }}>🔗</span>
+                      <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+                        100%
+                      </div>
+                    </div>
+                  ), 
+                  color: 'green', 
+                  label: 'Connected'
+                },
+              ]}
+            />
           }
         />
         </div>

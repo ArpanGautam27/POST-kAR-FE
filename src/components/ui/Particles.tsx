@@ -100,7 +100,7 @@ const fragment = /* glsl */ `
 `;
 
 const Particles: React.FC<ParticlesProps> = ({
-  particleCount = 200,
+  particleCount = 1500,
   particleSpread = 10,
   speed = 0.1,
   particleColors,
@@ -129,13 +129,20 @@ const Particles: React.FC<ParticlesProps> = ({
     camera.position.set(0, 0, cameraDistance);
 
     const resize = () => {
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-      renderer.setSize(width, height);
-      camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
+      const width = container.clientWidth || window.innerWidth;
+      const height = container.clientHeight || window.innerHeight;
+      
+      // Only resize if we have valid dimensions
+      if (width > 0 && height > 0) {
+        renderer.setSize(width, height);
+        camera.perspective({ aspect: width / height });
+      }
     };
     window.addEventListener('resize', resize, false);
+    
+    // Initial resize
     resize();
+    const resizeTimeout = setTimeout(resize, 100);
 
     const handleMouseMove = (e: MouseEvent) => {
       const rect = container.getBoundingClientRect();
@@ -154,6 +161,9 @@ const Particles: React.FC<ParticlesProps> = ({
     const colors = new Float32Array(count * 3);
     const palette = particleColors && particleColors.length > 0 ? particleColors : defaultColors;
 
+    // Pre-calculate colors to reduce memory allocations
+    const parsedColors = palette.map(hexToRgb);
+
     for (let i = 0; i < count; i++) {
       let x: number, y: number, z: number, len: number;
       do {
@@ -165,7 +175,7 @@ const Particles: React.FC<ParticlesProps> = ({
       const r = Math.cbrt(Math.random());
       positions.set([x * r, y * r, z * r], i * 3);
       randoms.set([Math.random(), Math.random(), Math.random(), Math.random()], i * 4);
-      const col = hexToRgb(palette[Math.floor(Math.random() * palette.length)]);
+      const col = parsedColors[Math.floor(Math.random() * parsedColors.length)];
       colors.set(col, i * 3);
     }
 
@@ -197,6 +207,8 @@ const Particles: React.FC<ParticlesProps> = ({
 
     const update = (t: number) => {
       animationFrameId = requestAnimationFrame(update);
+      
+      // Always update timing
       const delta = t - lastTime;
       lastTime = t;
       elapsed += delta * speed;
@@ -217,19 +229,34 @@ const Particles: React.FC<ParticlesProps> = ({
         particles.rotation.z += 0.01 * speed;
       }
 
+      // Always render, even if not visible - this prevents blank canvas
       renderer.render({ scene: particles, camera });
     };
 
     animationFrameId = requestAnimationFrame(update);
 
     return () => {
+      clearTimeout(resizeTimeout);
       window.removeEventListener('resize', resize);
       if (moveParticlesOnHover) {
         container.removeEventListener('mousemove', handleMouseMove);
       }
       cancelAnimationFrame(animationFrameId);
+      
+      // Clean up WebGL resources to prevent memory leaks
+      if (geometry) {
+        // @ts-ignore - OGL geometry cleanup
+        geometry.remove && geometry.remove();
+      }
+      
       if (container.contains(gl.canvas)) {
         container.removeChild(gl.canvas);
+      }
+      
+      // Clear GL context
+      const ext = gl.getExtension('WEBGL_lose_context');
+      if (ext) {
+        ext.loseContext();
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

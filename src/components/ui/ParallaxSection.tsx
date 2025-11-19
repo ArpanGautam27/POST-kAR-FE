@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
+import './ParallaxSection.css';
 
 interface ParallaxSectionProps {
   children: React.ReactNode;
@@ -12,24 +13,11 @@ export const ParallaxSection: React.FC<ParallaxSectionProps> = ({
   gradient,
   index = 0
 }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  });
-
-  // Keep sections mostly visible with subtle scale for depth
-  const scale = useTransform(
-    scrollYProgress,
-    [0, 0.25, 0.75, 1],
-    [0.92, 1, 1, 0.92]
-  );
-
+  // Simplified - removed scale animation to reduce lag
   return (
     <motion.section
-      ref={ref}
+      className="parallax-section"
       style={{
-        scale,
         background: gradient,
         position: 'sticky',
         top: 0,
@@ -37,14 +25,12 @@ export const ParallaxSection: React.FC<ParallaxSectionProps> = ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '4rem 2rem',
-        willChange: 'transform',
         zIndex: index + 1
       }}
     >
-      <motion.div className="parallax-content">
+      <div className="parallax-content">
         {children}
-      </motion.div>
+      </div>
     </motion.section>
   );
 };
@@ -65,51 +51,19 @@ export const SectionCard: React.FC<SectionCardProps> = ({
   reverse = false
 }) => {
   return (
-    <div style={{
-      maxWidth: '1400px',
-      margin: '0 auto',
-      display: 'grid',
-      gridTemplateColumns: reverse ? '1fr 1fr' : '1fr 1fr',
-      gap: '4rem',
-      alignItems: 'center',
-      width: '100%'
-    }}>
-      <div style={{ order: reverse ? 2 : 1 }}>
-        <div style={{
-          display: 'inline-block',
-          padding: '0.5rem 1.5rem',
-          borderRadius: '50px',
-          background: 'rgba(255,255,255,0.2)',
-          backdropFilter: 'blur(10px)',
-          fontSize: '0.85rem',
-          fontWeight: '600',
-          textTransform: 'uppercase',
-          letterSpacing: '1.5px',
-          marginBottom: '2rem',
-          color: 'rgba(255,255,255,0.9)'
-        }}>
+    <div className="section-card" data-reverse={reverse}>
+      <div className="section-card__content">
+        <div className="section-card__tag">
           {tag}
         </div>
-        <h2 style={{
-          fontSize: 'clamp(2.5rem, 5vw, 4rem)',
-          fontWeight: '800',
-          color: '#fff',
-          marginBottom: '1.5rem',
-          lineHeight: '1.1',
-          letterSpacing: '-0.02em'
-        }}>
+        <h2 className="section-card__title">
           {title}
         </h2>
-        <p style={{
-          fontSize: 'clamp(1rem, 2vw, 1.25rem)',
-          color: 'rgba(255,255,255,0.8)',
-          lineHeight: '1.6',
-          maxWidth: '500px'
-        }}>
+        <p className="section-card__description">
           {description}
         </p>
       </div>
-      <div style={{ order: reverse ? 1 : 2 }}>
+      <div className="section-card__visual">
         {visual}
       </div>
     </div>
