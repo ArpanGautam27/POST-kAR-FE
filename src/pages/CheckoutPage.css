@@ -116,12 +116,26 @@
    /* forms */
    .checkout-form { display:flex; flex-direction:column; gap:12px; }
    .form-group label { font-weight:700; color:var(--white); margin-bottom:6px; display:block; }
-   .form-group input {
+   .form-group input,
+   .form-group select {
      padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);
      background: rgba(255,255,255,0.02); color:var(--white); outline:none; transition: box-shadow .18s, border-color .18s;
    }
    .form-group input::placeholder { color: rgba(255,255,255,0.36); }
-   .form-group input:focus { border-color: rgba(124,58,237,0.9); box-shadow: 0 6px 30px rgba(124,58,237,0.08); }
+   .form-group input:focus,
+   .form-group select:focus { border-color: rgba(124,58,237,0.9); box-shadow: 0 6px 30px rgba(124,58,237,0.08); }
+   .form-group select option { background: #1a1a2e; color: var(--white); }
+
+   /* selected address display */
+   .selected-address-display {
+     padding: 12px; border-radius: 10px; border: 1px solid rgba(124,58,237,0.3);
+     background: linear-gradient(180deg, rgba(124,58,237,0.08), rgba(124,58,237,0.02));
+     margin-top: 8px;
+   }
+   .address-display-item {
+     padding: 6px 0; color: var(--white); font-size: 14px; line-height: 1.5;
+   }
+   .address-display-item strong { color: rgba(124,58,237,0.9); font-weight: 700; }
    
    /* responsive */
    @media (max-width:900px) {

@@ -6,9 +6,23 @@ import './CheckoutPage.css';
 // Storage key used by AddressesPage
 const STORAGE_KEY = 'pk_addresses_v1';
 
+type Address = {
+  id: string;
+  fullName: string;
+  phone: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+  isDefault?: boolean;
+};
+
 export default function CheckoutPage() {
   const { items, totalItems, totalPrice, clearCart } = useCart();
   const [placing, setPlacing] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
   
   // Guest checkout form data
   const [formData, setFormData] = useState({
@@ -34,7 +48,25 @@ export default function CheckoutPage() {
 
   const defaultAddress = useMemo(() => {
     if (!addresses?.length) return null;
-    return addresses.find((a: any) => a.isDefault) ?? addresses[0];
+    return addresses.find((a: Address) => a.isDefault) ?? addresses[0];
+  }, [addresses]);
+
+  // Initialize selected address on first load
+  useMemo(() => {
+    if (!selectedAddressId && defaultAddress) {
+      setSelectedAddressId(defaultAddress.id);
+      setFormData({
+        email: formData.email,
+        fullName: defaultAddress.fullName,
+        phone: defaultAddress.phone,
+        line1: defaultAddress.line1,
+        line2: defaultAddress.line2 || '',
+        city: defaultAddress.city,
+        state: defaultAddress.state,
+        postalCode: defaultAddress.postalCode,
+        country: defaultAddress.country,
+      });
+    }
   }, [addresses]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,6 +74,24 @@ export default function CheckoutPage() {
       ...prev,
       [e.target.name]: e.target.value
     }));
+  };
+
+  const handleAddressSelect = (addressId: string) => {
+    const selected = addresses.find((a: Address) => a.id === addressId);
+    if (selected) {
+      setSelectedAddressId(addressId);
+      setFormData({
+        email: formData.email,
+        fullName: selected.fullName,
+        phone: selected.phone,
+        line1: selected.line1,
+        line2: selected.line2 || '',
+        city: selected.city,
+        state: selected.state,
+        postalCode: selected.postalCode,
+        country: selected.country,
+      });
+    }
   };
   
   const isFormValid = formData.email && formData.fullName && formData.phone && 
@@ -122,113 +172,152 @@ export default function CheckoutPage() {
                   required
                 />
               </div>
-              
-              <div className="form-group">
-                <label htmlFor="fullName">Full Name *</label>
-                <input
-                  type="text"
-                  id="fullName"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleInputChange}
-                  placeholder="John Doe"
-                  required
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="phone">Phone Number *</label>
-                <input
-                  type="tel"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                  placeholder="+1 (555) 000-0000"
-                  required
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="line1">Address Line 1 *</label>
-                <input
-                  type="text"
-                  id="line1"
-                  name="line1"
-                  value={formData.line1}
-                  onChange={handleInputChange}
-                  placeholder="123 Main Street"
-                  required
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="line2">Address Line 2</label>
-                <input
-                  type="text"
-                  id="line2"
-                  name="line2"
-                  value={formData.line2}
-                  onChange={handleInputChange}
-                  placeholder="Apt 4B (optional)"
-                />
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="city">City *</label>
-                  <input
-                    type="text"
-                    id="city"
-                    name="city"
-                    value={formData.city}
-                    onChange={handleInputChange}
-                    placeholder="New York"
-                    required
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="state">State *</label>
-                  <input
-                    type="text"
-                    id="state"
-                    name="state"
-                    value={formData.state}
-                    onChange={handleInputChange}
-                    placeholder="NY"
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="postalCode">Postal Code *</label>
-                  <input
-                    type="text"
-                    id="postalCode"
-                    name="postalCode"
-                    value={formData.postalCode}
-                    onChange={handleInputChange}
-                    placeholder="10001"
-                    required
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="country">Country *</label>
-                  <input
-                    type="text"
-                    id="country"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleInputChange}
-                    placeholder="United States"
-                    required
-                  />
-                </div>
-              </div>
+
+              {addresses.length > 0 ? (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="addressSelect">Select Delivery Address *</label>
+                    <select
+                      id="addressSelect"
+                      value={selectedAddressId || ''}
+                      onChange={(e) => handleAddressSelect(e.target.value)}
+                      required
+                    >
+                      <option value="">-- Select an address --</option>
+                      {addresses.map((addr: Address) => (
+                        <option key={addr.id} value={addr.id}>
+                          {addr.fullName} - {addr.line1}, {addr.city} {addr.postalCode}
+                          {addr.isDefault ? ' (Default)' : ''}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {selectedAddressId && (
+                    <div className="selected-address-display">
+                      <div className="address-display-item">
+                        <strong>Name:</strong> {formData.fullName}
+                      </div>
+                      <div className="address-display-item">
+                        <strong>Phone:</strong> {formData.phone}
+                      </div>
+                      <div className="address-display-item">
+                        <strong>Address:</strong> {formData.line1}
+                        {formData.line2 && `, ${formData.line2}`}, {formData.city}, {formData.state} {formData.postalCode}, {formData.country}
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="fullName">Full Name *</label>
+                    <input
+                      type="text"
+                      id="fullName"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleInputChange}
+                      placeholder="John Doe"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="phone">Phone Number *</label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      placeholder="+1 (555) 000-0000"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="line1">Address Line 1 *</label>
+                    <input
+                      type="text"
+                      id="line1"
+                      name="line1"
+                      value={formData.line1}
+                      onChange={handleInputChange}
+                      placeholder="123 Main Street"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="line2">Address Line 2</label>
+                    <input
+                      type="text"
+                      id="line2"
+                      name="line2"
+                      value={formData.line2}
+                      onChange={handleInputChange}
+                      placeholder="Apt 4B (optional)"
+                    />
+                  </div>
+                  
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label htmlFor="city">City *</label>
+                      <input
+                        type="text"
+                        id="city"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        placeholder="New York"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="state">State *</label>
+                      <input
+                        type="text"
+                        id="state"
+                        name="state"
+                        value={formData.state}
+                        onChange={handleInputChange}
+                        placeholder="NY"
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="form-row">
+                    <div className="form-group">
+                      <label htmlFor="postalCode">Postal Code *</label>
+                      <input
+                        type="text"
+                        id="postalCode"
+                        name="postalCode"
+                        value={formData.postalCode}
+                        onChange={handleInputChange}
+                        placeholder="10001"
+                        required
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="country">Country *</label>
+                      <input
+                        type="text"
+                        id="country"
+                        name="country"
+                        value={formData.country}
+                        onChange={handleInputChange}
+                        placeholder="United States"
+                        required
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </section>
 
