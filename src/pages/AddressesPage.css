@@ -1,154 +1,169 @@
-.addresses-page {
-  min-height: 100vh;
-  background: var(--color-bg-primary);
+/* -------------------------------
+   AddressesPage.css — Cinematic B2
+   Copy-paste to replace your AddressesPage.css
+   ------------------------------- */
+
+   * { box-sizing: border-box; }
+   :root {
+     --bg-a: #000009;
+     --bg-b: #050017;
+     --glass-strong: rgba(255,255,255,0.04);
+     --muted-text: rgba(255,255,255,0.72);
+     --accent: linear-gradient(135deg,#6366f1,#d946ef);
+     --radius: 18px;
+   }
+   
+   /* page background */
+   .addresses-page {
+     position: relative;
+     min-height: 100vh;
+     background: linear-gradient(180deg,var(--bg-a), var(--bg-b));
+     color: #fff;
+     padding-top: 82px;
+     overflow-x: hidden;
+   }
+   
+   /* ambient glow */
+   .addresses-page::before,
+   .addresses-page::after {
+     content:""; position:absolute; inset:-18%; pointer-events:none; z-index:0; filter: blur(60px);
+   }
+   .addresses-page::before { background: radial-gradient(circle at 20% 30%, rgba(99,102,241,0.18), transparent 12%); animation: floatSlow 19s infinite linear; mix-blend-mode: screen; }
+   .addresses-page::after  { background: radial-gradient(circle at 80% 70%, rgba(217,70,239,0.12), transparent 16%); animation: floatSlow 23s infinite linear reverse; mix-blend-mode: screen; }
+   
+   .addresses-container { position:relative; z-index:6; max-width:960px; margin:0 auto; padding:24px; }
+   
+   /* header */
+   .addresses-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+   .addresses-title { font-size:1.75rem; font-weight:800; color:#fff; }
+   
+   /* empty area */
+   .addresses-empty {
+     background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+     border-radius: 14px; padding: 20px; border: 1px solid rgba(255,255,255,0.04); box-shadow: 0 12px 40px rgba(2,6,30,0.65);
+     display:flex; gap:20px; align-items:center;
+   }
+   .addresses-empty-title { font-size:1.25rem; font-weight:800; color:#fff; }
+   .addresses-empty-sub { color: var(--muted-text); }
+   
+   /* list */
+   .addresses-list { display:grid; gap:14px; margin:0; padding:0; list-style:none; }
+   
+   /* address card = glass-card */
+   .address-card {
+     background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+     border: 1px solid rgba(255,255,255,0.04);
+     border-radius: 14px;
+     padding: 14px;
+     display:flex;
+     justify-content:space-between;
+     gap:12px;
+     box-shadow: 0 12px 38px rgba(0,0,0,0.6);
+     align-items:flex-start;
+   }
+   .address-card--default { border-color: rgba(124,58,237,0.9); box-shadow: 0 20px 60px rgba(99,92,246,0.08); }
+   
+   /* content inside */
+   .address-card__name { font-weight:700; color:#fff; margin-bottom:4px; }
+   .address-card__meta { color:var(--muted-text); margin-bottom:6px; }
+   .address-card__addr { color:rgba(255,255,255,0.9); line-height:1.5; }
+   
+   /* actions */
+   .address-card__actions { display:flex; gap:8px; align-items:center; }
+   .btn { border-radius:999px; padding:8px 14px; font-weight:700; cursor:pointer; border:none; }
+   .btn-primary { background: var(--accent); color:#fff; box-shadow: 0 10px 30px rgba(139,92,246,0.12); }
+   .btn-secondary { background: rgba(255,255,255,0.02); color:#fff; border:1px solid rgba(255,255,255,0.04); }
+   
+   /* form card */
+   .address-form-card {
+     margin-top: 18px;
+     background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+     border: 1px solid rgba(255,255,255,0.04);
+     border-radius: 14px;
+     padding: 16px;
+     box-shadow: 0 12px 40px rgba(0,0,0,0.65);
+   }
+   .address-form-title { font-size:1.125rem; font-weight:800; margin-bottom:12px; color:#fff; }
+   
+   /* form layout */
+   .address-form { display:grid; gap:12px; }
+   .form-row { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+   .form-row label { display:block; color:var(--muted-text); font-weight:700; margin-bottom:8px; }
+   .address-form input {
+     width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);
+     background: rgba(255,255,255,0.02); color:#fff; outline:none;
+   }
+   .address-form input:focus { border-color: rgba(124,58,237,0.9); box-shadow: 0 6px 30px rgba(124,58,237,0.06); }
+   
+   /* checkbox */
+   .checkbox { display:flex; align-items:center; gap:8px; color:var(--muted-text); }
+   
+   /* form actions align right */
+   .form-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:6px; }
+   
+   /* small errors */
+   .err { color:#ff6b6b; font-size:0.9rem; }
+   
+   /* responsive */
+   @media (max-width:768px) {
+     .form-row { grid-template-columns: 1fr; }
+     .addresses-container { padding:16px; }
+   }
+   
+   /* hover */
+   .card-hover { transition: transform .22s ease, box-shadow .22s; }
+   .card-hover:hover { transform: translateY(-6px); box-shadow: 0 28px 80px rgba(0,0,0,0.7); }
+   
+   /* shared animations */
+   @keyframes floatSlow { from { transform: translateY(0); } 50% { transform: translateY(-28px); } to { transform: translateY(0); } }
+   @keyframes particlesX { from { background-position: 0 0; } to { background-position: 4000px 0; } }
+/* === GLOBAL MODAL OVERRIDE (FINAL FIX) === */
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.06) !important;
+  backdrop-filter: blur(20px) saturate(160%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 22px !important;
+  color: white !important;
+
+  /* remove pure white box */
+  box-shadow: 0 20px 80px rgba(0,0,0,0.6) !important;
 }
 
-.addresses-container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: var(--spacing-10) var(--spacing-4);
+/* modal title */
+.modal-title {
+  color: #fff !important;
 }
 
-.addresses-header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* align to start */
-  gap: var(--spacing-4);
-  margin-bottom: var(--spacing-8);
+/* FORCE all inputs inside modal */
+.modal-content input {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: white !important;
+  border-radius: 14px !important;
+  padding: 14px 16px !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
 }
 
-.addresses-header--has {
-  justify-content: space-between; /* when list exists, push CTA to end */
+.modal-content input::placeholder {
+  color: rgba(255, 255, 255, 0.45) !important;
 }
 
-.addresses-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin: 0;
+.modal-content input:focus {
+  border-color: #8b5cf6 !important;
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
 }
 
-.addresses-empty {
-  text-align: left; /* align to start */
-  padding: var(--spacing-12) var(--spacing-6);
-  background: var(--color-bg-secondary);
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-xl);
-  margin-bottom: var(--spacing-10);
+/* checkbox fix */
+.modal-content .checkbox input {
+  accent-color: #8b5cf6 !important;
 }
 
-.addresses-empty-banner {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-8);
-  justify-content: center;
+/* Buttons inside modal */
+.modal-content .btn-primary {
+  background: linear-gradient(135deg, #6366f1, #d946ef) !important;
+  color: white !important;
+  border-radius: 40px !important;
 }
-
-.addresses-empty-content {
-  display: grid;
-  gap: var(--spacing-2); /* tighter spacing between text and CTA */
-  text-align: left;
-}
-
-.addresses-empty-title { 
-  margin: 0; 
-  font-size: 1.5rem; 
-  font-weight: 700; 
-}
-.addresses-empty-sub { 
-  margin: 0; 
-  color: var(--color-text-secondary); 
-}
-.empty-cta { 
-  width: fit-content; 
-  margin-top: var(--spacing-2); /* reduce gap to previous text */
-}
-
-.addresses-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: var(--spacing-6); /* better spacing between cards */
-  text-align: left; /* ensure left alignment */
-}
-
-.address-card {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--spacing-6);
-  background: #fff;
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-6);
-  box-shadow: var(--shadow-sm);
-  text-align: left; /* avoid centered text */
-}
-
-.address-card__main {
-  display: flex;
-  flex-direction: column;
-}
-
-.address-card--default {
-  border-color: var(--color-primary);
-  box-shadow: 0 6px 18px rgba(79, 70, 229, 0.08);
-}
-
-.address-card__name { font-weight: 600; margin-bottom: 4px; }
-.address-card__meta { color: var(--color-text-secondary); margin-bottom: 6px; }
-.address-card__addr { color: var(--color-text-primary); line-height: var(--line-height-relaxed); }
-
-.address-card__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-4);
-}
-
-.address-form-card {
-  margin-top: var(--spacing-10);
-  background: #fff;
-  border: 1px solid var(--color-border-light);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-sm);
-  padding: var(--spacing-6);
-}
-
-.address-form-title {
-  margin: 0 0 var(--spacing-5) 0;
-  font-size: 1.25rem;
-  font-weight: 700;
-}
-
-.address-form { display: grid; gap: var(--spacing-6); }
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-6);
-}
-
-.address-form label { display: grid; gap: var(--spacing-2); align-items: start; }
-.address-form input {
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-base);
-  padding: 12px 14px;
-  font-size: var(--font-size-base);
-  width: 100%;
-}
-
-.checkbox { display: flex; align-items: center; gap: var(--spacing-3); }
-.checkbox input { width: 18px; height: 18px; }
-.checkbox span { line-height: 1.2; }
-
-.form-actions { display: flex; justify-content: flex-end; gap: var(--spacing-4); }
-
-.err { color: #dc2626; font-size: var(--font-size-sm); }
-
-/* Reuse existing .btn, .btn-primary, .btn-secondary styles from ProductDetailPage.css */
-@media (max-width: 768px) {
-  .addresses-container { padding: var(--spacing-6) var(--spacing-4); }
-  .form-row { grid-template-columns: 1fr; }
-  .addresses-header { flex-direction: column; align-items: flex-start; gap: var(--spacing-3); }
-  .addresses-empty-banner { flex-direction: column; gap: var(--spacing-6); }
-}
+   

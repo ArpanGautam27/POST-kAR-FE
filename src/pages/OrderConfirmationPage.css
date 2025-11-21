@@ -1,84 +1,177 @@
-.order-confirm-page {
-  min-height: 100vh;
-  background: #f5f7fb;
-}
+/* ---------------------------------------------------------
+   OrderConfirmPage.css — CINEMATIC DARK + GLASS (Option B)
+   --------------------------------------------------------- */
 
-.order-confirm-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 40px 20px 80px;
-}
-
-.confirm-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 36px 28px;
-  text-align: center;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.04);
-}
-
-.confirm-card.success {
-  border-color: #a7f3d0;
-}
-
-.confirm-card.failure {
-  border-color: #fecaca;
-}
-
-.lottie-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
-.title {
-  font-size: 28px;
-  font-weight: 800;
-  color: #111827;
-  margin-bottom: 8px;
-}
-
-.subtitle {
-  color: #4b5563;
-  font-size: 16px;
-  margin-bottom: 8px;
-}
-
-.detail {
-  color: #6b7280;
-  font-weight: 600;
-  margin-bottom: 18px;
-}
-
-.actions {
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-}
-
-.btn {
-  display: inline-block;
-  text-decoration: none;
-  border-radius: 10px;
-  padding: 12px 18px;
-  font-weight: 700;
-}
-
-.btn.primary {
-  background: #111827;
-  color: #fff;
-}
-
-.btn.secondary {
-  background: #eef2ff;
-  color: #3730a3;
-}
-
-@media (max-width: 640px) {
-  .confirm-card {
-    padding: 28px 20px;
-  }
-  .title { font-size: 24px; }
-}
+   * { box-sizing: border-box; }
+   :root {
+     --bg-dark-1: #030014;
+     --bg-dark-2: #050018;
+     --accent-purple: #8b5cf6;
+     --accent-pink: #d946ef;
+     --accent-green: #10b981;
+     --accent-red: #ef4444;
+     --text-main: rgba(255,255,255,0.95);
+     --text-muted: rgba(255,255,255,0.6);
+     --radius-xl: 22px;
+   }
+   
+   /* 🔥 CINEMATIC BACKGROUND + ANIMATED GLOW */
+   .order-confirm-page {
+     position: relative;
+     min-height: 100vh;
+     padding-top: 82px;
+     background: linear-gradient(180deg, var(--bg-dark-1), var(--bg-dark-2));
+     overflow-x: hidden;
+   }
+   
+   /* floating glow layers */
+   .order-confirm-page::before,
+   .order-confirm-page::after {
+     content: "";
+     position: absolute;
+     inset: -20%;
+     pointer-events: none;
+     filter: blur(70px) saturate(140%);
+   }
+   
+   .order-confirm-page::before {
+     background: radial-gradient(circle at 20% 30%, rgba(139,92,246,0.25), transparent 30%);
+     animation: floatGlow 18s linear infinite;
+   }
+   
+   .order-confirm-page::after {
+     background: radial-gradient(circle at 80% 70%, rgba(217,70,239,0.2), transparent 40%);
+     animation: floatGlow 24s linear infinite reverse;
+   }
+   
+   /* subtle particle field */
+   .order-confirm-page .particles {
+     position: absolute;
+     inset: 0;
+     pointer-events: none;
+     opacity: 0.45;
+     background-image:
+       radial-gradient(circle at 10% 20%, rgba(255,255,255,0.03) 0px, transparent 2px),
+       radial-gradient(circle at 30% 70%, rgba(255,255,255,0.02) 0px, transparent 2px),
+       radial-gradient(circle at 80% 40%, rgba(255,255,255,0.025) 0px, transparent 2px);
+     background-size: 600px 600px, 900px 900px, 700px 700px;
+     animation: driftParticles 60s linear infinite;
+   }
+   
+   /* container */
+   .order-confirm-container {
+     position: relative;
+     z-index: 5;
+     max-width: 900px;
+     margin: 0 auto;
+     padding: 40px 20px 80px;
+   }
+   
+   /* 🔥 GLASS CARD */
+   .confirm-card {
+     background: rgba(255, 255, 255, 0.06);
+     border: 1px solid rgba(255, 255, 255, 0.15);
+     border-radius: var(--radius-xl);
+     padding: 40px 30px;
+     text-align: center;
+     backdrop-filter: blur(22px) saturate(160%);
+     box-shadow: 0 20px 80px rgba(0,0,0,0.6);
+     transition: 0.3s ease;
+   }
+   
+   /* glowing border colors */
+   .confirm-card.success {
+     border-color: rgba(16, 185, 129, 0.6);
+     box-shadow: 0 0 40px rgba(16,185,129,0.3);
+   }
+   .confirm-card.failure {
+     border-color: rgba(239,68,68,0.6);
+     box-shadow: 0 0 40px rgba(239,68,68,0.3);
+   }
+   
+   /* title area */
+   .lottie-wrap {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     margin-bottom: 12px;
+   }
+   
+   .title {
+     font-size: 32px;
+     font-weight: 900;
+     color: var(--text-main);
+     margin-bottom: 8px;
+   }
+   
+   .subtitle {
+     color: var(--text-muted);
+     font-size: 18px;
+     margin-bottom: 10px;
+   }
+   
+   .detail {
+     color: var(--text-muted);
+     font-weight: 600;
+     margin-bottom: 22px;
+   }
+   
+   /* buttons section */
+   .actions {
+     display: flex;
+     gap: 12px;
+     justify-content: center;
+     margin-top: 6px;
+   }
+   
+   .btn {
+     text-decoration: none;
+     border-radius: 40px;
+     padding: 12px 22px;
+     font-weight: 700;
+     transition: 0.25s ease;
+   }
+   
+   /* primary = neon purple/pink gradient */
+   .btn.primary {
+     background: linear-gradient(135deg, #6366f1, #d946ef);
+     color: white;
+     box-shadow: 0 12px 40px rgba(139,92,246,0.3);
+   }
+   .btn.primary:hover {
+     transform: translateY(-3px);
+     box-shadow: 0 22px 60px rgba(139,92,246,0.4);
+   }
+   
+   /* secondary = soft glass button */
+   .btn.secondary {
+     background: rgba(255,255,255,0.1);
+     color: var(--text-main);
+     border: 1px solid rgba(255,255,255,0.2);
+     backdrop-filter: blur(14px);
+   }
+   .btn.secondary:hover {
+     transform: translateY(-3px);
+     box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+   }
+   
+   /* responsive */
+   @media (max-width: 640px) {
+     .confirm-card {
+       padding: 28px 20px;
+     }
+     .title { font-size: 26px; }
+   }
+   
+   /* animations */
+   @keyframes floatGlow {
+     0% { transform: translateY(0) scale(1); }
+     50% { transform: translateY(-30px) scale(1.05); }
+     100% { transform: translateY(0) scale(1); }
+   }
+   
+   @keyframes driftParticles {
+     0% { background-position: 0 0, 0 0, 0 0; }
+     100% { background-position: 4000px 0, -2000px 0, 1500px 0; }
+   }
+   
