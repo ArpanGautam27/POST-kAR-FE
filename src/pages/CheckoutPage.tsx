@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import Navigation from '../components/layout/Navigation';
 import { useCart } from '../contexts/CartContext';
+import { orderService } from '../services/OrderService';
 import './CheckoutPage.css';
 
 // Storage key used by AddressesPage
@@ -34,7 +35,7 @@ export default function CheckoutPage() {
     city: '',
     state: '',
     postalCode: '',
-    country: 'United States'
+    country: ''
   });
 
   const addresses = useMemo(() => {
@@ -104,43 +105,34 @@ export default function CheckoutPage() {
     if (!isFormValid) return;
     setPlacing(true);
     try {
-      // Simulate order placement
-      await new Promise((r) => setTimeout(r, 1200));
-      const oid = `PK-${Date.now().toString(36).toUpperCase()}`;
-      const placedAt = new Date().toISOString();
-      const eta = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(); // +5 days
-      const order = {
-        id: oid,
-        status: 'PLACED',
-        paymentMethod: 'COD',
-        placedAt,
-        eta,
-        address: formData,
-        email: formData.email,
+      // Create order via API
+      const orderResponse = await orderService.createOrder({
         items: items.map((it) => ({
-          id: it.product.id,
-          name: it.product.name,
-          thumbnail_url: it.product.thumbnail_url,
+          productId: it.product.id,
           quantity: it.quantity,
-          unitPrice: 99.99,
-          lineTotal: 99.99 * it.quantity,
         })),
-        totals: {
-          subtotal: totalPrice,
-          shipping: 0,
-          total: totalPrice,
-          currency: 'USD',
+        address: {
+          fullName: formData.fullName,
+          phone: formData.phone,
+          line1: formData.line1,
+          line2: formData.line2,
+          city: formData.city,
+          state: formData.state,
+          postalCode: formData.postalCode,
+          country: formData.country,
         },
-      };
-      try {
-        const raw = localStorage.getItem('pk_orders_v1');
-        const list = raw ? JSON.parse(raw) : [];
-        list.unshift(order);
-        localStorage.setItem('pk_orders_v1', JSON.stringify(list));
-      } catch {}
-      clearCart();
-      window.location.href = `/order-confirmation?status=success&orderId=${encodeURIComponent(oid)}`;
+        email: formData.email,
+        paymentMethod: 'COD',
+      });
+
+      if (orderResponse.success && orderResponse.data) {
+        clearCart();
+        window.location.href = `/order-confirmation?status=success&orderId=${encodeURIComponent(orderResponse.data.id)}`;
+      } else {
+        throw new Error(orderResponse.error || 'Failed to create order');
+      }
     } catch (e) {
+      console.error('Order placement error:', e);
       window.location.href = `/order-confirmation?status=failed`;
     } finally {
       setPlacing(false);

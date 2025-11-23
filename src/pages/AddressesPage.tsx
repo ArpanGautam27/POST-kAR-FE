@@ -1,20 +1,9 @@
 import { useEffect, useState } from 'react';
 import Navigation from '../components/layout/Navigation';
 import Modal from '../components/common/Modal';
+import { addressService } from '../services/AddressService';
+import type { Address } from '../services/AddressService';
 import './AddressesPage.css';
-
-export type Address = {
-  id: string;
-  fullName: string;
-  phone: string;
-  line1: string;
-  line2?: string;
-  city: string;
-  state: string;
-  postalCode: string;
-  country: string;
-  isDefault?: boolean;
-};
 
 const STORAGE_KEY = 'pk_addresses_v1';
 
@@ -39,13 +28,32 @@ export default function AddressesPage() {
     isDefault: false,
   });
 
+  // Load addresses from API on mount
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setAddresses(JSON.parse(raw));
-    } catch {}
+    const loadAddresses = async () => {
+      try {
+        const response = await addressService.getAddresses();
+        if (response.success && response.data) {
+          setAddresses(response.data);
+        } else {
+          // Fallback to localStorage
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) setAddresses(JSON.parse(raw));
+        }
+      } catch (err) {
+        console.error('Error loading addresses:', err);
+        // Fallback to localStorage on error
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) setAddresses(JSON.parse(raw));
+        } catch {}
+      }
+    };
+
+    loadAddresses();
   }, []);
 
+  // Sync addresses to localStorage as backup
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(addresses));
@@ -85,45 +93,106 @@ export default function AddressesPage() {
     setEditing(null);
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const v = validate(form);
     setErrors(v);
     if (Object.keys(v).length) return;
+    
     setSaving(true);
-    const payload = { ...form, id: form.id || `addr_${Date.now()}` };
-    setAddresses(prev => {
-      let next = prev;
-      if (editing) {
-        next = prev.map(a => (a.id === editing.id ? payload : a));
-      } else {
-        next = [...prev, payload];
-      }
-      if (payload.isDefault) {
-        next = next.map(a => ({ ...a, isDefault: a.id === payload.id }));
-      }
-      return next;
-    });
-    setSaving(false);
-    setFormOpen(false);
-    setEditing(null);
-
-    // If a return path is specified, navigate back to it
     try {
-      const params = new URLSearchParams(window.location.search);
-      const ret = params.get('return');
-      if (ret) {
-        window.location.href = ret;
+      if (editing) {
+        // Update existing address
+        const response = await addressService.updateAddress(editing.id, {
+          fullName: form.fullName,
+          phone: form.phone,
+          line1: form.line1,
+          line2: form.line2,
+          city: form.city,
+          state: form.state,
+          postalCode: form.postalCode,
+          country: form.country,
+          isDefault: form.isDefault,
+        });
+
+        if (response.success && response.data) {
+          setAddresses(prev => prev.map(a => (a.id === editing.id ? response.data! : a)));
+        } else {
+          throw new Error(response.error || 'Failed to update address');
+        }
+      } else {
+        // Create new address
+        const response = await addressService.createAddress({
+          fullName: form.fullName,
+          phone: form.phone,
+          line1: form.line1,
+          line2: form.line2,
+          city: form.city,
+          state: form.state,
+          postalCode: form.postalCode,
+          country: form.country,
+          isDefault: form.isDefault,
+        });
+
+        if (response.success && response.data) {
+          setAddresses(prev => {
+            let next = [...prev, response.data!];
+            if (response.data!.isDefault) {
+              next = next.map(a => ({ ...a, isDefault: a.id === response.data!.id }));
+            }
+            return next;
+          });
+        } else {
+          throw new Error(response.error || 'Failed to create address');
+        }
       }
-    } catch {}
+
+      setFormOpen(false);
+      setEditing(null);
+
+      // If a return path is specified, navigate back to it
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const ret = params.get('return');
+        if (ret) {
+          window.location.href = ret;
+        }
+      } catch {}
+    } catch (err) {
+      console.error('Error saving address:', err);
+      setErrors({ submit: err instanceof Error ? err.message : 'Failed to save address' });
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const remove = (id: string) => {
-    setAddresses(prev => prev.filter(a => a.id !== id));
+  const remove = async (id: string) => {
+    try {
+      const response = await addressService.deleteAddress(id);
+      if (response.success) {
+        setAddresses(prev => prev.filter(a => a.id !== id));
+      } else {
+        console.error('Failed to delete address:', response.error);
+      }
+    } catch (err) {
+      console.error('Error deleting address:', err);
+    }
   };
 
-  const makeDefault = (id: string) => {
-    setAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === id })));
+  const makeDefault = async (id: string) => {
+    try {
+      const addressToUpdate = addresses.find(a => a.id === id);
+      if (addressToUpdate) {
+        const response = await addressService.updateAddress(id, { isDefault: true });
+        if (response.success) {
+          setAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === id })));
+        } else {
+          console.error('Failed to set default address:', response.error);
+        }
+      }
+    } catch (err) {
+      console.error('Error setting default address:', err);
+    }
   };
 
   return (

@@ -103,9 +103,137 @@ Search products (optional)
 
 **Response:** Same format as GET /v1/products
 
+## Authentication API
+
+### POST /api/auth/send-otp
+Send OTP to mobile number
+
+**Request Body:**
+```json
+{
+  "mobileNumber": "9876543210",
+  "type": "login" | "signup"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "OTP sent successfully",
+  "otpId": "otp-id-123"
+}
+```
+
+### POST /api/auth/verify-otp
+Verify OTP and authenticate user
+
+**Request Body:**
+```json
+{
+  "mobileNumber": "9876543210",
+  "otp": "123456",
+  "otpId": "otp-id-123",
+  "type": "login" | "signup"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "token": "jwt-token-here",
+  "user": {
+    "id": "user-001",
+    "mobileNumber": "9876543210",
+    "createdAt": "2024-01-15T10:00:00Z"
+  }
+}
+```
+
+### POST /api/auth/refresh-token
+Refresh JWT token
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "token": "new-jwt-token"
+}
+```
+
+### POST /api/auth/logout
+Logout user
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Logged out successfully"
+}
+```
+
+### GET /api/auth/profile
+Get current user profile
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "user": {
+    "id": "user-001",
+    "mobileNumber": "9876543210",
+    "createdAt": "2024-01-15T10:00:00Z"
+  }
+}
+```
+
+### PUT /api/auth/profile
+Update user profile
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+  "mobileNumber": "9876543210"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "user": {
+    "id": "user-001",
+    "mobileNumber": "9876543210",
+    "createdAt": "2024-01-15T10:00:00Z"
+  }
+}
+```
+
 ## Scanner API
 
-### POST /scanner-api/detect
+### POST /api/scanner/detect
 Detect image and return associated video URL
 
 **Request Body:**
@@ -141,7 +269,7 @@ Detect image and return associated video URL
 }
 ```
 
-### GET /scanner-api/media/:imageId
+### GET /api/scanner/media/:imageId
 Get media by image ID
 
 **Parameters:**
@@ -159,6 +287,342 @@ Get media by image ID
       "description": "AR content description"
     }
   }
+}
+```
+
+## Cart API
+
+### GET /v1/cart
+Get user's cart
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "product": {
+          "id": "prod-001",
+          "name": "Product Name",
+          "thumbnail_url": "https://cdn.example.com/thumb.jpg"
+        },
+        "quantity": 2
+      }
+    ],
+    "totalItems": 2,
+    "totalPrice": 199.98
+  }
+}
+```
+
+### POST /v1/cart/items
+Add item to cart
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+  "productId": "prod-001",
+  "quantity": 1
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "items": [...],
+    "totalItems": 3,
+    "totalPrice": 299.97
+  }
+}
+```
+
+### PUT /v1/cart/items/:itemId
+Update cart item quantity
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+  "quantity": 5
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "items": [...],
+    "totalItems": 5,
+    "totalPrice": 499.95
+  }
+}
+```
+
+### DELETE /v1/cart/items/:itemId
+Remove item from cart
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "items": [...],
+    "totalItems": 2,
+    "totalPrice": 199.98
+  }
+}
+```
+
+### DELETE /v1/cart
+Clear entire cart
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "items": [],
+    "totalItems": 0,
+    "totalPrice": 0
+  }
+}
+```
+
+## Orders API
+
+### POST /v1/orders
+Create order (checkout)
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+  "items": [
+    {
+      "productId": "prod-001",
+      "quantity": 2
+    }
+  ],
+  "address": {
+    "fullName": "John Doe",
+    "phone": "+91 9876543210",
+    "line1": "123 Main Street",
+    "line2": "Apt 4B",
+    "city": "New York",
+    "state": "NY",
+    "postalCode": "10001",
+    "country": "United States"
+  },
+  "email": "john@example.com",
+  "paymentMethod": "COD"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "PK-ABC123",
+    "status": "PLACED",
+    "paymentMethod": "COD",
+    "placedAt": "2024-01-15T10:00:00Z",
+    "eta": "2024-01-20T10:00:00Z",
+    "address": {...},
+    "email": "john@example.com",
+    "items": [...],
+    "totals": {
+      "subtotal": 199.98,
+      "shipping": 0,
+      "total": 199.98,
+      "currency": "USD"
+    }
+  }
+}
+```
+
+### GET /v1/orders
+Get all user's orders
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "PK-ABC123",
+      "status": "PLACED",
+      "paymentMethod": "COD",
+      "placedAt": "2024-01-15T10:00:00Z",
+      "eta": "2024-01-20T10:00:00Z",
+      "items": [...],
+      "totals": {...}
+    }
+  ]
+}
+```
+
+### GET /v1/orders/:orderId
+Get specific order details
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "PK-ABC123",
+    "status": "PLACED",
+    "paymentMethod": "COD",
+    "placedAt": "2024-01-15T10:00:00Z",
+    "eta": "2024-01-20T10:00:00Z",
+    "address": {...},
+    "email": "john@example.com",
+    "items": [...],
+    "totals": {...}
+  }
+}
+```
+
+## Addresses API
+
+### GET /v1/addresses
+Get all user's addresses
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "addr-001",
+      "fullName": "John Doe",
+      "phone": "+91 9876543210",
+      "line1": "123 Main Street",
+      "line2": "Apt 4B",
+      "city": "New York",
+      "state": "NY",
+      "postalCode": "10001",
+      "country": "United States",
+      "isDefault": true
+    }
+  ]
+}
+```
+
+### POST /v1/addresses
+Create new address
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+```json
+{
+  "fullName": "John Doe",
+  "phone": "+91 9876543210",
+  "line1": "123 Main Street",
+  "line2": "Apt 4B",
+  "city": "New York",
+  "state": "NY",
+  "postalCode": "10001",
+  "country": "United States",
+  "isDefault": false
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "addr-001",
+    "fullName": "John Doe",
+    "phone": "+91 9876543210",
+    "line1": "123 Main Street",
+    "line2": "Apt 4B",
+    "city": "New York",
+    "state": "NY",
+    "postalCode": "10001",
+    "country": "United States",
+    "isDefault": false
+  }
+}
+```
+
+### PUT /v1/addresses/:addressId
+Update address
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Request Body:** (same as POST, all fields optional)
+
+**Response:** (same as POST)
+
+### DELETE /v1/addresses/:addressId
+Delete address
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Address deleted successfully"
 }
 ```
 

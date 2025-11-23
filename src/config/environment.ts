@@ -6,7 +6,6 @@
 export interface AppConfig {
   // API Configuration
   apiBaseUrl: string;
-  apiVersion: string;
   
   // Feature Flags
   enableAnalytics: boolean;
@@ -55,7 +54,6 @@ function getNumberEnv(value: string | undefined, defaultValue: number): number {
 export const config: AppConfig = {
   // API Configuration
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://api.postkar.com',
-  apiVersion: import.meta.env.VITE_API_VERSION || 'v1',
   
   // Feature Flags
   enableAnalytics: getBooleanEnv(import.meta.env.VITE_ENABLE_ANALYTICS, false),
@@ -90,8 +88,7 @@ export const config: AppConfig = {
 // Validation function to ensure required config is present
 export function validateConfig(): void {
   const requiredFields: (keyof AppConfig)[] = [
-    'apiBaseUrl',
-    'apiVersion'
+    'apiBaseUrl'
   ];
   
   const missingFields = requiredFields.filter(field => !config[field]);
