@@ -8,18 +8,29 @@ npm install
 ```
 
 ### 2. Configure Environment
-Create `.env.local`:
+The `.env.development` is already configured for local development:
 ```env
-# For development with mock data
-VITE_ENABLE_MOCK_DATA=true
-
-# For production with real API
+VITE_API_BASE_URL=http://localhost:3001
+VITE_API_VERSION=v1
+VITE_SCANNER_API_URL=http://localhost:3001/api/scanner
 VITE_ENABLE_MOCK_DATA=false
-VITE_API_BASE_URL=https://your-api.com
-VITE_SCANNER_API_URL=https://your-scanner-api.com
 ```
 
-### 3. Run Development Server
+**For production**, update `.env.production`:
+```env
+VITE_API_BASE_URL=https://your-api.com
+VITE_SCANNER_API_URL=https://your-api.com/api/scanner
+VITE_ENABLE_MOCK_DATA=false
+```
+
+### 3. Start Backend Server
+Your backend must be running on `http://localhost:3001`:
+```bash
+# Start your Java/Spring Boot backend
+java -jar your-backend.jar
+```
+
+### 4. Run Development Server
 ```bash
 npm run dev
 ```
@@ -30,17 +41,26 @@ Visit `http://localhost:5173`
 
 ## 📁 Key Files
 
-### New Services
-- `src/services/ProductService.ts` - Real API for products
-- `src/services/MediaService.ts` - Image detection & video API
-
-### New Hook
-- `src/hooks/useCamera.ts` - Camera access & capture
+### Services (API Integration)
+- `src/services/ProductService.ts` - Products API
+- `src/services/AuthService.ts` - Authentication API
+- `src/services/CartService.ts` - **NEW** Cart API
+- `src/services/OrderService.ts` - **NEW** Orders API
+- `src/services/AddressService.ts` - **NEW** Addresses API
+- `src/services/MediaService.ts` - Scanner/Media API
 
 ### Updated Pages
-- `src/pages/ProductsPage.tsx` - API integrated
-- `src/pages/ProductDetailPage.tsx` - API integrated
-- `src/pages/ScannerPage.tsx` - **Fully implemented scanner**
+- `src/pages/ProductsPage.tsx` - Fetches from API
+- `src/pages/ProductDetailPage.tsx` - Fetches from API
+- `src/pages/CheckoutPage.tsx` - **NEW** Creates orders via API
+- `src/pages/OrdersPage.tsx` - **NEW** Fetches orders from API
+- `src/pages/AddressesPage.tsx` - **NEW** Full CRUD via API
+- `src/pages/ScannerPage.tsx` - Image detection via API
+
+### Documentation
+- `API_INTEGRATION_GUIDE.md` - Complete API specifications
+- `API_INTEGRATION_SUMMARY.md` - Integration overview
+- `BACKEND_IMPLEMENTATION_CHECKLIST.md` - Backend setup checklist
 
 ---
 

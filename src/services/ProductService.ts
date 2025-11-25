@@ -8,11 +8,9 @@ import { config } from '../config/environment';
 export class ProductService {
   private static instance: ProductService;
   private baseUrl: string;
-  private apiVersion: string;
 
   private constructor() {
     this.baseUrl = config.apiBaseUrl;
-    this.apiVersion = config.apiVersion;
   }
 
   public static getInstance(): ProductService {
@@ -27,7 +25,7 @@ export class ProductService {
    */
   async getProducts(): Promise<Product[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/${this.apiVersion}/products`, {
+      const response = await fetch(`${this.baseUrl}/api/products`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +54,7 @@ export class ProductService {
    */
   async getProduct(id: string): Promise<Product | null> {
     try {
-      const response = await fetch(`${this.baseUrl}/${this.apiVersion}/products/${id}`, {
+      const response = await fetch(`${this.baseUrl}/api/products/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -82,26 +80,21 @@ export class ProductService {
       throw error;
     }
   }
-
   /**
    * Search products by query
    */
   async searchProducts(query: string): Promise<Product[]> {
     try {
-      const response = await fetch(
-        `${this.baseUrl}/${this.apiVersion}/products/search?q=${encodeURIComponent(query)}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await fetch(`${this.baseUrl}/api/products/search?q=${encodeURIComponent(query)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-
       const data: ProductsResponse = await response.json();
       
       if (data.success && data.data) {

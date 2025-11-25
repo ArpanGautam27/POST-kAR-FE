@@ -1,27 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Navigation from '../components/layout/Navigation';
+import { orderService } from '../services/OrderService';
+import type { Order } from '../services/OrderService';
 import './OrdersPage.css';
-
-type OrderItem = {
-  id: string;
-  name: string;
-  thumbnail_url?: string;
-  quantity: number;
-  unitPrice: number;
-  lineTotal: number;
-};
-
-type Order = {
-  id: string;
-  status: 'PLACED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
-  paymentMethod: string;
-  placedAt: string; // ISO
-  eta?: string; // ISO
-  address: any;
-  items: OrderItem[];
-  totals: { subtotal: number; shipping: number; total: number; currency: string };
-};
 
 const STORAGE_KEY = 'pk_orders_v1';
 
@@ -31,12 +13,30 @@ export default function OrdersPage() {
   const emptyAnim = new URL('../assets/order_now.json', import.meta.url).toString();
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      setOrders(raw ? JSON.parse(raw) : []);
-    } catch {
-      setOrders([]);
-    }
+    const loadOrders = async () => {
+      try {
+        // Try API first
+        const response = await orderService.getOrders();
+        if (response.success && response.data) {
+          setOrders(response.data);
+        } else {
+          // Fallback to localStorage
+          const raw = localStorage.getItem(STORAGE_KEY);
+          setOrders(raw ? JSON.parse(raw) : []);
+        }
+      } catch (err) {
+        console.error('Error loading orders:', err);
+        // Fallback to localStorage on error
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          setOrders(raw ? JSON.parse(raw) : []);
+        } catch {
+          setOrders([]);
+        }
+      }
+    };
+
+    loadOrders();
   }, []);
 
   const formatPrice = (n: number, c: string) =>

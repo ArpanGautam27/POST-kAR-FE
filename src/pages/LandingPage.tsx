@@ -5,8 +5,10 @@ import { AuthModal } from '../components/auth/AuthModal';
 import Navigation from '../components/layout/Navigation';
 import { ProductService } from '../services/ProductService';
 import { MockProductService } from '../services/MockProductService';
+import { HeroService } from '../services/HeroService';
 import { config } from '../config/environment';
 import type { Product } from '../types';
+import type { HeroImage } from '../services/HeroService';
 import cf1 from '../assets/customer_feedback_1.mp4';
 import cf2 from '../assets/customer_feedback_2.mp4';
 import cf3 from '../assets/customer_feedback_3.mp4';
@@ -209,11 +211,30 @@ export default function LandingPage() {
   ];
 
   const totalPanels = cinematicPanels.length; // 9 slides
-  // Products for home
+  // Hero images for parallax section
+  const [heroImages, setHeroImages] = useState<HeroImage[]>([]);
+  // Products for featured section
   const [products, setProducts] = useState<Product[]>([]);
   const productService = config.enableMockData ? MockProductService.getInstance() : ProductService.getInstance();
+  const heroService = HeroService.getInstance();
 
   useEffect(() => {
+    // Load hero images for the parallax section
+    (async () => {
+      try {
+        const response = await heroService.getHeroImages();
+        if (response.success && response.data) {
+          setHeroImages(response.data);
+        } else {
+          console.warn('Failed to load hero images:', response.error);
+          setHeroImages([]);
+        }
+      } catch (e) {
+        console.error('Error loading hero images:', e);
+        setHeroImages([]);
+      }
+    })();
+
     // Load first 6 products for the home page (featured products)
     (async () => {
       try {
@@ -288,15 +309,15 @@ export default function LandingPage() {
 
 
 
-  // Prepare products for HeroParallax (ensure we always have products)
-  const heroProducts = products.length > 0 
-    ? products.slice(0, 15).map((product) => ({
-        title: product.name,
-        link: `/product/${product.id}`,
-        thumbnail: product.thumbnail_url || product.image_url,
+  // Prepare hero images for HeroParallax (ensure we always have images)
+  const heroProducts = heroImages.length > 0 
+    ? heroImages.slice(0, 15).map((image) => ({
+        title: image.title || 'Hero Image',
+        link: '#',
+        thumbnail: image.imageUrl,
       }))
     : Array(15).fill(null).map((_, i) => ({
-        title: `Product ${i + 1}`,
+        title: `Hero ${i + 1}`,
         link: '#',
         thumbnail: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80',
       }));
