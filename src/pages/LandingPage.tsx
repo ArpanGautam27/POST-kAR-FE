@@ -5,9 +5,19 @@ import { AuthModal } from '../components/auth/AuthModal';
 import Navigation from '../components/layout/Navigation';
 import { ProductService } from '../services/ProductService';
 import { HeroService } from '../services/HeroService';
-import { CommunityVideoService } from '../services/CommunityVideoService';
 import type { Product } from '../types';
 import type { HeroImage } from '../services/HeroService';
+import cf1 from '../assets/customer_feedback_1.mp4';
+import cf2 from '../assets/customer_feedback_2.mp4';
+import cf3 from '../assets/customer_feedback_3.mp4';
+import cf4 from '../assets/customer_feedback_4.mp4';
+import cf5 from '../assets/customer_feedback_5.mp4';
+import cf6 from '../assets/customer_feedback_6.mp4';
+import cf7 from '../assets/customer_feedback_7.mp4';
+import cf8 from '../assets/customer_feedback_8.mp4';
+import cf9 from '../assets/customer_feedback_9.mp4';
+import cf10 from '../assets/customer_feedback_10.mp4';
+import cf11 from '../assets/customer_feedback_11.mp4';
 import Mascot from '../components/common/Mascot';
 import { HeroParallax } from '../components/ui/HeroParallax';
 import { ParallaxSection, SectionCard } from '../components/ui/ParallaxSection';
@@ -92,13 +102,12 @@ export default function LandingPage() {
   const [activePanel, setActivePanel] = useState(0);
   const spotlightRef = useRef<HTMLDivElement | null>(null);
   const servicesRef = useRef<HTMLDivElement | null>(null);
-  const [feedbackVideos, setFeedbackVideos] = useState<string[]>([]);
+  const feedbackVideos = [cf1, cf3, cf5, cf8, cf4, cf2, cf6, cf7, cf9, cf10, cf11];
   const videoRefs = useRef<HTMLVideoElement[]>([]);
-  const [muted, setMuted] = useState<boolean[]>([]);
+  const [muted, setMuted] = useState<boolean[]>(() => feedbackVideos.map(() => true));
   const [fullscreenVideo, setFullscreenVideo] = useState<{ src: string; index: number } | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const fullscreenVideoRef = useRef<HTMLVideoElement>(null);
-  const communityVideoService = CommunityVideoService.getInstance();
 
   // Animated counter hooks for community stats
   const visitsCount = useCounter(1200, 2500);
@@ -208,19 +217,6 @@ export default function LandingPage() {
   const heroService = HeroService.getInstance();
 
   useEffect(() => {
-    // Load community videos from Cloudflare
-    (async () => {
-      try {
-        const videos = await communityVideoService.getCommunityVideos();
-        setFeedbackVideos(videos);
-        setMuted(videos.map(() => true));
-      } catch (e) {
-        console.error('Error loading community videos:', e);
-        setFeedbackVideos([]);
-        setMuted([]);
-      }
-    })();
-
     // Load hero images for the parallax section
     (async () => {
       try {
