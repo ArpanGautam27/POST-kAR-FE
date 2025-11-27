@@ -25,7 +25,7 @@ export class ProductService {
    */
   async getProducts(): Promise<Product[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/products`, {
+      const response = await fetch(`${this.baseUrl}/api/markers`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -54,7 +54,7 @@ export class ProductService {
    */
   async getProduct(id: string): Promise<Product | null> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/products/${id}`, {
+      const response = await fetch(`${this.baseUrl}/api/markers/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export class ProductService {
    */
   async searchProducts(query: string): Promise<Product[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/products/search?q=${encodeURIComponent(query)}`, {
+      const response = await fetch(`${this.baseUrl}/api/markers/search?q=${encodeURIComponent(query)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
