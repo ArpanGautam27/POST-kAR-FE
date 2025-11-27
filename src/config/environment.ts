@@ -24,6 +24,9 @@ export interface AppConfig {
   scannerApiUrl: string;
   enableCameraPermissions: boolean;
   
+  // Video Configuration
+  cloudflareVideoUrl: string;
+  
   // Analytics
   googleAnalyticsId?: string;
   mixpanelToken?: string;
@@ -71,6 +74,9 @@ export const config: AppConfig = {
   // Scanner Configuration
   scannerApiUrl: import.meta.env.VITE_SCANNER_API_URL || 'https://scanner-api.postkar.com',
   enableCameraPermissions: getBooleanEnv(import.meta.env.VITE_ENABLE_CAMERA_PERMISSIONS, false),
+  
+  // Video Configuration
+  cloudflareVideoUrl: import.meta.env.VITE_CLOUDFLARE_VIDEO_URL || 'https://customer-videos.postkar.com',
   
   // Analytics
   googleAnalyticsId: import.meta.env.VITE_GOOGLE_ANALYTICS_ID,
