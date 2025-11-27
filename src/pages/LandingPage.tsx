@@ -4,9 +4,7 @@ import { Phone, Mail, MapPin } from 'lucide-react';
 import { AuthModal } from '../components/auth/AuthModal';
 import Navigation from '../components/layout/Navigation';
 import { ProductService } from '../services/ProductService';
-import { MockProductService } from '../services/MockProductService';
 import { HeroService } from '../services/HeroService';
-import { config } from '../config/environment';
 import type { Product } from '../types';
 import type { HeroImage } from '../services/HeroService';
 import cf1 from '../assets/customer_feedback_1.mp4';
@@ -215,7 +213,7 @@ export default function LandingPage() {
   const [heroImages, setHeroImages] = useState<HeroImage[]>([]);
   // Products for featured section
   const [products, setProducts] = useState<Product[]>([]);
-  const productService = config.enableMockData ? MockProductService.getInstance() : ProductService.getInstance();
+  const productService = ProductService.getInstance();
   const heroService = HeroService.getInstance();
 
   useEffect(() => {
@@ -242,14 +240,8 @@ export default function LandingPage() {
         // Always show first 6 products as featured on landing page
         setProducts(Array.isArray(data) ? data.slice(0, 6) : []);
       } catch (e) {
-        if (config.enableMockData) {
-          const mock = MockProductService.getInstance();
-          const data = await mock.getProducts();
-          // Always show first 6 products as featured on landing page
-          setProducts(Array.isArray(data) ? data.slice(0, 6) : []);
-        } else {
-          setProducts([]);
-        }
+        console.error('Error loading products:', e);
+        setProducts([]);
       }
     })();
     // Reveal-on-scroll animations

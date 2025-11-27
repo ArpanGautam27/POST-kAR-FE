@@ -3,16 +3,12 @@ import Navigation from '../components/layout/Navigation';
 import Mascot from '../components/common/Mascot';
 import ProductGrid from '../components/product/ProductGrid';
 import { ProductService } from '../services/ProductService';
-import { MockProductService } from '../services/MockProductService';
-import { config } from '../config/environment';
  
 import type { Product } from '../types';
 import './ProductsPage.css';
 
-// Use real API service or mock based on config
-const productService = config.enableMockData 
-  ? MockProductService.getInstance() 
-  : ProductService.getInstance();
+// Use real API service
+const productService = ProductService.getInstance();
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -25,22 +21,7 @@ export default function ProductsPage() {
         setLoading(true);
         setError(null);
         
-        // Try real API first, fallback to mock if enabled
-        // This will load all 17 products from centralized data
-        let productsData: Product[];
-        try {
-          productsData = await productService.getProducts();
-        } catch (apiError) {
-          // If real API fails and mock is enabled, try mock service
-          if (config.enableMockData) {
-            console.warn('API failed, falling back to mock data:', apiError);
-            const mockService = MockProductService.getInstance();
-            productsData = await mockService.getProducts();
-          } else {
-            throw apiError;
-          }
-        }
-        
+        const productsData = await productService.getProducts();
         setProducts(productsData);
       } catch (err) {
         setError('Failed to load products. Please try again later.');
