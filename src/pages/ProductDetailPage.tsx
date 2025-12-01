@@ -4,18 +4,14 @@ import Navigation from '../components/layout/Navigation';
 import ProductGrid from '../components/product/ProductGrid';
 import Modal from '../components/common/Modal';
 import { ProductService } from '../services/ProductService';
-import { MockProductService } from '../services/MockProductService';
-import { config } from '../config/environment';
 import { useNavigation } from '../hooks/useNavigation';
 import { useBreadcrumbs } from '../hooks/useBreadcrumbs';
 import { useCart } from '../contexts/CartContext';
 import type { Product } from '../types';
 import './ProductDetailPage.css';
 
-// Use real API service or mock based on config
-const productService = config.enableMockData 
-  ? MockProductService.getInstance() 
-  : ProductService.getInstance();
+// Use real API service
+const productService = ProductService.getInstance();
 
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -85,20 +81,7 @@ export default function ProductDetailPage() {
         setLoading(true);
         setError(null);
         
-        // Try real API first, fallback to mock if enabled
-        let productData: Product | null;
-        try {
-          productData = await productService.getProduct(id);
-        } catch (apiError) {
-          // If real API fails and mock is enabled, try mock service
-          if (config.enableMockData) {
-            console.warn('API failed, falling back to mock data:', apiError);
-            const mockService = MockProductService.getInstance();
-            productData = await mockService.getProduct(id);
-          } else {
-            throw apiError;
-          }
-        }
+        const productData = await productService.getProduct(id);
         
         if (!productData) {
           setError('Product not found');

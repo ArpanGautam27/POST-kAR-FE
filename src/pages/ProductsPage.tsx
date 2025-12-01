@@ -3,16 +3,12 @@ import Navigation from '../components/layout/Navigation';
 import Mascot from '../components/common/Mascot';
 import ProductGrid from '../components/product/ProductGrid';
 import { ProductService } from '../services/ProductService';
-import { MockProductService } from '../services/MockProductService';
-import { config } from '../config/environment';
  
 import type { Product } from '../types';
 import './ProductsPage.css';
 
-// Use real API service or mock based on config
-const productService = config.enableMockData 
-  ? MockProductService.getInstance() 
-  : ProductService.getInstance();
+// Use real API service
+const productService = ProductService.getInstance();
 
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -24,9 +20,14 @@ export default function ProductsPage() {
       try {
         setLoading(true);
         setError(null);
+<<<<<<< HEAD
 
         // Use either real API or mock service based on config
         const productsData: Product[] = await productService.getProducts();
+=======
+        
+        const productsData = await productService.getProducts();
+>>>>>>> origin/feature/web-app-R-0.4
         setProducts(productsData);
       } catch (err: any) {
         const message = err?.message || 'Failed to load products from API.';
