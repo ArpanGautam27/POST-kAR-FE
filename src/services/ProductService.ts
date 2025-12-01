@@ -1,4 +1,4 @@
-import type { Product, ProductsResponse, ProductResponse } from '../types';
+import type { Product } from '../types';
 import { config } from '../config/environment';
 
 /**
@@ -25,7 +25,7 @@ export class ProductService {
    */
   async getProducts(): Promise<Product[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/products`, {
+      const response = await fetch(`${this.baseUrl}/api/markers?page=0&size=100`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -36,12 +36,16 @@ export class ProductService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: ProductsResponse = await response.json();
+      const data = await response.json();
       
-      if (data.success && data.data) {
-        return data.data;
+      // Backend returns paginated response with 'content' array
+      if (data.content && Array.isArray(data.content)) {
+        return data.content;
+      } else if (Array.isArray(data)) {
+        // Fallback if backend returns array directly
+        return data;
       } else {
-        throw new Error(data.error || 'Failed to fetch products');
+        throw new Error('Invalid response format from API');
       }
     } catch (error) {
       console.error('Error fetching products from API:', error);
@@ -54,7 +58,7 @@ export class ProductService {
    */
   async getProduct(id: string): Promise<Product | null> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/products/${id}`, {
+      const response = await fetch(`${this.baseUrl}/api/markers/${id}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -68,12 +72,13 @@ export class ProductService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data: ProductResponse = await response.json();
+      const data = await response.json();
       
-      if (data.success && data.data) {
-        return data.data;
+      // Backend returns Marker object directly
+      if (data && data.id) {
+        return data;
       } else {
-        throw new Error(data.error || 'Failed to fetch product');
+        throw new Error('Invalid product response format');
       }
     } catch (error) {
       console.error(`Error fetching product ${id} from API:`, error);
@@ -85,7 +90,7 @@ export class ProductService {
    */
   async searchProducts(query: string): Promise<Product[]> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/products/search?q=${encodeURIComponent(query)}`, {
+      const response = await fetch(`${this.baseUrl}/api/markers/search?q=${encodeURIComponent(query)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -95,12 +100,13 @@ export class ProductService {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data: ProductsResponse = await response.json();
+      const data = await response.json();
       
-      if (data.success && data.data) {
-        return data.data;
+      // Backend returns array of Marker objects directly
+      if (Array.isArray(data)) {
+        return data;
       } else {
-        throw new Error(data.error || 'Failed to search products');
+        throw new Error('Invalid search response format');
       }
     } catch (error) {
       console.error('Error searching products:', error);
