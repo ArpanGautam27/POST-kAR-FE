@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { User, LogOut, Settings, ChevronDown, Package } from 'lucide-react';
+import { User, LogOut, Settings, ChevronDown, Package, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import userAvatarAnim from '../../assets/user_avatar.json?url';
 import './ProfileDropdown.css';
 
 export const ProfileDropdown: React.FC = () => {
@@ -22,6 +23,8 @@ export const ProfileDropdown: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
+    const confirmed = window.confirm('Are you sure you want to logout?');
+    if (!confirmed) return;
     logout();
     setIsOpen(false);
   };
@@ -37,9 +40,21 @@ export const ProfileDropdown: React.FC = () => {
         aria-haspopup="true"
       >
         <div className="profile-avatar">
-          <User size={16} />
+          {(() => {
+            const LottiePlayer = 'lottie-player' as any;
+            return (
+              <LottiePlayer
+                src={userAvatarAnim}
+                background="transparent"
+                speed="1"
+                loop
+                autoplay
+                style={{ width: 24, height: 24 }}
+              />
+            );
+          })()}
         </div>
-        <span className="profile-name">User</span>
+        <span className="profile-name">{user.email || 'User'}</span>
         <ChevronDown 
           size={16} 
           className={`profile-chevron ${isOpen ? 'profile-chevron-open' : ''}`}
@@ -50,11 +65,25 @@ export const ProfileDropdown: React.FC = () => {
         <div className="profile-menu">
           <div className="profile-menu-header">
             <div className="profile-menu-avatar">
-              <User size={20} />
+              {(() => {
+                const LottiePlayer = 'lottie-player' as any;
+                return (
+                  <LottiePlayer
+                    src={userAvatarAnim}
+                    background="transparent"
+                    speed="1"
+                    loop
+                    autoplay
+                    style={{ width: 32, height: 32 }}
+                  />
+                );
+              })()}
             </div>
             <div className="profile-menu-info">
-              <div className="profile-menu-name">User</div>
-              <div className="profile-menu-mobile">+91 {user.mobileNumber}</div>
+              <div className="profile-menu-name">{user.email || 'User'}</div>
+              <div className="profile-menu-mobile">
+                {user.email && user.email}
+              </div>
             </div>
           </div>
 
@@ -68,6 +97,15 @@ export const ProfileDropdown: React.FC = () => {
             >
               <Package size={16} />
               <span>Orders</span>
+            </Link>
+
+            <Link
+              to="/cart"
+              className="profile-menu-item"
+              onClick={() => setIsOpen(false)}
+            >
+              <ShoppingCart size={16} />
+              <span>Cart</span>
             </Link>
 
             <Link 

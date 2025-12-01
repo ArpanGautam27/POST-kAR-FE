@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-import { Loader2, Phone, KeyRound } from 'lucide-react';
+import { Loader2, Mail, KeyRound } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { authService } from '../../services/AuthService';
 
 interface AuthFormProps {
   onSuccess: () => void;
 }
 
 export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
-  const [step, setStep] = useState<'mobile' | 'otp'>('mobile');
-  const [mobileNumber, setMobileNumber] = useState('');
+  const [step, setStep] = useState<'email' | 'otp'>('email');
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
-  const [otpId, setOtpId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [resendTimer, setResendTimer] = useState(0);
@@ -36,60 +34,45 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
     e.preventDefault();
     setError('');
 
-    // Validate mobile number
-    if (!mobileNumber || mobileNumber.length !== 10) {
-      setError('Please enter a valid 10-digit mobile number');
+    if (!email || !email.includes('@')) {
+      setError('Please enter a valid email address');
       return;
     }
 
     setIsLoading(true);
 
-    try {
-      // Use mock service for development - will automatically handle login/signup
-      const response = await authService.sendOTPMock({
-        mobileNumber,
-        type: 'login' // We use 'login' as default since the flow is the same
-      });
-
-      if (response.success) {
-        setOtpId(response.otpId || '');
-        setStep('otp');
-        startResendTimer();
-      } else {
-        setError(response.message);
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to send OTP');
-    } finally {
+    // For now we mock email OTP locally; backend integration can be wired later
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      setStep('otp');
+      startResendTimer();
+    }, 800);
   };
 
   const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!otp || otp.length !== 6) {
-      setError('Please enter a valid 6-digit OTP');
+    if (!otp || otp.length !== 4) {
+      setError('Please enter the 4-digit OTP');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Use mock service for development
-      const response = await authService.verifyOTPMock({
-        mobileNumber,
-        otp,
-        otpId,
-        type: 'login' // The backend will handle whether it's login or signup
-      });
-
-      if (response.success && response.token && response.user) {
-        login(response.token, response.user);
-        onSuccess();
+      // Demo-only verification: accept OTP 1234
+      if (otp !== '1234') {
+        setError('Invalid OTP. Use 1234 for testing.');
       } else {
-        setError(response.message);
+        const token = 'mock-email-token-' + Date.now();
+        const user = {
+          id: 'user-' + Date.now().toString(),
+          email,
+          createdAt: new Date().toISOString(),
+        } as any;
+        login(token, user);
+        onSuccess();
       }
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to verify OTP');
@@ -104,41 +87,28 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
     setError('');
     setIsLoading(true);
 
-    try {
-      const response = await authService.sendOTPMock({
-        mobileNumber,
-        type: 'login'
-      });
-
-      if (response.success) {
-        setOtpId(response.otpId || '');
-        startResendTimer();
-      } else {
-        setError(response.message);
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Failed to resend OTP');
-    } finally {
+    // Demo-only resend: just restart timer
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      startResendTimer();
+    }, 600);
   };
 
-  if (step === 'mobile') {
+  if (step === 'email') {
     return (
       <form onSubmit={handleSendOTP} className="auth-form">
         <div className="auth-form-group">
-          <label htmlFor="mobile" className="auth-form-label">
-            <Phone size={16} />
-            Mobile Number
+          <label htmlFor="email" className="auth-form-label">
+            <Mail size={16} />
+            Email Address
           </label>
           <input
-            id="mobile"
-            type="tel"
-            value={mobileNumber}
-            onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, '').slice(0, 10))}
-            placeholder="Enter your mobile number"
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
             className="auth-form-input"
-            maxLength={10}
             required
           />
         </div>
@@ -147,7 +117,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
 
         <button
           type="submit"
-          disabled={isLoading || mobileNumber.length !== 10}
+          disabled={isLoading || !email}
           className="auth-form-button"
         >
           {isLoading ? (
@@ -161,10 +131,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
         </button>
 
         <div className="auth-form-info">
-          <p>We'll send you a 6-digit OTP to verify your mobile number.</p>
+          <p>We'll send you a 4-digit OTP to verify your email address.</p>
           <p>If you're a new user, an account will be created automatically.</p>
           <p className="auth-demo-info">
-            <strong>Demo:</strong> Use OTP <code>123456</code> for testing
+            <strong>Demo:</strong> Use OTP <code>1234</code> for testing
           </p>
         </div>
       </form>
@@ -174,22 +144,41 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
   return (
     <form onSubmit={handleVerifyOTP} className="auth-form">
       <div className="auth-form-group">
-        <label htmlFor="otp" className="auth-form-label">
+        <label className="auth-form-label">
           <KeyRound size={16} />
           Enter OTP
         </label>
-        <input
-          id="otp"
-          type="text"
-          value={otp}
-          onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-          placeholder="Enter 6-digit OTP"
-          className="auth-form-input otp-input"
-          maxLength={6}
-          required
-        />
+        <div className="auth-otp-grid">
+          {[0, 1, 2, 3].map((index) => (
+            <input
+              key={index}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              className="auth-form-input otp-input-box"
+              value={otp[index] || ''}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 1);
+                const next = otp.split('');
+                next[index] = val;
+                const joined = next.join('').slice(0, 4);
+                setOtp(joined);
+                if (val && index < 3) {
+                  const nextInput = (e.target.parentElement?.querySelectorAll('input')[index + 1] as HTMLInputElement | undefined);
+                  nextInput?.focus();
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Backspace' && !otp[index] && index > 0) {
+                  const prevInput = (e.currentTarget.parentElement?.querySelectorAll('input')[index - 1] as HTMLInputElement | undefined);
+                  prevInput?.focus();
+                }
+              }}
+            />
+          ))}
+        </div>
         <p className="auth-form-helper">
-          OTP sent to +91 {mobileNumber}
+          OTP sent to {email}
         </p>
       </div>
 
@@ -197,7 +186,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
 
       <button
         type="submit"
-        disabled={isLoading || otp.length !== 6}
+        disabled={isLoading || otp.length !== 4}
         className="auth-form-button"
       >
         {isLoading ? (
@@ -213,10 +202,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
       <div className="auth-form-actions">
         <button
           type="button"
-          onClick={() => setStep('mobile')}
+          onClick={() => setStep('email')}
           className="auth-form-link"
         >
-          Change mobile number
+          Change email
         </button>
         
         <button

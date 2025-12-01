@@ -214,6 +214,21 @@
   gap: 1rem;
 }
 
+/* OTP 4-box layout */
+.auth-otp-grid {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.otp-input-box {
+  width: 3rem;
+  height: 3rem;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding: 0;
+}
+
 .auth-form-link {
   background: none;
   border: none;

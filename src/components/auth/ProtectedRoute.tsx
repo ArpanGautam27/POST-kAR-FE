@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AuthModal } from './AuthModal';
+import LoadingSpinner from '../common/LoadingSpinner';
 import './ProtectedRoute.css';
 
 interface ProtectedRouteProps {
@@ -19,8 +20,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   if (isLoading) {
     return (
       <div className="protected-route-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading...</p>
+        <LoadingSpinner size="small" message="Checking your session..." />
       </div>
     );
   }

@@ -24,27 +24,14 @@ export default function ProductsPage() {
       try {
         setLoading(true);
         setError(null);
-        
-        // Try real API first, fallback to mock if enabled
-        // This will load all 17 products from centralized data
-        let productsData: Product[];
-        try {
-          productsData = await productService.getProducts();
-        } catch (apiError) {
-          // If real API fails and mock is enabled, try mock service
-          if (config.enableMockData) {
-            console.warn('API failed, falling back to mock data:', apiError);
-            const mockService = MockProductService.getInstance();
-            productsData = await mockService.getProducts();
-          } else {
-            throw apiError;
-          }
-        }
-        
+
+        // Use either real API or mock service based on config
+        const productsData: Product[] = await productService.getProducts();
         setProducts(productsData);
-      } catch (err) {
-        setError('Failed to load products. Please try again later.');
-        console.error('Error loading products:', err);
+      } catch (err: any) {
+        const message = err?.message || 'Failed to load products from API.';
+        setError(message);
+        console.error('Error loading products from API:', err);
       } finally {
         setLoading(false);
       }

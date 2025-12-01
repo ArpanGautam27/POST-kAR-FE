@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navigation from '../components/layout/Navigation';
 import { useCart } from '../contexts/CartContext';
 import { useNavigation } from '../hooks/useNavigation';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import './CartPage.css';
 
 export default function CartPage() {
@@ -51,11 +52,11 @@ export default function CartPage() {
       <div className="cart-page">
         <Navigation />
         <div className="cart-container">
-          <div className="empty-cart">
+          <div className="glass-card card-hover empty-cart">
             <div className="empty-cart-icon">🛒</div>
             <h2>Your cart is empty</h2>
             <p>Add some amazing AR-enabled products to get started!</p>
-            <Link to="/products" className="continue-shopping-btn">
+            <Link to="/products" className="btn btn-primary">
               Continue Shopping
             </Link>
           </div>
@@ -75,8 +76,7 @@ export default function CartPage() {
 
         {isCheckingOut ? (
           <div className="checkout-loading">
-            <div className="spinner"></div>
-            <p>Processing your order...</p>
+            <LoadingSpinner size="small" message="Processing your order..." />
           </div>
         ) : (
           <>

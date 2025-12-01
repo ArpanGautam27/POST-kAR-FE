@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import Navigation from '../components/layout/Navigation';
 import { orderService } from '../services/OrderService';
 import type { Order } from '../services/OrderService';
+import { useAuth } from '../contexts/AuthContext';
 import './OrdersPage.css';
 
 const STORAGE_KEY = 'pk_orders_v1';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const { isAuthenticated } = useAuth();
   const LottiePlayer: any = 'lottie-player';
   const emptyAnim = new URL('../assets/order_now.json', import.meta.url).toString();
 
@@ -54,14 +56,22 @@ export default function OrdersPage() {
         </div>
 
         {empty ? (
-          <div className="orders-empty">
-            <div className="orders-empty-lottie">
-              <LottiePlayer autoplay loop mode="normal" src={emptyAnim} style={{ width: '360px', height: '360px' }} />
+          isAuthenticated ? (
+            <div className="orders-empty">
+              <div className="orders-empty-lottie">
+                <LottiePlayer autoplay loop mode="normal" src={emptyAnim} style={{ width: '360px', height: '360px' }} />
+              </div>
+              <h2 className="orders-empty-title">You haven’t placed an order yet</h2>
+              <p className="orders-empty-sub">Discover AR-enabled products and place your first order now.</p>
+              <Link to="/products" className="browse-btn">Explore Products</Link>
             </div>
-            <h2 className="orders-empty-title">You haven’t placed an order yet</h2>
-            <p className="orders-empty-sub">Discover AR-enabled products and place your first order now.</p>
-            <Link to="/products" className="browse-btn">Explore Products</Link>
-          </div>
+          ) : (
+            <div className="orders-empty">
+              <h2 className="orders-empty-title">Login to view your orders</h2>
+              <p className="orders-empty-sub">Use the Login button in the top toolbar to sign in and see your past orders.</p>
+              <Link to="/products" className="browse-btn">Browse Products</Link>
+            </div>
+          )
         ) : (
           <div className="orders-list">
             {orders.map((o) => (

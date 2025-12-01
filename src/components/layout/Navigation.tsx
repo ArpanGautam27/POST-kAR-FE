@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-// import { LogIn } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
-// import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
-// import { ProfileDropdown } from '../auth/ProfileDropdown';
+import { ProfileDropdown } from '../auth/ProfileDropdown';
 import './Navigation.css';
 import headerLogoVideo from '../../assets/logo_new.mp4';
 import scannerButtonAnim from '../../assets/scanner_button.json?url';
@@ -19,7 +19,7 @@ interface NavigationProps {}
  */
 export const Navigation: React.FC<NavigationProps> = () => {
   const { totalItems } = useCart();
-  // const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
@@ -94,13 +94,14 @@ export const Navigation: React.FC<NavigationProps> = () => {
                 );
               })()}
             </a>
-            <Link to="/cart" className="nav-link nav-cart-link">
-              <ShoppingCart size={18} />
-              {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
-            </Link>
-            <Link to="/orders" className="nav-link">Orders</Link>
+            {totalItems > 0 && (
+              <Link to="/cart" className="nav-link nav-cart-link">
+                <ShoppingCart size={18} />
+                {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
+              </Link>
+            )}
             {/* Authentication Section */}
-            {/* <div className="nav-auth">
+            <div className="nav-auth">
               {!isLoading && (
                 isAuthenticated ? (
                   <ProfileDropdown />
@@ -114,7 +115,7 @@ export const Navigation: React.FC<NavigationProps> = () => {
                   </button>
                 )
               )}
-            </div> */}
+            </div>
           </div>
         </div>
       </nav>

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 
 export interface User {
   id: string;
-  mobileNumber: string;
+  mobileNumber?: string;
   email?: string;
   createdAt: string;
 }

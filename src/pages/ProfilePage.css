@@ -2,6 +2,7 @@
 .profile-page {
   min-height: 100vh;
   background: #f9fafb;
+  padding-top: 5rem;
 }
 
 .profile-container {
@@ -19,10 +20,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 6rem;
-  height: 6rem;
-  background: #3b82f6;
-  color: white;
+  width: 7rem;
+  height: 7rem;
+  background: transparent;
   border-radius: 50%;
   margin-bottom: 1rem;
 }

@@ -141,8 +141,8 @@ class AuthService {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
-    // Mock OTP verification (accept 123456 as valid OTP)
-    if (request.otp !== '123456') {
+    // Mock OTP verification (accept 1234 as valid OTP)
+    if (request.otp !== '1234') {
       return {
         success: false,
         message: 'Invalid OTP. Please try again.',

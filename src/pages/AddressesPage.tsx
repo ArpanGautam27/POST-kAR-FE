@@ -9,7 +9,7 @@ const STORAGE_KEY = 'pk_addresses_v1';
 
 export default function AddressesPage() {
   const LottiePlayer: any = 'lottie-player';
-  const addAddressLottie = new URL('../assets/add_address.json', import.meta.url).toString();
+  const locationLottie = new URL('../assets/Location.json', import.meta.url).toString();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -210,13 +210,13 @@ export default function AddressesPage() {
           <div className="addresses-empty">
             <div className="addresses-empty-banner">
               <LottiePlayer
-                src={addAddressLottie}
+                src={locationLottie}
                 background="transparent"
                 speed="1"
                 style={{ width: '220px', height: '220px' }}
                 loop
                 autoplay
-              ></LottiePlayer>
+              />
               <div className="addresses-empty-content">
                 <h2 className="addresses-empty-title">No address added</h2>
                 <p className="addresses-empty-sub">Save your address to speed up checkout and deliveries.</p>
