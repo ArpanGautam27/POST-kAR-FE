@@ -115,12 +115,6 @@ export default function ProductDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const handleScanClick = () => {
-    // Use full page load to static scanner page under public/
-    window.location.href = '/scanner/scan_mind.html';
-  };
-
-
   const handleAddToCart = () => {
     if (product) {
       addToCart(product);
@@ -205,8 +199,13 @@ export default function ProductDetailPage() {
                             className="product-image"
                           />
                         ) : (
-                          <video className="product-video" controls playsInline preload="metadata">
-                            <source src={s.src} />
+                          <video
+                            className="product-video"
+                            controls
+                            playsInline
+                            preload="metadata"
+                          >
+                            <source src={s.src} type="video/mp4" />
                           </video>
                         )}
                       </div>
@@ -293,27 +292,20 @@ export default function ProductDetailPage() {
                     </button>
                   </div>
                 ) : (
-                  <button 
+                  <button
                     onClick={handleAddToCart}
-                    className={`add-to-cart-btn ${addedToCart ? 'added' : ''}`}
+                    className="add-to-cart-btn"
                   >
                     {addedToCart ? 'Added to Cart' : 'Add to Cart'}
                   </button>
                 )}
-                
-                <button 
-                  onClick={handleScanClick}
-                  className="scan-btn"
-                >
-                  View on Scanner
-                </button>
               </div>
 
               {/* Reviews Section */}
               <section className="reviews-section">
                 <div className="reviews-header">
                   <h2 className="reviews-title">Reviews</h2>
-                  <button className="btn btn-primary" onClick={openReviewModal}>Add Review</button>
+                  <button className="btn btn-light-card" onClick={openReviewModal}>Add Review</button>
                 </div>
                 {reviews.length === 0 ? (
                   <p className="reviews-empty">No reviews yet. Be the first to review.</p>

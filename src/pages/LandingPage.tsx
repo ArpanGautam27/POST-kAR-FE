@@ -633,14 +633,24 @@ export default function LandingPage() {
                   label: 'Active Users'
                 },
                 { 
-                  icon: (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
-                      <span style={{ fontSize: '2.5rem' }}>🔗</span>
-                      <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
-                        100%
+                  icon: (() => {
+                    const LottiePlayer = 'lottie-player' as any;
+                    return (
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
+                        <LottiePlayer
+                          src={indianFlagAnim}
+                          background="transparent"
+                          speed="1"
+                          loop
+                          autoplay
+                          style={{ width: 60, height: 60 }}
+                        />
+                        <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.3)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                          Connected
+                        </div>
                       </div>
-                    </div>
-                  ), 
+                    );
+                  })(), 
                   color: 'green', 
                   label: 'Connected'
                 },

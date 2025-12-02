@@ -20,6 +20,40 @@ export class ProductService {
     return ProductService.instance;
   }
 
+  // Map backend Marker object to frontend Product shape
+  private mapMarkerToProduct(marker: any): Product {
+    if (!marker) {
+      throw new Error('Invalid marker data');
+    }
+
+    const id = marker.markerId || marker.id || marker._id || '';
+    const name = marker.name || marker.markerId || 'Unknown Marker';
+    const description = marker.description || '';
+
+    const thumbnailUrl = marker.thumbnailUrl || marker.markerImageUrl || '';
+    const imageUrl = marker.markerImageUrl || marker.thumbnailUrl || '';
+
+    const videos = Array.isArray(marker.videos) ? marker.videos : [];
+    const activeVideoId = marker.activeVideoId;
+    const activeVideo =
+      videos.find((v: any) => v._id === activeVideoId) || videos[0] || null;
+
+    const videoUrl = activeVideo?.videoUrl || '';
+
+    return {
+      id,
+      name,
+      description,
+      thumbnail_url: thumbnailUrl,
+      image_url: imageUrl,
+      image_id: id,
+      video_url: videoUrl,
+      metadata: {
+        created_at: marker.createdAt,
+      },
+    };
+  }
+
   /**
    * Get all products from backend API
    */
@@ -37,13 +71,13 @@ export class ProductService {
       }
 
       const data = await response.json();
-      
+
       // Backend returns paginated response with 'content' array
       if (data.content && Array.isArray(data.content)) {
-        return data.content;
+        return data.content.map((marker: any) => this.mapMarkerToProduct(marker));
       } else if (Array.isArray(data)) {
         // Fallback if backend returns array directly
-        return data;
+        return data.map((marker: any) => this.mapMarkerToProduct(marker));
       } else {
         throw new Error('Invalid response format from API');
       }
@@ -73,10 +107,10 @@ export class ProductService {
       }
 
       const data = await response.json();
-      
+
       // Backend returns Marker object directly
-      if (data && data.id) {
-        return data;
+      if (data) {
+        return this.mapMarkerToProduct(data);
       } else {
         throw new Error('Invalid product response format');
       }
@@ -101,10 +135,10 @@ export class ProductService {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      
+
       // Backend returns array of Marker objects directly
       if (Array.isArray(data)) {
-        return data;
+        return data.map((marker: any) => this.mapMarkerToProduct(marker));
       } else {
         throw new Error('Invalid search response format');
       }

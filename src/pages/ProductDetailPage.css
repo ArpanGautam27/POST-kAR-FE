@@ -226,16 +226,25 @@
 }
 .option-row { display: flex; gap: var(--spacing-2); flex-wrap: wrap; }
 .option-chip {
-  padding: 8px 12px;
-  border: 1px solid var(--color-border-light);
-  background: #fff;
-  color: var(--color-text-primary);
-  border-radius: var(--radius-base);
+  padding: 8px 14px;
+  border-radius: 9999px;
+  border: 1px solid #1f2937; /* dark border */
+  background: #111827;       /* dark grey for unselected */
+  color: #e5e7eb;            /* light grey text */
   cursor: pointer;
+  font-weight: var(--font-weight-medium);
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
   transition: all var(--transition-base);
 }
-.option-chip:hover { border-color: var(--color-primary); }
-.option-chip.is-active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+.option-chip:hover {
+  border-color: #374151;
+}
+.option-chip.is-active {
+  background: #e5e7eb;       /* light grey selected */
+  color: #111827;            /* dark text on light */
+  border-color: #e5e7eb;
+}
 
 .image-loading {
   position: absolute;
@@ -322,7 +331,7 @@
 .product-price {
   font-size: 2rem;
   font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
+  color: #ffffff;
 }
 
 .quantity-indicator {
@@ -382,29 +391,22 @@
 }
 
 .add-to-cart-btn {
-  padding: var(--spacing-4) var(--spacing-8);
-  background-color: var(--color-success);
-  color: var(--color-white);
-  font-weight: var(--font-weight-bold);
-  font-size: var(--font-size-lg);
+  width: 100%;
+  background-color: #262626 !important; /* neutral-800 */
+  color: white !important;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
   border: none;
-  border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: all var(--transition-base);
-  box-shadow: var(--shadow-md);
-  min-height: var(--touch-target-comfortable);
 }
 
 .add-to-cart-btn:hover {
-  background-color: #2ecc71; /* darker green */
-  color: #ffffff;
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  background-color: #262626 !important;
 }
 
 .add-to-cart-btn.added {
-  background-color: var(--color-primary);
-  animation: addedPulse 0.5s ease;
+  background-color: #262626 !important;
 }
 
 @keyframes addedPulse {
@@ -517,6 +519,20 @@
   outline-offset: 2px;
 }
 
+/* Light grey pill/card button variant used for Add Review */
+.btn-light-card {
+  background-color: #e5e7eb;
+  color: #111827;
+  border-color: #e5e7eb;
+  border-radius: 9999px;
+  padding-inline: var(--spacing-5);
+}
+
+.btn-light-card:hover {
+  background-color: #d1d5db;
+  border-color: #d1d5db;
+}
+
 /* Reviews: left-aligned section under CTAs */
 .reviews-section {
   margin-top: var(--spacing-12);
@@ -551,12 +567,44 @@
   margin: 0;
 }
 
+/* Review cards: reuse services card border-frame aesthetic */
 .review-item {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: var(--radius-xl);
-  padding: var(--spacing-5);
-  box-shadow: var(--shadow-md);
+  position: relative;
+  border-radius: 16px;
+  padding: 1.5rem 1.5rem 2rem 1.5rem;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.review-item::before {
+  --gap: 40px;
+  --line: rgba(255,255,255,0.95);
+  --thickness: 2px;
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--line),var(--line)) top left / calc(100% - var(--gap)) var(--thickness) no-repeat,
+    linear-gradient(var(--line),var(--line)) bottom right / calc(100% - var(--gap)) var(--thickness) no-repeat,
+    linear-gradient(var(--line),var(--line)) top left / var(--thickness) calc(100% - var(--gap)) no-repeat,
+    linear-gradient(var(--line),var(--line)) bottom right / var(--thickness) calc(100% - var(--gap)) no-repeat;
+}
+
+.review-item::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  width: 28px;
+  height: 28px;
+  background-image: url("../assets/top_right_quote.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: brightness(0) invert(1);
 }
 
 .review-meta {

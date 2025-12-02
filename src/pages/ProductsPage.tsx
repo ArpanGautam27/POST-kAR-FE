@@ -20,14 +20,9 @@ export default function ProductsPage() {
       try {
         setLoading(true);
         setError(null);
-<<<<<<< HEAD
-
+        
         // Use either real API or mock service based on config
         const productsData: Product[] = await productService.getProducts();
-=======
-        
-        const productsData = await productService.getProducts();
->>>>>>> origin/feature/web-app-R-0.4
         setProducts(productsData);
       } catch (err: any) {
         const message = err?.message || 'Failed to load products from API.';

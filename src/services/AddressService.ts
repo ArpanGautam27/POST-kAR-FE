@@ -82,13 +82,20 @@ export class AddressService {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        return {
+          success: false,
+          error: `HTTP error! status: ${response.status}`,
+        };
       }
 
-      return await response.json();
+      const data = await response.json();
+      return data.success !== false ? data : { success: false, error: data.error || 'Failed to fetch addresses' };
     } catch (error) {
       console.error('Error fetching addresses:', error);
-      throw error;
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch addresses',
+      };
     }
   }
 
@@ -105,13 +112,20 @@ export class AddressService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        return {
+          success: false,
+          error: errorData.error || `HTTP error! status: ${response.status}`,
+        };
       }
 
-      return await response.json();
+      const data = await response.json();
+      return data.success !== false ? data : { success: false, error: data.error || 'Failed to create address' };
     } catch (error) {
       console.error('Error creating address:', error);
-      throw error;
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to create address',
+      };
     }
   }
 
@@ -128,13 +142,20 @@ export class AddressService {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+        return {
+          success: false,
+          error: errorData.error || `HTTP error! status: ${response.status}`,
+        };
       }
 
-      return await response.json();
+      const data = await response.json();
+      return data.success !== false ? data : { success: false, error: data.error || 'Failed to update address' };
     } catch (error) {
       console.error(`Error updating address ${addressId}:`, error);
-      throw error;
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to update address',
+      };
     }
   }
 
@@ -149,13 +170,20 @@ export class AddressService {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        return {
+          success: false,
+          error: `HTTP error! status: ${response.status}`,
+        };
       }
 
-      return await response.json();
+      const data = await response.json();
+      return data.success !== false ? data : { success: false, error: data.error || 'Failed to delete address' };
     } catch (error) {
       console.error(`Error deleting address ${addressId}:`, error);
-      throw error;
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to delete address',
+      };
     }
   }
 }

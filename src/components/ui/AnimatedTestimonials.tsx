@@ -30,72 +30,69 @@ export const AnimatedTestimonials: React.FC<AnimatedTestimonialsProps> = ({
   };
 
   useEffect(() => {
-    if (autoplay) {
+    if (autoplay && testimonials.length > 0) {
       const interval = setInterval(handleNext, 5000);
       return () => clearInterval(interval);
     }
   }, [autoplay, active]);
 
-  const randomRotateY = () => {
-    return Math.floor(Math.random() * 21) - 10;
-  };
+  // If we have no testimonials, render nothing to avoid runtime errors
+  if (!testimonials || testimonials.length === 0) {
+    return null;
+  }
+
+  // Ensure active index is always within bounds
+  const safeIndex = Math.min(Math.max(active, 0), testimonials.length - 1);
 
   return (
     <div className="animated-testimonials-container">
       <div className="testimonials-content">
         <div className="testimonials-grid">
-          <AnimatePresence>
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{
-                  opacity: 0,
-                  scale: 0.9,
-                  z: -100,
-                  rotate: randomRotateY(),
-                }}
-                animate={{
-                  opacity: index === active ? 1 : 0.7,
-                  scale: index === active ? 1 : 0.95,
-                  z: index === active ? 0 : -100,
-                  rotate: index === active ? 0 : randomRotateY(),
-                  zIndex: index === active ? 999 : testimonials.length - Math.abs(index - active),
-                  y: index === active ? [0, -80, 0] : 0,
-                }}
-                exit={{
-                  opacity: 0,
-                  scale: 0.9,
-                  z: 100,
-                  rotate: randomRotateY(),
-                }}
-                transition={{
-                  duration: 0.4,
-                  ease: "easeInOut",
-                }}
-                className="testimonial-card"
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                }}
-              >
-                {testimonial.isVideo ? (
-                  <video
-                    src={testimonial.src}
-                    autoPlay
-                    loop
-                    muted={testimonial.muted !== false}
-                    playsInline
-                    className="testimonial-media"
-                  />
-                ) : (
-                  <img
-                    src={testimonial.src}
-                    alt={testimonial.name || 'Testimonial'}
-                    className="testimonial-media"
-                  />
-                )}
-              </motion.div>
-            ))}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={safeIndex}
+              initial={{
+                opacity: 0,
+                scale: 0.9,
+                y: 40,
+              }}
+              animate={{
+                opacity: 1,
+                scale: 1,
+                y: 0,
+              }}
+              exit={{
+                opacity: 0,
+                scale: 0.9,
+                y: -40,
+              }}
+              transition={{
+                duration: 0.4,
+                ease: 'easeInOut',
+              }}
+              className="testimonial-card"
+              style={{
+                position: 'absolute',
+                inset: 0,
+              }}
+            >
+              {testimonials[safeIndex].isVideo ? (
+                <video
+                  src={testimonials[safeIndex].src}
+                  autoPlay
+                  loop
+                  muted={testimonials[safeIndex].muted !== false}
+                  playsInline
+                  className="testimonial-media"
+                />
+              ) : (
+                <img
+                  src={testimonials[safeIndex].src}
+                  alt={testimonials[safeIndex].name || 'Testimonial'}
+                  className="testimonial-media"
+                />
+              )}
+            </motion.div>
           </AnimatePresence>
         </div>
 

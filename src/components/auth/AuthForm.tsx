@@ -133,9 +133,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
         <div className="auth-form-info">
           <p>We'll send you a 4-digit OTP to verify your email address.</p>
           <p>If you're a new user, an account will be created automatically.</p>
-          <p className="auth-demo-info">
-            <strong>Demo:</strong> Use OTP <code>1234</code> for testing
-          </p>
         </div>
       </form>
     );

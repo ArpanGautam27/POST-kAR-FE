@@ -100,98 +100,93 @@ export default function AddressesPage() {
     if (Object.keys(v).length) return;
     
     setSaving(true);
-    try {
-      if (editing) {
-        // Update existing address
-        const response = await addressService.updateAddress(editing.id, {
-          fullName: form.fullName,
-          phone: form.phone,
-          line1: form.line1,
-          line2: form.line2,
-          city: form.city,
-          state: form.state,
-          postalCode: form.postalCode,
-          country: form.country,
-          isDefault: form.isDefault,
-        });
+    setErrors({}); // Clear previous errors
+    
+    if (editing) {
+      // Update existing address
+      const response = await addressService.updateAddress(editing.id, {
+        fullName: form.fullName,
+        phone: form.phone,
+        line1: form.line1,
+        line2: form.line2,
+        city: form.city,
+        state: form.state,
+        postalCode: form.postalCode,
+        country: form.country,
+        isDefault: form.isDefault,
+      });
 
-        if (response.success && response.data) {
-          setAddresses(prev => prev.map(a => (a.id === editing.id ? response.data! : a)));
-        } else {
-          throw new Error(response.error || 'Failed to update address');
-        }
-      } else {
-        // Create new address
-        const response = await addressService.createAddress({
-          fullName: form.fullName,
-          phone: form.phone,
-          line1: form.line1,
-          line2: form.line2,
-          city: form.city,
-          state: form.state,
-          postalCode: form.postalCode,
-          country: form.country,
-          isDefault: form.isDefault,
-        });
-
-        if (response.success && response.data) {
-          setAddresses(prev => {
-            let next = [...prev, response.data!];
-            if (response.data!.isDefault) {
-              next = next.map(a => ({ ...a, isDefault: a.id === response.data!.id }));
-            }
-            return next;
-          });
-        } else {
-          throw new Error(response.error || 'Failed to create address');
-        }
-      }
-
-      setFormOpen(false);
-      setEditing(null);
-
-      // If a return path is specified, navigate back to it
-      try {
+      if (response.success && response.data) {
+        setAddresses(prev => prev.map(a => (a.id === editing.id ? response.data! : a)));
+        setFormOpen(false);
+        setEditing(null);
+        
+        // If a return path is specified, navigate back to it
         const params = new URLSearchParams(window.location.search);
         const ret = params.get('return');
         if (ret) {
           window.location.href = ret;
         }
-      } catch {}
-    } catch (err) {
-      console.error('Error saving address:', err);
-      setErrors({ submit: err instanceof Error ? err.message : 'Failed to save address' });
-    } finally {
-      setSaving(false);
+      } else {
+        setErrors({ submit: response.error || 'Failed to update address' });
+      }
+    } else {
+      // Create new address
+      const response = await addressService.createAddress({
+        fullName: form.fullName,
+        phone: form.phone,
+        line1: form.line1,
+        line2: form.line2,
+        city: form.city,
+        state: form.state,
+        postalCode: form.postalCode,
+        country: form.country,
+        isDefault: form.isDefault,
+      });
+
+      if (response.success && response.data) {
+        setAddresses(prev => {
+          let next = [...prev, response.data!];
+          if (response.data!.isDefault) {
+            next = next.map(a => ({ ...a, isDefault: a.id === response.data!.id }));
+          }
+          return next;
+        });
+        setFormOpen(false);
+        setEditing(null);
+        
+        // If a return path is specified, navigate back to it
+        const params = new URLSearchParams(window.location.search);
+        const ret = params.get('return');
+        if (ret) {
+          window.location.href = ret;
+        }
+      } else {
+        setErrors({ submit: response.error || 'Failed to create address' });
+      }
     }
+    
+    setSaving(false);
   };
 
   const remove = async (id: string) => {
-    try {
-      const response = await addressService.deleteAddress(id);
-      if (response.success) {
-        setAddresses(prev => prev.filter(a => a.id !== id));
-      } else {
-        console.error('Failed to delete address:', response.error);
-      }
-    } catch (err) {
-      console.error('Error deleting address:', err);
+    const response = await addressService.deleteAddress(id);
+    if (response.success) {
+      setAddresses(prev => prev.filter(a => a.id !== id));
+    } else {
+      alert('Failed to delete address: ' + (response.error || 'Unknown error'));
     }
   };
 
   const makeDefault = async (id: string) => {
-    try {
-      const addressToUpdate = addresses.find(a => a.id === id);
-      if (addressToUpdate) {
-        const response = await addressService.updateAddress(id, { isDefault: true });
-        if (response.success) {
-          setAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === id })));
-        } else {
-          console.error('Failed to set default address:', response.error);
-        }
+    const addressToUpdate = addresses.find(a => a.id === id);
+    if (addressToUpdate) {
+      const response = await addressService.updateAddress(id, { isDefault: true });
+      if (response.success) {
+        setAddresses(prev => prev.map(a => ({ ...a, isDefault: a.id === id })));
+      } else {
+        alert('Failed to set default address: ' + (response.error || 'Unknown error'));
       }
-    } catch (err) {
-      console.error('Error setting default address:', err);
     }
   };
 
@@ -300,6 +295,7 @@ export default function AddressesPage() {
               <input type="checkbox" checked={!!form.isDefault} onChange={e => setForm({ ...form, isDefault: e.target.checked })} />
               <span>Set as default address</span>
             </label>
+            {errors.submit && <div className="error-message" style={{ color: '#ef4444', marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', borderRadius: '0.375rem' }}>{errors.submit}</div>}
             <div className="form-actions">
               <button type="button" className="btn" onClick={cancelForm}>Cancel</button>
               <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? 'Saving...' : editing ? 'Update Address' : 'Save Address'}</button>
