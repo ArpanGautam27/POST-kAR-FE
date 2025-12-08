@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Loader2, Phone, KeyRound, User } from 'lucide-react';
+import { Loader2, Mail, KeyRound, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { authService } from '../../services/AuthService';
 
@@ -11,7 +11,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
   const [step, setStep] = useState<'details' | 'otp'>('details');
   const [formData, setFormData] = useState({
     name: '',
-    mobileNumber: '',
+    email: '',
   });
   const [otp, setOtp] = useState('');
   const [otpId, setOtpId] = useState('');
@@ -52,17 +52,18 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
       return;
     }
 
-    if (!formData.mobileNumber || formData.mobileNumber.length !== 10) {
-      setError('Please enter a valid 10-digit mobile number');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email || !emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Use mock service for development
-      const response = await authService.sendOTPMock({
-        mobileNumber: formData.mobileNumber,
+      // Use real API service
+      const response = await authService.sendOTP({
+        email: formData.email,
         type: 'signup'
       });
 
@@ -92,13 +93,12 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
     setIsLoading(true);
 
     try {
-      // Use mock service for development
-      const response = await authService.verifyOTPMock({
-        mobileNumber: formData.mobileNumber,
+      // Use real API service
+      const response = await authService.verifyOTP({
+        email: formData.email,
         otp,
         otpId,
-        type: 'signup',
-        name: formData.name
+        type: 'signup'
       });
 
       if (response.success && response.token && response.user) {
@@ -121,8 +121,8 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
     setIsLoading(true);
 
     try {
-      const response = await authService.sendOTPMock({
-        mobileNumber: formData.mobileNumber,
+      const response = await authService.sendOTP({
+        email: formData.email,
         type: 'signup'
       });
 
@@ -159,18 +159,17 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
         </div>
 
         <div className="auth-form-group">
-          <label htmlFor="mobile" className="auth-form-label">
-            <Phone size={16} />
-            Mobile Number
+          <label htmlFor="email" className="auth-form-label">
+            <Mail size={16} />
+            Email Address
           </label>
           <input
-            id="mobile"
-            type="tel"
-            value={formData.mobileNumber}
-            onChange={(e) => handleInputChange('mobileNumber', e.target.value.replace(/\D/g, '').slice(0, 10))}
-            placeholder="Enter your mobile number"
+            id="email"
+            type="email"
+            value={formData.email}
+            onChange={(e) => handleInputChange('email', e.target.value)}
+            placeholder="Enter your email address"
             className="auth-form-input"
-            maxLength={10}
             required
           />
         </div>
@@ -179,7 +178,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
 
         <button
           type="submit"
-          disabled={isLoading || !formData.name.trim() || formData.mobileNumber.length !== 10}
+          disabled={isLoading || !formData.name.trim() || !formData.email}
           className="auth-form-button"
         >
           {isLoading ? (
@@ -193,10 +192,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
         </button>
 
         <div className="auth-form-info">
-          <p>We'll send you a 6-digit OTP to verify your mobile number.</p>
-          <p className="auth-demo-info">
-            <strong>Demo:</strong> Use OTP <code>123456</code> for testing
-          </p>
+          <p>We'll send you a 6-digit OTP to verify your email address.</p>
         </div>
       </form>
     );
@@ -220,7 +216,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
           required
         />
         <p className="auth-form-helper">
-          OTP sent to +91 {formData.mobileNumber}
+          OTP sent to {formData.email}
         </p>
       </div>
 
@@ -249,7 +245,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSuccess }) => {
         >
           Change details
         </button>
-        
+
         <button
           type="button"
           onClick={handleResendOTP}

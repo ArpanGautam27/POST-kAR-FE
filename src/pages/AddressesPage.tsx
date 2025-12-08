@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Navigation from '../components/layout/Navigation';
 import Modal from '../components/common/Modal';
+import { AuthModal } from '../components/auth/AuthModal';
 import { addressService } from '../services/AddressService';
 import type { Address } from '../services/AddressService';
 import './AddressesPage.css';
@@ -15,6 +16,7 @@ export default function AddressesPage() {
   const [saving, setSaving] = useState(false);
   const [editing, setEditing] = useState<Address | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [form, setForm] = useState<Address>({
     id: '',
     fullName: '',
@@ -46,7 +48,7 @@ export default function AddressesPage() {
         try {
           const raw = localStorage.getItem(STORAGE_KEY);
           if (raw) setAddresses(JSON.parse(raw));
-        } catch {}
+        } catch { }
       }
     };
 
@@ -57,7 +59,7 @@ export default function AddressesPage() {
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(addresses));
-    } catch {}
+    } catch { }
   }, [addresses]);
 
   const hasAny = addresses.length > 0;
@@ -98,10 +100,10 @@ export default function AddressesPage() {
     const v = validate(form);
     setErrors(v);
     if (Object.keys(v).length) return;
-    
+
     setSaving(true);
     setErrors({}); // Clear previous errors
-    
+
     if (editing) {
       // Update existing address
       const response = await addressService.updateAddress(editing.id, {
@@ -120,7 +122,7 @@ export default function AddressesPage() {
         setAddresses(prev => prev.map(a => (a.id === editing.id ? response.data! : a)));
         setFormOpen(false);
         setEditing(null);
-        
+
         // If a return path is specified, navigate back to it
         const params = new URLSearchParams(window.location.search);
         const ret = params.get('return');
@@ -128,7 +130,19 @@ export default function AddressesPage() {
           window.location.href = ret;
         }
       } else {
-        setErrors({ submit: response.error || 'Failed to update address' });
+        // Check if error is due to unauthorized access
+        const isUnauthorized = response.status === 401 ||
+          (response.error || '').toLowerCase().includes('unauthorized');
+
+        if (isUnauthorized) {
+          // Close the address form modal first
+          setFormOpen(false);
+          setEditing(null);
+          // Then show the auth modal
+          setShowAuthModal(true);
+        } else {
+          setErrors({ submit: response.error || 'Failed to update address' });
+        }
       }
     } else {
       // Create new address
@@ -154,7 +168,7 @@ export default function AddressesPage() {
         });
         setFormOpen(false);
         setEditing(null);
-        
+
         // If a return path is specified, navigate back to it
         const params = new URLSearchParams(window.location.search);
         const ret = params.get('return');
@@ -162,10 +176,22 @@ export default function AddressesPage() {
           window.location.href = ret;
         }
       } else {
-        setErrors({ submit: response.error || 'Failed to create address' });
+        // Check if error is due to unauthorized access
+        const isUnauthorized = response.status === 401 ||
+          (response.error || '').toLowerCase().includes('unauthorized');
+
+        if (isUnauthorized) {
+          // Close the address form modal first
+          setFormOpen(false);
+          setEditing(null);
+          // Then show the auth modal
+          setShowAuthModal(true);
+        } else {
+          setErrors({ submit: response.error || 'Failed to create address' });
+        }
       }
     }
-    
+
     setSaving(false);
   };
 
@@ -302,6 +328,25 @@ export default function AddressesPage() {
             </div>
           </form>
         </Modal>
+
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => {
+            setShowAuthModal(false);
+            // Reload addresses after successful login
+            const loadAddresses = async () => {
+              try {
+                const response = await addressService.getAddresses();
+                if (response.success && response.data) {
+                  setAddresses(response.data);
+                }
+              } catch (err) {
+                console.error('Error reloading addresses:', err);
+              }
+            };
+            loadAddresses();
+          }}
+        />
       </div>
     </div>
   );

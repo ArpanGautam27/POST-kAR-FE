@@ -6,34 +6,34 @@
 export interface AppConfig {
   // API Configuration
   apiBaseUrl: string;
-  
+
   // Feature Flags
   enableAnalytics: boolean;
   enablePerformanceMonitoring: boolean;
   enableErrorReporting: boolean;
   enableMockData: boolean;
-  
+
   // Development Settings
   mockApiDelay: number;
-  
+
   // Image Configuration
   imageCdnUrl: string;
   imageOptimization: boolean;
-  
+
   // Scanner Configuration
   scannerApiUrl: string;
   enableCameraPermissions: boolean;
-  
+
   // Video Configuration
   cloudflareVideoUrl: string;
-  
+
   // Analytics
   googleAnalyticsId?: string;
   mixpanelToken?: string;
-  
+
   // Error Reporting
   sentryDsn?: string;
-  
+
   // Environment Info
   isDevelopment: boolean;
   isProduction: boolean;
@@ -56,35 +56,35 @@ function getNumberEnv(value: string | undefined, defaultValue: number): number {
 // Create configuration object
 export const config: AppConfig = {
   // API Configuration
-  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://api.postkar.com',
-  
+  apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://post-kar.com',
+
   // Feature Flags
   enableAnalytics: getBooleanEnv(import.meta.env.VITE_ENABLE_ANALYTICS, false),
   enablePerformanceMonitoring: getBooleanEnv(import.meta.env.VITE_ENABLE_PERFORMANCE_MONITORING, true),
   enableErrorReporting: getBooleanEnv(import.meta.env.VITE_ENABLE_ERROR_REPORTING, false),
-  enableMockData: getBooleanEnv(import.meta.env.VITE_ENABLE_MOCK_DATA, true),
-  
+  enableMockData: getBooleanEnv(import.meta.env.VITE_ENABLE_MOCK_DATA, false),
+
   // Development Settings
   mockApiDelay: getNumberEnv(import.meta.env.VITE_MOCK_API_DELAY, 500),
-  
+
   // Image Configuration
-  imageCdnUrl: import.meta.env.VITE_IMAGE_CDN_URL || 'https://cdn.postkar.com',
+  imageCdnUrl: import.meta.env.VITE_IMAGE_CDN_URL || 'https://media.post-kar.com',
   imageOptimization: getBooleanEnv(import.meta.env.VITE_IMAGE_OPTIMIZATION, true),
-  
+
   // Scanner Configuration
-  scannerApiUrl: import.meta.env.VITE_SCANNER_API_URL || 'https://scanner-api.postkar.com',
+  scannerApiUrl: import.meta.env.VITE_SCANNER_API_URL || 'https://post-kar.com',
   enableCameraPermissions: getBooleanEnv(import.meta.env.VITE_ENABLE_CAMERA_PERMISSIONS, false),
-  
+
   // Video Configuration
-  cloudflareVideoUrl: import.meta.env.VITE_CLOUDFLARE_VIDEO_URL || 'https://customer-videos.postkar.com',
-  
+  cloudflareVideoUrl: import.meta.env.VITE_CLOUDFLARE_VIDEO_URL || 'https://media.post-kar.com',
+
   // Analytics
   googleAnalyticsId: import.meta.env.VITE_GOOGLE_ANALYTICS_ID,
   mixpanelToken: import.meta.env.VITE_MIXPANEL_TOKEN,
-  
+
   // Error Reporting
   sentryDsn: import.meta.env.VITE_SENTRY_DSN,
-  
+
   // Environment Info
   isDevelopment: import.meta.env.DEV,
   isProduction: import.meta.env.PROD,
@@ -96,13 +96,13 @@ export function validateConfig(): void {
   const requiredFields: (keyof AppConfig)[] = [
     'apiBaseUrl'
   ];
-  
+
   const missingFields = requiredFields.filter(field => !config[field]);
-  
+
   if (missingFields.length > 0) {
     console.warn('Missing required configuration fields:', missingFields);
   }
-  
+
   // Log configuration in development
   if (config.isDevelopment) {
     console.log('App Configuration:', {
