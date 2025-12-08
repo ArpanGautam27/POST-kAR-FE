@@ -1,4 +1,5 @@
 import { config } from '../config/environment';
+import { mockHeroService } from './MockHeroService';
 
 export interface HeroImage {
   id: string;
@@ -37,6 +38,12 @@ export class HeroService {
    * Returns 10 random hero images from the database
    */
   async getHeroImages(): Promise<HeroResponse> {
+    // Use mock data if enabled
+    if (config.enableMockData) {
+      console.log('Using mock data for hero images');
+      return mockHeroService.getHeroImages();
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/api/hero`, {
         method: 'GET',
@@ -51,8 +58,9 @@ export class HeroService {
 
       return await response.json();
     } catch (error) {
-      console.error('Error fetching hero images:', error);
-      throw error;
+      console.error('Error fetching hero images, falling back to mock data:', error);
+      // Fallback to mock data on error
+      return mockHeroService.getHeroImages();
     }
   }
 }

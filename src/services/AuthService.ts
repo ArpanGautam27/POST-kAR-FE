@@ -1,7 +1,7 @@
 import type { User } from '../contexts/AuthContext';
 
 export interface SendOTPRequest {
-  mobileNumber: string;
+  email: string;
   type: 'login' | 'signup';
 }
 
@@ -12,7 +12,7 @@ export interface SendOTPResponse {
 }
 
 export interface VerifyOTPRequest {
-  mobileNumber: string;
+  email: string;
   otp: string;
   otpId: string;
   type: 'login' | 'signup';
@@ -36,7 +36,9 @@ class AuthService {
 
   constructor() {
     // Use environment variable or default to localhost
-    this.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+    // Ensure /api prefix is included
+    this.baseURL = apiBase.endsWith('/api') ? apiBase : `${apiBase}/api`;
   }
 
   private async makeRequest<T>(
@@ -63,30 +65,52 @@ class AuthService {
       },
     };
 
+    console.log(`[AuthService] Making request to: ${url}`);
+    console.log(`[AuthService] Request config:`, { method: config.method, headers: config.headers });
+    if (options.body) {
+      console.log(`[AuthService] Request body:`, options.body);
+    }
+
     try {
       const response = await fetch(url, config);
       
+      console.log(`[AuthService] Response status: ${response.status} ${response.statusText}`);
+      
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        console.error(`[AuthService] API Error:`, errorData);
+        const errorMessage = errorData.message || errorData.error || `Server error: ${response.status}`;
+        throw new Error(errorMessage);
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log(`[AuthService] Response data:`, data);
+      return data;
     } catch (error) {
-      console.error('API request failed:', error);
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        console.error('[AuthService] Network error - Failed to fetch. Possible causes:');
+        console.error('  1. CORS issue');
+        console.error('  2. Backend server is down');
+        console.error('  3. Invalid URL:', url);
+        console.error('  4. Network connectivity issue');
+        throw new Error('Network error: Unable to connect to server. Please check your connection or try again later.');
+      }
+      console.error('[AuthService] Request failed:', error);
       throw error;
     }
   }
 
   async sendOTP(request: SendOTPRequest): Promise<SendOTPResponse> {
-    return this.makeRequest<SendOTPResponse>('/auth/send-otp', {
+    // Direct API call - no mock fallback
+    return await this.makeRequest<SendOTPResponse>('/auth/send-otp', {
       method: 'POST',
       body: JSON.stringify(request),
     });
   }
 
   async verifyOTP(request: VerifyOTPRequest): Promise<VerifyOTPResponse> {
-    return this.makeRequest<VerifyOTPResponse>('/auth/verify-otp', {
+    // Direct API call - no mock fallback
+    return await this.makeRequest<VerifyOTPResponse>('/auth/verify-otp', {
       method: 'POST',
       body: JSON.stringify(request),
     });
@@ -123,10 +147,10 @@ class AuthService {
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     // Mock validation
-    if (!request.mobileNumber || request.mobileNumber.length !== 10) {
+    if (!request.email || !request.email.includes('@')) {
       return {
         success: false,
-        message: 'Please enter a valid 10-digit mobile number',
+        message: 'Please enter a valid email address',
       };
     }
 
@@ -152,7 +176,7 @@ class AuthService {
     // Mock user data
     const user: User = {
       id: 'user-' + Date.now(),
-      mobileNumber: request.mobileNumber,
+      email: request.email,
       createdAt: new Date().toISOString(),
     };
 

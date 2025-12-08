@@ -1,5 +1,6 @@
 import type { Product } from '../types';
 import { config } from '../config/environment';
+import { mockProductService } from './MockProductService';
 
 /**
  * Product Service - Real API Integration
@@ -58,6 +59,12 @@ export class ProductService {
    * Get all products from backend API
    */
   async getProducts(): Promise<Product[]> {
+    // Use mock data if enabled
+    if (config.enableMockData) {
+      console.log('Using mock data for products');
+      return mockProductService.getProducts();
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/api/markers?page=0&size=100`, {
         method: 'GET',
@@ -82,8 +89,9 @@ export class ProductService {
         throw new Error('Invalid response format from API');
       }
     } catch (error) {
-      console.error('Error fetching products from API:', error);
-      throw error;
+      console.error('Error fetching products from API, falling back to mock data:', error);
+      // Fallback to mock data on error
+      return mockProductService.getProducts();
     }
   }
 
@@ -91,6 +99,12 @@ export class ProductService {
    * Get a specific product by ID from backend API
    */
   async getProduct(id: string): Promise<Product | null> {
+    // Use mock data if enabled
+    if (config.enableMockData) {
+      console.log(`Using mock data for product ${id}`);
+      return mockProductService.getProduct(id);
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/api/markers/${id}`, {
         method: 'GET',
@@ -115,14 +129,26 @@ export class ProductService {
         throw new Error('Invalid product response format');
       }
     } catch (error) {
-      console.error(`Error fetching product ${id} from API:`, error);
-      throw error;
+      console.error(`Error fetching product ${id} from API, falling back to mock data:`, error);
+      // Fallback to mock data on error
+      return mockProductService.getProduct(id);
     }
   }
   /**
    * Search products by query
    */
   async searchProducts(query: string): Promise<Product[]> {
+    // Use mock data if enabled - simple filter on name/description
+    if (config.enableMockData) {
+      console.log(`Using mock data for product search: ${query}`);
+      const allProducts = await mockProductService.getProducts();
+      const lowerQuery = query.toLowerCase();
+      return allProducts.filter(p => 
+        p.name.toLowerCase().includes(lowerQuery) || 
+        p.description.toLowerCase().includes(lowerQuery)
+      );
+    }
+
     try {
       const response = await fetch(`${this.baseUrl}/api/markers/search?q=${encodeURIComponent(query)}`, {
         method: 'GET',
@@ -143,8 +169,14 @@ export class ProductService {
         throw new Error('Invalid search response format');
       }
     } catch (error) {
-      console.error('Error searching products:', error);
-      throw error;
+      console.error('Error searching products, falling back to mock data:', error);
+      // Fallback to mock data on error
+      const allProducts = await mockProductService.getProducts();
+      const lowerQuery = query.toLowerCase();
+      return allProducts.filter(p => 
+        p.name.toLowerCase().includes(lowerQuery) || 
+        p.description.toLowerCase().includes(lowerQuery)
+      );
     }
   }
 }

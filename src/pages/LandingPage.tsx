@@ -202,6 +202,7 @@ export default function LandingPage() {
   const totalPanels = cinematicPanels.length; // 9 slides
   // Hero images for parallax section
   const [heroImages, setHeroImages] = useState<HeroImage[]>([]);
+  const [displayHeroImages, setDisplayHeroImages] = useState<HeroImage[]>([]);
   // Products for featured section
   const [products, setProducts] = useState<Product[]>([]);
   const productService = ProductService.getInstance();
@@ -227,13 +228,16 @@ export default function LandingPage() {
         const response = await heroService.getHeroImages();
         if (response.success && response.data) {
           setHeroImages(response.data);
+          setDisplayHeroImages(response.data);
         } else {
           console.warn('Failed to load hero images:', response.error);
           setHeroImages([]);
+          setDisplayHeroImages([]);
         }
       } catch (e) {
         console.error('Error loading hero images:', e);
         setHeroImages([]);
+        setDisplayHeroImages([]);
       }
     })();
 
@@ -303,11 +307,43 @@ export default function LandingPage() {
     };
   }, [totalPanels]);
 
+  // Random image rotation effect - change 2 random images every 3 seconds
+  useEffect(() => {
+    if (heroImages.length === 0) return;
 
+    const interval = setInterval(() => {
+      setDisplayHeroImages(current => {
+        const newImages = [...current];
+        const randomIndex1 = Math.floor(Math.random() * heroImages.length);
+        let randomIndex2 = Math.floor(Math.random() * heroImages.length);
+        
+        // Ensure we pick 2 different indices
+        while (randomIndex2 === randomIndex1 && heroImages.length > 1) {
+          randomIndex2 = Math.floor(Math.random() * heroImages.length);
+        }
+        
+        // Replace 2 random positions with different images from heroImages
+        const availableIndices = heroImages.map((_, idx) => idx);
+        const newImgIdx1 = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+        let newImgIdx2 = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+        
+        while (newImgIdx2 === newImgIdx1 && heroImages.length > 1) {
+          newImgIdx2 = availableIndices[Math.floor(Math.random() * availableIndices.length)];
+        }
+        
+        newImages[randomIndex1] = heroImages[newImgIdx1];
+        newImages[randomIndex2] = heroImages[newImgIdx2];
+        
+        return newImages;
+      });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [heroImages]);
 
   // Prepare hero images for HeroParallax (ensure we always have images)
-  const heroProducts = heroImages.length > 0 
-    ? heroImages.slice(0, 15).map((image) => ({
+  const heroProducts = displayHeroImages.length > 0 
+    ? displayHeroImages.slice(0, 15).map((image) => ({
         title: image.title || 'Hero Image',
         link: '#',
         thumbnail: image.imageUrl,
