@@ -35,8 +35,8 @@ class AuthService {
   private baseURL: string;
 
   constructor() {
-    // Use environment variable or default to localhost
-    const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+    // Use environment variable or default to dev backend
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://dev.post-kar.com';
     // Ensure /api prefix is included
     this.baseURL = apiBase.endsWith('/api') ? apiBase : `${apiBase}/api`;
   }
@@ -46,7 +46,15 @@ class AuthService {
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
-    
+
+    // Debug logging to verify API calls
+    console.log('🔵 API Request:', {
+      url,
+      method: options.method || 'GET',
+      baseURL: this.baseURL,
+      endpoint
+    });
+
     const defaultHeaders: Record<string, string> = {
       'Content-Type': 'application/json',
     };
@@ -139,56 +147,6 @@ class AuthService {
       method: 'PUT',
       body: JSON.stringify(data),
     });
-  }
-
-  // Mock implementation for development/testing
-  async sendOTPMock(request: SendOTPRequest): Promise<SendOTPResponse> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock validation
-    if (!request.email || !request.email.includes('@')) {
-      return {
-        success: false,
-        message: 'Please enter a valid email address',
-      };
-    }
-
-    return {
-      success: true,
-      message: 'OTP sent successfully',
-      otpId: 'mock-otp-id-' + Date.now(),
-    };
-  }
-
-  async verifyOTPMock(request: VerifyOTPRequest): Promise<VerifyOTPResponse> {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Mock OTP verification (accept 1234 as valid OTP)
-    if (request.otp !== '1234') {
-      return {
-        success: false,
-        message: 'Invalid OTP. Please try again.',
-      };
-    }
-
-    // Mock user data
-    const user: User = {
-      id: 'user-' + Date.now(),
-      email: request.email,
-      createdAt: new Date().toISOString(),
-    };
-
-    // Mock JWT token
-    const token = 'mock-jwt-token-' + Date.now();
-
-    return {
-      success: true,
-      message: request.type === 'signup' ? 'Account created successfully' : 'Login successful',
-      token,
-      user,
-    };
   }
 }
 

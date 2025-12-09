@@ -25,18 +25,20 @@ export interface CreateAddressRequest {
   isDefault?: boolean;
 }
 
-export interface UpdateAddressRequest extends Partial<CreateAddressRequest> {}
+export interface UpdateAddressRequest extends Partial<CreateAddressRequest> { }
 
 export interface AddressResponse {
   success: boolean;
   data?: Address;
   error?: string;
+  status?: number;
 }
 
 export interface AddressesListResponse {
   success: boolean;
   data?: Address[];
   error?: string;
+  status?: number;
 }
 
 /**
@@ -85,6 +87,7 @@ export class AddressService {
         return {
           success: false,
           error: `HTTP error! status: ${response.status}`,
+          status: response.status,
         };
       }
 
@@ -115,6 +118,7 @@ export class AddressService {
         return {
           success: false,
           error: errorData.error || `HTTP error! status: ${response.status}`,
+          status: response.status,
         };
       }
 
@@ -145,6 +149,7 @@ export class AddressService {
         return {
           success: false,
           error: errorData.error || `HTTP error! status: ${response.status}`,
+          status: response.status,
         };
       }
 
@@ -173,6 +178,7 @@ export class AddressService {
         return {
           success: false,
           error: `HTTP error! status: ${response.status}`,
+          status: response.status,
         };
       }
 
