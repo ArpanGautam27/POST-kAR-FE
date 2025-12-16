@@ -225,17 +225,20 @@ export default function LandingPage() {
     // Load hero images for the parallax section
     (async () => {
       try {
+        console.log('[LandingPage] Loading hero images...');
         const response = await heroService.getHeroImages();
+        console.log('[LandingPage] Hero images response:', response);
         if (response.success && response.data) {
+          console.log('[LandingPage] Loaded', response.data.length, 'hero images');
           setHeroImages(response.data);
           setDisplayHeroImages(response.data);
         } else {
-          console.warn('Failed to load hero images:', response.error);
+          console.warn('[LandingPage] Failed to load hero images:', response.error);
           setHeroImages([]);
           setDisplayHeroImages([]);
         }
       } catch (e) {
-        console.error('Error loading hero images:', e);
+        console.error('[LandingPage] Error loading hero images:', e);
         setHeroImages([]);
         setDisplayHeroImages([]);
       }
@@ -343,16 +346,26 @@ export default function LandingPage() {
 
   // Prepare hero images for HeroParallax (ensure we always have images)
   const heroProducts = displayHeroImages.length > 0 
-    ? displayHeroImages.slice(0, 15).map((image) => ({
-        title: image.title || 'Hero Image',
-        link: '#',
-        thumbnail: image.imageUrl,
-      }))
-    : Array(15).fill(null).map((_, i) => ({
-        title: `Hero ${i + 1}`,
-        link: '#',
-        thumbnail: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80',
-      }));
+    ? displayHeroImages.slice(0, 15).map((image) => {
+        console.log('[LandingPage] Mapping image:', image.id, image.imageUrl);
+        return {
+          id: image.id,
+          title: image.title || 'Hero Image',
+          link: '#',
+          thumbnail: image.imageUrl,
+        };
+      })
+    : (() => {
+        console.warn('[LandingPage] No hero images, using placeholders');
+        return Array(15).fill(null).map((_, i) => ({
+          id: `placeholder-${i}`,
+          title: `Hero ${i + 1}`,
+          link: '#',
+          thumbnail: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80',
+        }));
+      })();
+  
+  console.log('[LandingPage] heroProducts prepared:', heroProducts.length, 'items');
 
   // Ensure we have products for the featured section
   const featuredProducts = products.length > 0 ? products : Array(4).fill(null).map((_, i) => ({
