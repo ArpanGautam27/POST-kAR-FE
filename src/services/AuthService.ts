@@ -148,6 +148,17 @@ class AuthService {
       body: JSON.stringify(data),
     });
   }
+
+  /**
+   * Authenticate with Google OAuth
+   * @param accessToken - Google OAuth access token
+   */
+  async googleAuth(accessToken: string): Promise<VerifyOTPResponse> {
+    return this.makeRequest<VerifyOTPResponse>('/auth/google', {
+      method: 'POST',
+      body: JSON.stringify({ accessToken }),
+    });
+  }
 }
 
 export const authService = new AuthService();

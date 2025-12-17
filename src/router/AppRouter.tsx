@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NavigationProvider } from '../contexts/NavigationContext';
 import { CartProvider } from '../contexts/CartContext';
 import { AuthProvider } from '../contexts/AuthContext';
 import { withLazyLoading, preloadComponent } from '../utils/lazyLoad';
+import { googleOAuthConfig } from '../config/googleOAuth';
 
 // Lazy load pages for better performance
 const LandingPage = withLazyLoading(() => import('../pages/LandingPage'));
@@ -29,10 +31,11 @@ if (typeof window !== 'undefined') {
 
 export default function AppRouter() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <NavigationProvider>
-          <CartProvider>
+    <GoogleOAuthProvider clientId={googleOAuthConfig.clientId}>
+      <BrowserRouter>
+        <AuthProvider>
+          <NavigationProvider>
+            <CartProvider>
             <Routes>
               {/* Landing page route */}
               <Route path="/" element={<LandingPage />} />
@@ -68,5 +71,6 @@ export default function AppRouter() {
         </NavigationProvider>
       </AuthProvider>
     </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 }

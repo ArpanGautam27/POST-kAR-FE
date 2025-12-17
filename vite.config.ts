@@ -11,6 +11,7 @@ export default defineConfig({
   server: {
     host: true,  // expose on network (0.0.0.0)
     port: 5173,
+    strictPort: true,  // Don't try other ports, fail if 5173 is in use
   },
   resolve: {
     alias: {
