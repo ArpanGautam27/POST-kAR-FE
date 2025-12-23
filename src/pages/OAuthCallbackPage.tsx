@@ -12,6 +12,7 @@ export default function OAuthCallbackPage() {
     const handleCallback = async () => {
       try {
         const token = searchParams.get('token');
+        const refreshToken = searchParams.get('refreshToken');
         const userDataStr = searchParams.get('user');
         const errorParam = searchParams.get('error');
 
@@ -23,6 +24,12 @@ export default function OAuthCallbackPage() {
 
         if (token && userDataStr) {
           const user = JSON.parse(decodeURIComponent(userDataStr));
+
+          // Store refresh token if provided
+          if (refreshToken) {
+            localStorage.setItem('postkar-refresh-token', refreshToken);
+          }
+
           login(token, user);
           navigate('/');
         } else {
