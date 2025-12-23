@@ -11,7 +11,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleGoogleSignIn = async () => {
+  const handleGoogleSignIn = () => {
     if (!isLoading && !disabled) {
       setIsLoading(true);
       try {
@@ -19,30 +19,11 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
         const baseURL = apiBase.endsWith('/api') ? apiBase : `${apiBase}/api`;
         const initiateUrl = `${baseURL}/oauth/google/initiate`;
         
-        console.log('[GoogleSignInButton] Calling:', initiateUrl);
+        console.log('[GoogleSignInButton] 🚀 Redirecting to:', initiateUrl);
         
-        // Call the initiate endpoint to get the OAuth URL
-        const response = await fetch(initiateUrl, {
-          method: 'GET',
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to initiate OAuth: ${response.status}`);
-        }
-
-        const data = await response.json();
+        // Simply redirect - OAuth must use full page navigation
+        window.location.href = initiateUrl;
         
-        // Check if response contains a redirect URL
-        if (data.authUrl || data.url || data.redirectUrl) {
-          const oauthUrl = data.authUrl || data.url || data.redirectUrl;
-          console.log('[GoogleSignInButton] Redirecting to Google OAuth:', oauthUrl);
-          window.location.href = oauthUrl;
-        } else {
-          // If no redirect URL, the endpoint might be redirect-based
-          console.log('[GoogleSignInButton] Direct redirect to endpoint');
-          window.location.href = initiateUrl;
-        }
       } catch (error) {
         console.error('[GoogleSignInButton] ❌ Exception:', error);
         const message = error instanceof Error ? error.message : 'Failed to sign in with Google';
@@ -98,7 +79,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
               animation: 'spin 1s linear infinite',
             }}
           />
-          <span>Signing in...</span>
+          <span>Redirecting...</span>
         </>
       ) : (
         <>
