@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import { GoogleSignInButton } from './GoogleSignInButton';
 
-interface AuthFormProps {
-  onSuccess: () => void;
-}
-
-export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
+export const AuthForm: React.FC = () => {
   const [error, setError] = useState('');
 
   const handleGoogleError = (errorMessage: string) => {
@@ -20,7 +16,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({ onSuccess }) => {
       </div>
 
       <GoogleSignInButton
-        onSuccess={onSuccess}
         onError={handleGoogleError}
       />
 

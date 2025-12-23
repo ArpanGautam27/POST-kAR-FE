@@ -1,58 +1,54 @@
 import React, { useState } from 'react';
-import { useGoogleLogin } from '@react-oauth/google';
-import { useAuth } from '../../contexts/AuthContext';
-import { authService } from '../../services/AuthService';
 
 interface GoogleSignInButtonProps {
-  onSuccess: () => void;
   onError?: (error: string) => void;
   disabled?: boolean;
 }
 
 export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
-  onSuccess,
   onError,
   disabled = false,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
 
-  // Google OAuth login hook
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
+  const handleGoogleSignIn = async () => {
+    if (!isLoading && !disabled) {
       setIsLoading(true);
       try {
-        console.log('[GoogleSignInButton] ✅ Google Sign-In successful');
-        console.log('[GoogleSignInButton] Access token received');
+        const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://dev.post-kar.com';
+        const baseURL = apiBase.endsWith('/api') ? apiBase : `${apiBase}/api`;
+        const initiateUrl = `${baseURL}/oauth/google/initiate`;
+        
+        console.log('[GoogleSignInButton] Calling:', initiateUrl);
+        
+        // Call the initiate endpoint to get the OAuth URL
+        const response = await fetch(initiateUrl, {
+          method: 'GET',
+          credentials: 'include',
+        });
 
-        // Send access token to your backend for verification
-        const response = await authService.googleAuth(tokenResponse.access_token);
+        if (!response.ok) {
+          throw new Error(`Failed to initiate OAuth: ${response.status}`);
+        }
 
-        if (response.success && response.token && response.user) {
-          console.log('[GoogleSignInButton] ✅ Backend authentication successful');
-          login(response.token, response.user);
-          onSuccess();
+        const data = await response.json();
+        
+        // Check if response contains a redirect URL
+        if (data.authUrl || data.url || data.redirectUrl) {
+          const oauthUrl = data.authUrl || data.url || data.redirectUrl;
+          console.log('[GoogleSignInButton] Redirecting to Google OAuth:', oauthUrl);
+          window.location.href = oauthUrl;
         } else {
-          console.error('[GoogleSignInButton] ❌ Backend auth failed:', response.message);
-          onError?.(response.message || 'Failed to authenticate with backend');
+          // If no redirect URL, the endpoint might be redirect-based
+          console.log('[GoogleSignInButton] Direct redirect to endpoint');
+          window.location.href = initiateUrl;
         }
       } catch (error) {
         console.error('[GoogleSignInButton] ❌ Exception:', error);
         const message = error instanceof Error ? error.message : 'Failed to sign in with Google';
         onError?.(message);
-      } finally {
         setIsLoading(false);
       }
-    },
-    onError: () => {
-      console.error('[GoogleSignInButton] ❌ Google Sign-In failed');
-      onError?.('Failed to sign in with Google. Please try again.');
-    },
-  });
-
-  const handleGoogleSignIn = () => {
-    if (!isLoading && !disabled) {
-      googleLogin();
     }
   };
 

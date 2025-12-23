@@ -1,10 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import { NavigationProvider } from '../contexts/NavigationContext';
 import { CartProvider } from '../contexts/CartContext';
 import { AuthProvider } from '../contexts/AuthContext';
 import { withLazyLoading, preloadComponent } from '../utils/lazyLoad';
-import { googleOAuthConfig } from '../config/googleOAuth';
 
 // Lazy load pages for better performance
 const LandingPage = withLazyLoading(() => import('../pages/LandingPage'));
@@ -19,6 +17,7 @@ const OrderDetailPage = withLazyLoading(() => import('../pages/OrderDetailPage')
 const ProfilePage = withLazyLoading(() => import('../pages/ProfilePage'));
 const AddressesPage = withLazyLoading(() => import('../pages/AddressesPage'));
 const NotFoundPage = withLazyLoading(() => import('../pages/NotFoundPage'));
+const OAuthCallbackPage = withLazyLoading(() => import('../pages/OAuthCallbackPage'));
 
 // Preload critical pages for better UX
 if (typeof window !== 'undefined') {
@@ -31,11 +30,10 @@ if (typeof window !== 'undefined') {
 
 export default function AppRouter() {
   return (
-    <GoogleOAuthProvider clientId={googleOAuthConfig.clientId}>
-      <BrowserRouter>
-        <AuthProvider>
-          <NavigationProvider>
-            <CartProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <NavigationProvider>
+          <CartProvider>
             <Routes>
               {/* Landing page route */}
               <Route path="/" element={<LandingPage />} />
@@ -60,6 +58,9 @@ export default function AppRouter() {
               {/* Profile route - protected */}
               <Route path="/profile" element={<ProfilePage />} />
               
+              {/* OAuth callback route */}
+              <Route path="/auth/callback" element={<OAuthCallbackPage />} />
+              
               {/* Scanner route */}
               {/* Scanner is served as a static page under public/scanner/scan_mind.html */}
               {/* Links should use <a href="/scanner/scan_mind.html"> to trigger a full-page load */}
@@ -71,6 +72,5 @@ export default function AppRouter() {
         </NavigationProvider>
       </AuthProvider>
     </BrowserRouter>
-    </GoogleOAuthProvider>
   );
 }

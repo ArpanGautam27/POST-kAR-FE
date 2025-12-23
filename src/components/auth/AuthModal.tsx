@@ -38,7 +38,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         <div className="auth-modal-content">
-          <AuthForm onSuccess={onClose} />
+          <AuthForm />
         </div>
       </div>
     </div>

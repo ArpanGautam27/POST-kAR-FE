@@ -154,7 +154,7 @@ class AuthService {
    * @param accessToken - Google OAuth access token
    */
   async googleAuth(accessToken: string): Promise<VerifyOTPResponse> {
-    return this.makeRequest<VerifyOTPResponse>('/auth/google', {
+    return this.makeRequest<VerifyOTPResponse>('/oauth/google/initiate', {
       method: 'POST',
       body: JSON.stringify({ accessToken }),
     });

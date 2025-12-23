@@ -21,69 +21,57 @@ export const HeroParallax = ({
     thumbnail: string;
   }[];
 }) => {
-  // State for random image rotation
+  // State for card display
   const [displayProducts, setDisplayProducts] = useState<any[]>([]);
-  const [flippingIndices, setFlippingIndices] = useState<Set<number>>(new Set());
+
+  // Helper function to create unique shuffled array with no duplicates
+  const createUniqueShuffledArray = (sourceProducts: any[], targetLength: number): any[] => {
+    const result: any[] = [];
+    const timestamp = Date.now();
+    
+    // If we have enough unique products, use them without duplicates
+    if (sourceProducts.length >= targetLength) {
+      const shuffled = [...sourceProducts].sort(() => Math.random() - 0.5);
+      return shuffled.slice(0, targetLength).map((p, idx) => ({
+        ...p,
+        uniqueId: `${p.id}-${idx}-${timestamp}-${Math.random()}`
+      }));
+    }
+    
+    // If not enough products, distribute them evenly to minimize consecutive duplicates
+    const usedIds: string[] = [];
+    let productPool = [...sourceProducts].sort(() => Math.random() - 0.5);
+    
+    while (result.length < targetLength) {
+      if (productPool.length === 0) {
+        // Reshuffle when pool is empty
+        productPool = [...sourceProducts].sort(() => Math.random() - 0.5);
+      }
+      
+      const product = productPool.shift()!;
+      const lastId = usedIds[usedIds.length - 1];
+      
+      // Try to avoid consecutive duplicates
+      if (usedIds.length < 2 || product.id !== lastId || sourceProducts.length === 1) {
+        result.push({
+          ...product,
+          uniqueId: `${product.id}-${result.length}-${timestamp}-${Math.random()}`
+        });
+        usedIds.push(product.id);
+      } else {
+        // Put back and try next
+        productPool.push(product);
+      }
+    }
+    
+    return result;
+  };
 
   // Update displayProducts when products prop changes
   useEffect(() => {
-    const extendedProducts = [
-      ...products.map(p => ({ ...p, uniqueId: `${p.id}-0` })),
-      ...products.map(p => ({ ...p, uniqueId: `${p.id}-1` })),
-      ...products.map(p => ({ ...p, uniqueId: `${p.id}-2` })),
-    ];
-    setDisplayProducts(extendedProducts);
+    if (products.length === 0) return;
+    setDisplayProducts(createUniqueShuffledArray(products, 24));
   }, [products]);
-
-  // Randomly change 2-3 images every 2 seconds
-  useEffect(() => {
-    if (products.length === 0 || displayProducts.length === 0) return;
-
-    const interval = setInterval(() => {
-      // Select 2-3 random indices to flip
-      const numToFlip = Math.floor(Math.random() * 2) + 2; // 2 or 3
-      const indicesToFlip = new Set<number>();
-      
-      while (indicesToFlip.size < numToFlip && indicesToFlip.size < displayProducts.length) {
-        const randomIndex = Math.floor(Math.random() * displayProducts.length);
-        indicesToFlip.add(randomIndex);
-      }
-
-      // Mark cards as flipping
-      setFlippingIndices(indicesToFlip);
-
-      // After flip animation (500ms), update the images
-      setTimeout(() => {
-        setDisplayProducts(prev => {
-          const newProducts = [...prev];
-          indicesToFlip.forEach(index => {
-            // Get current image ID to avoid picking the same one
-            const currentImageId = prev[index].id;
-            
-            // Pick a different random image (not the same as current)
-            let randomProduct;
-            let attempts = 0;
-            do {
-              randomProduct = products[Math.floor(Math.random() * products.length)];
-              attempts++;
-              // Prevent infinite loop if only one product exists
-              if (attempts > 10 || products.length === 1) break;
-            } while (randomProduct.id === currentImageId);
-            
-            const suffix = prev[index].uniqueId.split('-')[1];
-            newProducts[index] = {
-              ...randomProduct,
-              uniqueId: `${randomProduct.id}-${suffix}-${Date.now()}`
-            };
-          });
-          return newProducts;
-        });
-        setFlippingIndices(new Set());
-      }, 500);
-    }, 2000); // Changed to 2 seconds
-
-    return () => clearInterval(interval);
-  }, [products, displayProducts.length]);
 
   const displayFirstRow = displayProducts.slice(0, 8);
   const displaySecondRow = displayProducts.slice(8, 16);
@@ -142,32 +130,29 @@ export const HeroParallax = ({
         className=""
       >
         <motion.div className="hero-parallax-grid">
-          {displayFirstRow.map((product, index) => (
+          {displayFirstRow.map((product) => (
             <ProductCard
               product={product}
               translate={translateX}
               key={product.uniqueId}
-              isFlipping={flippingIndices.has(index)}
             />
           ))}
         </motion.div>
         <motion.div className="hero-parallax-grid">
-          {displaySecondRow.map((product, index) => (
+          {displaySecondRow.map((product) => (
             <ProductCard
               product={product}
               translate={translateXReverse}
               key={product.uniqueId}
-              isFlipping={flippingIndices.has(index + 8)}
             />
           ))}
         </motion.div>
         <motion.div className="hero-parallax-grid">
-          {displayThirdRow.map((product, index) => (
+          {displayThirdRow.map((product) => (
             <ProductCard
               product={product}
               translate={translateX}
               key={product.uniqueId}
-              isFlipping={flippingIndices.has(index + 16)}
             />
           ))}
         </motion.div>
@@ -211,7 +196,6 @@ export const Header = () => {
 export const ProductCard = ({
   product,
   translate,
-  isFlipping = false,
 }: {
   product: {
     title: string;
@@ -219,7 +203,6 @@ export const ProductCard = ({
     thumbnail: string;
   };
   translate: MotionValue<number>;
-  isFlipping?: boolean;
 }) => {
   return (
     <motion.div
@@ -235,19 +218,7 @@ export const ProductCard = ({
         to={product.link}
         className="hero-parallax-card-link"
       >
-        <motion.div
-          animate={{
-            rotateY: isFlipping ? 180 : 0,
-            scale: isFlipping ? 0.95 : 1,
-          }}
-          transition={{
-            duration: 0.5,
-            ease: "easeInOut",
-          }}
-          style={{
-            transformStyle: "preserve-3d",
-          }}
-        >
+        <div>
           <img
             src={product.thumbnail}
             className="hero-parallax-card-image"
@@ -256,7 +227,7 @@ export const ProductCard = ({
               backfaceVisibility: "hidden",
             }}
           />
-        </motion.div>
+        </div>
       </Link>
     </motion.div>
   );
