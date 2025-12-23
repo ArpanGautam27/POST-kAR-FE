@@ -58,8 +58,9 @@ export default function AppRouter() {
               {/* Profile route - protected */}
               <Route path="/profile" element={<ProfilePage />} />
               
-              {/* OAuth callback route */}
+              {/* OAuth callback routes */}
               <Route path="/auth/callback" element={<OAuthCallbackPage />} />
+              <Route path="/login/oauth2/code/google" element={<OAuthCallbackPage />} />
               
               {/* Scanner route */}
               {/* Scanner is served as a static page under public/scanner/scan_mind.html */}
