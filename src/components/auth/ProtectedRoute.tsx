@@ -9,12 +9,19 @@ interface ProtectedRouteProps {
   fallback?: React.ReactNode;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  fallback 
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  fallback
 }) => {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, token } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  // 🔍 DEBUG: Log auth state
+  console.log('[ProtectedRoute] Auth state:', {
+    token: token ? token.substring(0, 20) + '...' : null,
+    isAuthenticated,
+    isLoading
+  });
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -42,7 +49,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         <div className="prompt-content">
           <h2>Authentication Required</h2>
           <p>Please log in to access this page.</p>
-          <button 
+          <button
             onClick={() => setShowAuthModal(true)}
             className="prompt-login-button"
           >
@@ -50,7 +57,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
           </button>
         </div>
       </div>
-      
+
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 export interface User {
   id: string;
@@ -15,7 +15,7 @@ export interface AuthState {
 }
 
 export interface AuthContextType extends AuthState {
-  login: (token: string, user: User) => void;
+  login: (token: string, user?: User | null) => void;
   logout: () => void;
   updateUser: (user: Partial<User>) => void;
   setLoading: (loading: boolean) => void;
@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
         if (storedToken && storedUser) {
           const user = JSON.parse(storedUser);
-          
+
           // Check if token is expired (basic check - in real app, decode JWT)
           const tokenData = parseJWT(storedToken);
           if (tokenData && tokenData.exp * 1000 > Date.now()) {
@@ -75,22 +75,38 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     initializeAuth();
   }, []);
 
-  const login = (token: string, user: User) => {
+  const login = (token: string, user?: User | null) => {
+    console.log('[AuthContext] login() called', {
+      hasToken: !!token,
+      hasUser: !!user
+    });
+
+    // Store token (required)
     localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-    
+
+    // Store user only if provided
+    if (user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+    }
+
+    // ✅ SYNCHRONOUS state update - NO async, NO delays
     setAuthState({
-      user,
+      user: user || null,
       token,
       isAuthenticated: true,
       isLoading: false,
+    });
+
+    console.log('[AuthContext] Auth state updated', {
+      isAuthenticated: true,
+      token: token.substring(0, 20) + '...'
     });
   };
 
   const logout = () => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
-    
+
     setAuthState({
       user: null,
       token: null,
@@ -103,7 +119,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (authState.user) {
       const newUser = { ...authState.user, ...updatedUser };
       localStorage.setItem(USER_KEY, JSON.stringify(newUser));
-      
+
       setAuthState(prev => ({
         ...prev,
         user: newUser,

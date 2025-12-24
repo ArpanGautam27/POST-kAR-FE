@@ -17,13 +17,13 @@ export default function OAuthCallbackPage() {
 
       if (errorParam) {
         setError(errorParam);
-        setTimeout(() => navigate('/'), 3000);
+        setTimeout(() => navigate('/', { replace: true }), 3000);
         return;
       }
 
       if (!token) {
         setError('Missing access token');
-        setTimeout(() => navigate('/'), 3000);
+        setTimeout(() => navigate('/', { replace: true }), 3000);
         return;
       }
 
@@ -45,13 +45,13 @@ export default function OAuthCallbackPage() {
       // Login using token (source of truth)
       login(token, user);
 
-      // Prevent navigation deadlock
-      setTimeout(() => navigate('/'), 0);
+      // ✅ Use replace to prevent navigation loop
+      navigate('/', { replace: true });
 
     } catch (err) {
       console.error('[OAuthCallback] Fatal error:', err);
       setError('Authentication failed');
-      setTimeout(() => navigate('/'), 3000);
+      setTimeout(() => navigate('/', { replace: true }), 3000);
     }
   }, [searchParams, navigate, login]);
 
