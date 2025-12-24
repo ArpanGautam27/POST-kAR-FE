@@ -9,41 +9,50 @@ export default function OAuthCallbackPage() {
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
-    const handleCallback = async () => {
-      try {
-        const token = searchParams.get('token');
-        const refreshToken = searchParams.get('refreshToken');
-        const userDataStr = searchParams.get('user');
-        const errorParam = searchParams.get('error');
+    try {
+      const token = searchParams.get('token');
+      const refreshToken = searchParams.get('refreshToken');
+      const userDataStr = searchParams.get('user');
+      const errorParam = searchParams.get('error');
 
-        if (errorParam) {
-          setError(errorParam);
-          setTimeout(() => navigate('/'), 3000);
-          return;
-        }
-
-        if (token && userDataStr) {
-          const user = JSON.parse(decodeURIComponent(userDataStr));
-
-          // Store refresh token if provided
-          if (refreshToken) {
-            localStorage.setItem('postkar-refresh-token', refreshToken);
-          }
-
-          login(token, user);
-          navigate('/');
-        } else {
-          setError('Missing authentication data');
-          setTimeout(() => navigate('/'), 3000);
-        }
-      } catch (err) {
-        console.error('[OAuthCallback] Error:', err);
-        setError('Authentication failed');
+      if (errorParam) {
+        setError(errorParam);
         setTimeout(() => navigate('/'), 3000);
+        return;
       }
-    };
 
-    handleCallback();
+      if (!token) {
+        setError('Missing access token');
+        setTimeout(() => navigate('/'), 3000);
+        return;
+      }
+
+      // Store refresh token
+      if (refreshToken) {
+        localStorage.setItem('postkar-refresh-token', refreshToken);
+      }
+
+      // Parse user ONLY if present
+      let user = null;
+      if (userDataStr) {
+        try {
+          user = JSON.parse(userDataStr); // 🔥 NO decodeURIComponent
+        } catch (e) {
+          console.warn('User parsing failed, continuing without user');
+        }
+      }
+
+      // Login using token (source of truth)
+      login(token, user);
+
+      // Prevent navigation deadlock
+      setTimeout(() => navigate('/'), 0);
+
+    } catch (err) {
+      console.error('[OAuthCallback] Fatal error:', err);
+      setError('Authentication failed');
+      setTimeout(() => navigate('/'), 3000);
+    }
   }, [searchParams, navigate, login]);
 
   return (
@@ -53,37 +62,17 @@ export default function OAuthCallbackPage() {
       alignItems: 'center',
       justifyContent: 'center',
       minHeight: '100vh',
-      padding: '20px',
       textAlign: 'center'
     }}>
       {error ? (
         <>
-          <div style={{ fontSize: '48px', marginBottom: '20px' }}>❌</div>
-          <h2 style={{ color: '#e74c3c', marginBottom: '10px' }}>Authentication Failed</h2>
-          <p style={{ color: '#666' }}>{error}</p>
-          <p style={{ color: '#999', fontSize: '14px', marginTop: '20px' }}>
-            Redirecting to home page...
-          </p>
+          <h2 style={{ color: '#e74c3c' }}>Authentication Failed</h2>
+          <p>{error}</p>
         </>
       ) : (
         <>
-          <div style={{
-            width: '40px',
-            height: '40px',
-            border: '3px solid #e0e0e0',
-            borderTop: '3px solid #4285f4',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            marginBottom: '20px'
-          }} />
-          <h2 style={{ color: '#333', marginBottom: '10px' }}>Completing Sign In...</h2>
-          <p style={{ color: '#666' }}>Please wait while we authenticate you.</p>
-          <style>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}</style>
+          <h2>Completing Sign In…</h2>
+          <p>Please wait while we authenticate you.</p>
         </>
       )}
     </div>
