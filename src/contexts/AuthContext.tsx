@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
 
 export interface User {
   id: string;
@@ -75,7 +75,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     initializeAuth();
   }, []);
 
-  const login = (token: string, user?: User | null) => {
+  const login = useCallback((token: string, user?: User | null) => {
     console.log('[AuthContext] login() called', {
       hasToken: !!token,
       hasUser: !!user
@@ -101,9 +101,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       isAuthenticated: true,
       token: token.substring(0, 20) + '...'
     });
-  };
+  }, []); // ✅ Empty deps = stable function reference
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
 
@@ -113,26 +113,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       isAuthenticated: false,
       isLoading: false,
     });
-  };
+  }, []); // ✅ Empty deps = stable function reference
 
-  const updateUser = (updatedUser: Partial<User>) => {
-    if (authState.user) {
-      const newUser = { ...authState.user, ...updatedUser };
-      localStorage.setItem(USER_KEY, JSON.stringify(newUser));
+  const updateUser = useCallback((updatedUser: Partial<User>) => {
+    setAuthState(prev => {
+      if (prev.user) {
+        const newUser = { ...prev.user, ...updatedUser };
+        localStorage.setItem(USER_KEY, JSON.stringify(newUser));
+        return {
+          ...prev,
+          user: newUser,
+        };
+      }
+      return prev;
+    });
+  }, []); // ✅ Empty deps = stable function reference
 
-      setAuthState(prev => ({
-        ...prev,
-        user: newUser,
-      }));
-    }
-  };
-
-  const setLoading = (loading: boolean) => {
+  const setLoading = useCallback((loading: boolean) => {
     setAuthState(prev => ({
       ...prev,
       isLoading: loading,
     }));
-  };
+  }, []); // ✅ No dependencies - function is stable
 
   return (
     <AuthContext.Provider
