@@ -1,12 +1,15 @@
 import { config } from '../config/environment';
 
 export interface OrderItem {
-  id: string;
-  name: string;
-  thumbnail_url: string;
-  quantity: number;
+  markerId: string;
+  markerName: string;
+  thumbnailUrl: string;
+  productType?: string; // e.g., "CANVAS", "POSTER_CARD"
+  size?: string; // e.g., "A5", "A4"
   unitPrice: number;
-  lineTotal: number;
+  quantity: number;
+  totalPrice: number;
+  currency: string;
 }
 
 export interface OrderAddress {
@@ -22,19 +25,20 @@ export interface OrderAddress {
 
 export interface Order {
   id: string;
-  status: 'PLACED' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
-  paymentMethod: string;
-  placedAt: string;
-  eta?: string;
-  address: OrderAddress;
-  email: string;
+  userId: string;
+  orderNumber: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
   items: OrderItem[];
-  totals: {
-    subtotal: number;
-    shipping: number;
-    total: number;
-    currency: string;
-  };
+  totalAmount: number;
+  currency: string;
+  status: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'REFUNDED';
+  shippingAddress: OrderAddress;
+  billingAddress: OrderAddress;
+  createdAt: string;
+  updatedAt: string;
+  deliveredAt?: string;
 }
 
 export interface CreateOrderRequest {
@@ -136,19 +140,45 @@ export class OrderService {
    */
   async getOrders(): Promise<OrdersListResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/orders`, {
+      const url = `${this.baseUrl}/api/orders`;
+      const headers = this.getAuthHeaders();
+
+      console.log('🌐 OrderService.getOrders called');
+      console.log('📍 API URL:', url);
+      console.log('🔑 Headers:', headers);
+      console.log('🔑 Token exists:', !!headers['Authorization']);
+
+      const response = await fetch(url, {
         method: 'GET',
-        headers: this.getAuthHeaders(),
+        headers,
       });
 
+      console.log('📡 Response status:', response.status, response.statusText);
+
       if (!response.ok) {
+        if (response.status === 401) {
+          console.error('❌ Unauthorized - Token may be invalid or expired');
+          const errorData = await response.json().catch(() => ({}));
+          console.error('❌ Error response:', errorData);
+          return {
+            success: false,
+            error: 'Unauthorized. Please log in again.',
+            data: []
+          };
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const responseData = await response.json();
+      console.log('✅ API Success response:', responseData);
+      return responseData;
     } catch (error) {
-      console.error('Error fetching orders:', error);
-      throw error;
+      console.error('❌ Error fetching orders:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch orders',
+        data: []
+      };
     }
   }
 

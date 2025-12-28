@@ -77,16 +77,16 @@ export default function OrdersPage() {
             {orders.map((o) => (
               <Link key={o.id} to={`/order/${o.id}`} className="order-card">
                 <div className="order-top">
-                  <div className="order-id">{o.id}</div>
+                  <div className="order-id">{o.orderNumber}</div>
                   <span className={`status ${o.status.toLowerCase()}`}>{o.status}</span>
                 </div>
                 <div className="order-meta">
-                  <span>Placed on {new Date(o.placedAt).toLocaleString()}</span>
-                  {o.eta && <span>ETA {new Date(o.eta).toLocaleDateString()}</span>}
+                  <span>Placed on {new Date(o.createdAt).toLocaleString()}</span>
+                  {o.deliveredAt && <span>Delivered on {new Date(o.deliveredAt).toLocaleDateString()}</span>}
                 </div>
                 <div className="order-items">
-                  {o.items.slice(0, 3).map(i => (
-                    <img key={i.id} src={i.thumbnail_url} alt={i.name} onError={(e) => {
+                  {o.items.slice(0, 3).map((item, idx) => (
+                    <img key={`${item.markerId}-${idx}`} src={item.thumbnailUrl} alt={item.markerName} onError={(e) => {
                       (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDgiIGhlaWdodD0iNDgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjQ4IiBoZWlnaHQ9IjQ4IiBmaWxsPSIjZWVlIi8+PC9zdmc+';
                     }} />
                   ))}
@@ -94,7 +94,9 @@ export default function OrdersPage() {
                 </div>
                 <div className="order-total">
                   <span>Total</span>
-                  <span className="price">{formatPrice(o.totals.total, o.totals.currency)}</span>
+                  <span className="price">
+                    {formatPrice(o.totalAmount, o.currency)}
+                  </span>
                 </div>
               </Link>
             ))}
