@@ -7,7 +7,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import './CartPage.css';
 
 export default function CartPage() {
-  const { items, totalItems, totalPrice, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { items, totalItems, totalPrice, isLoading, removeFromCart, updateQuantity, clearCart } = useCart();
   const { navigate } = useNavigation();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -30,7 +30,7 @@ export default function CartPage() {
       const raw = localStorage.getItem('pk_addresses_v1');
       const list = raw ? JSON.parse(raw) : [];
       hasAddress = Array.isArray(list) && list.length > 0;
-    } catch {}
+    } catch { }
 
     if (!hasAddress) {
       navigate('/addresses?return=/cart');
@@ -46,6 +46,18 @@ export default function CartPage() {
       currency: 'USD'
     }).format(price);
   };
+
+  // Show loading state while fetching cart
+  if (isLoading) {
+    return (
+      <div className="cart-page">
+        <Navigation />
+        <div className="cart-container">
+          <LoadingSpinner size="small" message="Loading your cart..." />
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0 && !isCheckingOut) {
     return (
@@ -84,21 +96,30 @@ export default function CartPage() {
               {items.map((item) => (
                 <div key={item.product.id} className="cart-item">
                   <div className="cart-item-image">
-                    <img 
-                      src={item.product.thumbnail_url} 
+                    <img
+                      src={item.product.thumbnail_url}
                       alt={item.product.name}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2VlZSIvPjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjEwMCIgeT0iMTAwIiBzdHlsZT0iZmlsbDojYWFhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjEycHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+Tm8gSW1hZ2U8L3RleHQ+PC9zdmc+';
                       }}
                     />
                   </div>
-                  
+
                   <div className="cart-item-details">
                     <h3 className="cart-item-name">
                       <Link to={`/product/${item.product.id}`}>
                         {item.product.name}
                       </Link>
                     </h3>
+                    {/* Display variant information if available */}
+                    {(item.productType || item.size) && (
+                      <p className="cart-item-variant">
+                        {item.productType && item.size
+                          ? `${item.productType} • ${item.size}`
+                          : item.productType || item.size
+                        }
+                      </p>
+                    )}
                     <p className="cart-item-description">{item.product.description}</p>
                     {item.product.metadata?.category && (
                       <span className="cart-item-category">{item.product.metadata.category}</span>
@@ -134,8 +155,28 @@ export default function CartPage() {
                   </div>
 
                   <div className="cart-item-price">
-                    <p className="item-price">{formatPrice(99.99 * item.quantity)}</p>
-                    <p className="item-unit-price">@ {formatPrice(99.99)} each</p>
+                    {/* Use variant pricing if available, otherwise fallback to placeholder */}
+                    {(() => {
+                      let unitPrice = 99.99; // default fallback
+
+                      // Try to find variant price if type and size are specified
+                      if (item.productType && item.size && item.product.productTypes) {
+                        const productType = item.product.productTypes.find(pt => pt.type === item.productType);
+                        if (productType) {
+                          const variant = productType.variants.find(v => v.size === item.size);
+                          if (variant) {
+                            unitPrice = variant.discountedPrice;
+                          }
+                        }
+                      }
+
+                      return (
+                        <>
+                          <p className="item-price">₹{(unitPrice * item.quantity).toFixed(2)}</p>
+                          <p className="item-unit-price">@ ₹{unitPrice.toFixed(2)} each</p>
+                        </>
+                      );
+                    })()}
                   </div>
 
                   <button
@@ -164,27 +205,27 @@ export default function CartPage() {
               </div>
 
               <div className="cart-actions">
-              <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <input
-                  type="checkbox"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                />
-                <span>
-                  I agree to the <a href="#terms">Terms & Conditions</a>
-                </span>
-              </label>
-              <Link to="/products" className="continue-shopping-link">
-                ← Continue Shopping
-              </Link>
-              <button 
-                className="checkout-btn"
-                onClick={handleCheckout}
-                disabled={items.length === 0 || !termsAccepted}
-              >
-                Proceed to Checkout
-              </button>
-            </div>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <input
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                  />
+                  <span>
+                    I agree to the <a href="#terms">Terms & Conditions</a>
+                  </span>
+                </label>
+                <Link to="/products" className="continue-shopping-link">
+                  ← Continue Shopping
+                </Link>
+                <button
+                  className="checkout-btn"
+                  onClick={handleCheckout}
+                  disabled={items.length === 0 || !termsAccepted}
+                >
+                  Proceed to Checkout
+                </button>
+              </div>
             </div>
           </>
         )}

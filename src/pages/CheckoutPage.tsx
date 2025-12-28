@@ -24,7 +24,7 @@ export default function CheckoutPage() {
   const { items, totalItems, totalPrice, clearCart } = useCart();
   const [placing, setPlacing] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
-  
+
   // Guest checkout form data
   const [formData, setFormData] = useState({
     email: '',
@@ -69,7 +69,7 @@ export default function CheckoutPage() {
       });
     }
   }, [addresses]);
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
@@ -94,45 +94,73 @@ export default function CheckoutPage() {
       });
     }
   };
-  
-  const isFormValid = formData.email && formData.fullName && formData.phone && 
-                      formData.line1 && formData.city && formData.state && formData.postalCode;
+
+  const isFormValid = formData.email && formData.fullName && formData.phone &&
+    formData.line1 && formData.city && formData.state && formData.postalCode;
+
+  // Debug form validation state
+  console.log('🔍 Form Validation State:', {
+    isFormValid,
+    formData,
+    totalItems,
+    itemsLength: items.length,
+    placing
+  });
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
 
   const placeOrder = async () => {
-    if (!isFormValid) return;
+    console.log('🛒 Place Order button clicked!');
+    console.log('📝 Form valid?', isFormValid);
+    console.log('📦 Cart items:', items);
+
+    if (!isFormValid) {
+      console.warn('⚠️ Form validation failed, cannot place order');
+      return;
+    }
+
+    console.log('✅ Form is valid, proceeding with order placement');
     setPlacing(true);
+
     try {
-      // Create order via API
-      const orderResponse = await orderService.createOrder({
-        items: items.map((it) => ({
-          productId: it.product.id,
-          quantity: it.quantity,
-        })),
-        address: {
+      const orderRequest = {
+        customerName: formData.fullName,
+        customerEmail: formData.email,
+        customerPhone: formData.phone,
+        shippingAddress: {
           fullName: formData.fullName,
           phone: formData.phone,
-          line1: formData.line1,
-          line2: formData.line2,
+          addressLine1: formData.line1,
+          addressLine2: formData.line2 || undefined,
           city: formData.city,
           state: formData.state,
           postalCode: formData.postalCode,
           country: formData.country,
         },
-        email: formData.email,
-        paymentMethod: 'COD',
-      });
+        items: items.map((it) => ({
+          productId: it.product.id,
+          quantity: it.quantity,
+        })),
+        paymentMethod: 'COD' as const,
+      };
+
+      console.log('📤 Sending order request:', orderRequest);
+
+      // Create order via API
+      const orderResponse = await orderService.createOrder(orderRequest);
+
+      console.log('📥 Order response:', orderResponse);
 
       if (orderResponse.success && orderResponse.data) {
+        console.log('✅ Order placed successfully:', orderResponse.data);
         clearCart();
         window.location.href = `/order-confirmation?status=success&orderId=${encodeURIComponent(orderResponse.data.id)}`;
       } else {
         throw new Error(orderResponse.error || 'Failed to create order');
       }
     } catch (e) {
-      console.error('Order placement error:', e);
+      console.error('❌ Order placement error:', e);
       window.location.href = `/order-confirmation?status=failed`;
     } finally {
       setPlacing(false);
@@ -214,7 +242,7 @@ export default function CheckoutPage() {
                       required
                     />
                   </div>
-                  
+
                   <div className="form-group">
                     <label htmlFor="phone">Phone Number *</label>
                     <input
@@ -227,7 +255,7 @@ export default function CheckoutPage() {
                       required
                     />
                   </div>
-                  
+
                   <div className="form-group">
                     <label htmlFor="line1">Address Line 1 *</label>
                     <input
@@ -240,7 +268,7 @@ export default function CheckoutPage() {
                       required
                     />
                   </div>
-                  
+
                   <div className="form-group">
                     <label htmlFor="line2">Address Line 2</label>
                     <input
@@ -252,7 +280,7 @@ export default function CheckoutPage() {
                       placeholder="Apt 4B (optional)"
                     />
                   </div>
-                  
+
                   <div className="form-row">
                     <div className="form-group">
                       <label htmlFor="city">City *</label>
@@ -266,7 +294,7 @@ export default function CheckoutPage() {
                         required
                       />
                     </div>
-                    
+
                     <div className="form-group">
                       <label htmlFor="state">State *</label>
                       <input
@@ -280,7 +308,7 @@ export default function CheckoutPage() {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="form-row">
                     <div className="form-group">
                       <label htmlFor="postalCode">Postal Code *</label>
@@ -294,7 +322,7 @@ export default function CheckoutPage() {
                         required
                       />
                     </div>
-                    
+
                     <div className="form-group">
                       <label htmlFor="country">Country *</label>
                       <input
@@ -354,7 +382,15 @@ export default function CheckoutPage() {
               <span>Total</span>
               <span>{formatPrice(totalPrice)}</span>
             </div>
-            <button className="place-order-btn" disabled={!isFormValid || placing || items.length === 0} onClick={placeOrder}>
+            <button
+              className="place-order-btn"
+              disabled={!isFormValid || placing || items.length === 0}
+              onClick={() => {
+                console.log('🖱️ Button onClick triggered');
+                placeOrder();
+              }}
+              title={!isFormValid ? 'Please fill all required fields' : placing ? 'Processing...' : items.length === 0 ? 'Cart is empty' : 'Place your order'}
+            >
               {placing ? 'Placing Order…' : 'Place Order (COD)'}
             </button>
           </section>

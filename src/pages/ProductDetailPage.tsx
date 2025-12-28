@@ -4,10 +4,12 @@ import Navigation from '../components/layout/Navigation';
 import ProductGrid from '../components/product/ProductGrid';
 import Modal from '../components/common/Modal';
 import { ProductService } from '../services/ProductService';
+import { cartService } from '../services/CartService';
 import { useNavigation } from '../hooks/useNavigation';
 import { useBreadcrumbs } from '../hooks/useBreadcrumbs';
-import { useCart } from '../contexts/CartContext';
+import { findVariant } from '../types/marker';
 import type { Product } from '../types';
+import type { Variant } from '../types/marker';
 import './ProductDetailPage.css';
 
 // Use real API service
@@ -17,22 +19,28 @@ export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { navigate } = useNavigation();
   const { updateBreadcrumbsForPage } = useBreadcrumbs();
-  const { addToCart, isInCart, getCartItem, updateQuantity } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [addedToCart, setAddedToCart] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [selectedPresentation, setSelectedPresentation] = useState<'Framed Print' | 'Poster Board'>('Framed Print');
-  const [selectedSize, setSelectedSize] = useState<'A4' | 'A3' | 'A2' | 'A1'>('A3');
+
+  // Variant selection state
+  const [selectedProductType, setSelectedProductType] = useState<string>('');
+  const [selectedSize, setSelectedSize] = useState<string>('');
+  const [quantity, setQuantity] = useState(1);
+
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [relatedLoading, setRelatedLoading] = useState<boolean>(true);
-  const [reviews, setReviews] = useState<Array<{ id: string; author: string; rating: number; comment: string; date: string }>>([
-    { id: 'r1', author: 'Alex', rating: 5, comment: 'Looks amazing on my wall!', date: '2025-09-12' },
-    { id: 'r2', author: 'Sam', rating: 4, comment: 'Great print quality. Fast delivery.', date: '2025-10-02' },
-  ]);
+  const [reviews, setReviews] = useState<Array<{ id: string; author: string; rating: number; comment: string; date: string }>>([]);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [newReview, setNewReview] = useState<{ author: string; rating: number; comment: string }>({ author: '', rating: 5, comment: '' });
+
+  // Get selected variant based on current selection
+  const selectedVariant: Variant | null = useMemo(() => {
+    if (!product || !selectedProductType || !selectedSize) return null;
+    return findVariant(product as any, selectedProductType, selectedSize);
+  }, [product, selectedProductType, selectedSize]);
 
   // Build media slides: images + optional video (aim for 4 slides)
   type Slide = { type: 'image' | 'video'; src: string };
@@ -80,13 +88,24 @@ export default function ProductDetailPage() {
       try {
         setLoading(true);
         setError(null);
-        
+
         const productData = await productService.getProduct(id);
-        
+
         if (!productData) {
           setError('Product not found');
         } else {
           setProduct(productData);
+
+          // Auto-select first product type and size if variants exist
+          if (productData.productTypes && productData.productTypes.length > 0) {
+            const firstType = productData.productTypes[0];
+            setSelectedProductType(firstType.type);
+
+            if (firstType.variants && firstType.variants.length > 0) {
+              setSelectedSize(firstType.variants[0].size);
+            }
+          }
+
           // Update breadcrumbs with product name
           updateBreadcrumbsForPage(window.location.pathname, productData.name);
           // Load related products
@@ -115,21 +134,35 @@ export default function ProductDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const handleAddToCart = () => {
-    if (product) {
-      addToCart(product);
-      setAddedToCart(true);
-      setTimeout(() => setAddedToCart(false), 2000);
+  const handleAddToCart = async () => {
+    if (!product || !selectedProductType || !selectedSize) {
+      alert('Please select product type and size');
+      return;
     }
-  };
 
-  const handleQuantityChange = (change: number) => {
-    if (product) {
-      const cartItem = getCartItem(product.id);
-      if (cartItem) {
-        const newQuantity = cartItem.quantity + change;
-        updateQuantity(product.id, newQuantity);
-      }
+    if (!selectedVariant) {
+      alert('Selected variant not available');
+      return;
+    }
+
+    if (!selectedVariant.inStock) {
+      alert('This variant is out of stock');
+      return;
+    }
+
+    try {
+      setAddedToCart(true);
+      await cartService.addToCart({
+        markerId: product.id,
+        productType: selectedProductType,
+        size: selectedSize,
+        quantity: quantity
+      });
+      setTimeout(() => setAddedToCart(false), 2000);
+    } catch (error) {
+      console.error('Failed to add to cart:', error);
+      alert('Failed to add to cart. Please try again.');
+      setAddedToCart(false);
     }
   };
 
@@ -214,7 +247,7 @@ export default function ProductDetailPage() {
                   <button className="carousel__control carousel__control--next" onClick={goNext} aria-label="Next slide">›</button>
                   <div className="carousel__dots">
                     {slides.map((_: Slide, i: number) => (
-                      <button key={i} className={`carousel__dot ${i === currentSlide ? 'is-active' : ''}`} onClick={() => setCurrentSlide(i)} aria-label={`Go to slide ${i+1}`}></button>
+                      <button key={i} className={`carousel__dot ${i === currentSlide ? 'is-active' : ''}`} onClick={() => setCurrentSlide(i)} aria-label={`Go to slide ${i + 1}`}></button>
                     ))}
                   </div>
                 </div>
@@ -226,79 +259,107 @@ export default function ProductDetailPage() {
             <div className="product-info">
               <h1 className="product-title">{product.name}</h1>
               <p className="product-description">{product.description}</p>
-              
+
               {/* Category removed per request */}
 
-              <div className="product-price-section">
-                <span className="product-price">$99.99</span>
-                {isInCart(product.id) && (
-                  <div className="quantity-indicator">
-                    <span>In Cart: {getCartItem(product.id)?.quantity || 0}</span>
+              {/* Product Type Selector */}
+              {product.productTypes && product.productTypes.length > 0 && (
+                <div className="option-group">
+                  <h3 className="option-title">Choose Product Type</h3>
+                  <div className="option-row">
+                    {product.productTypes.map((type) => (
+                      <button
+                        key={type.type}
+                        type="button"
+                        className={`option-chip ${selectedProductType === type.type ? 'is-active' : ''}`}
+                        onClick={() => {
+                          setSelectedProductType(type.type);
+                          // Reset size to first available
+                          if (type.variants && type.variants.length > 0) {
+                            setSelectedSize(type.variants[0].size);
+                          }
+                        }}
+                      >
+                        <div className="type-name">{type.type}</div>
+                        <div className="type-badge">{type.positioning}</div>
+                      </button>
+                    ))}
                   </div>
-                )}
-              </div>
-
-              {/* Presentation options */}
-              <div className="option-group">
-                <h3 className="option-title">Presentation</h3>
-                <div className="option-row">
-                  {['Framed Print', 'Poster Board'].map((opt) => (
-                    <button
-                      key={opt}
-                      type="button"
-                      className={`option-chip ${selectedPresentation === opt ? 'is-active' : ''}`}
-                      onClick={() => setSelectedPresentation(opt as any)}
-                    >
-                      {opt}
-                    </button>
-                  ))}
                 </div>
-              </div>
+              )}
 
-              {/* Size options */}
+              {/* Size Selector */}
+              {selectedProductType && product.productTypes && (
+                <div className="option-group">
+                  <h3 className="option-title">Choose Size</h3>
+                  <div className="option-row">
+                    {product.productTypes
+                      .find(t => t.type === selectedProductType)
+                      ?.variants.map((variant) => (
+                        <button
+                          key={variant.size}
+                          type="button"
+                          className={`option-chip size-option ${selectedSize === variant.size ? 'is-active' : ''} ${!variant.inStock ? 'is-disabled' : ''}`}
+                          onClick={() => variant.inStock && setSelectedSize(variant.size)}
+                          disabled={!variant.inStock}
+                        >
+                          <div className="size-label">{variant.size}</div>
+                          <div className="size-price">₹{variant.discountedPrice}</div>
+                          {!variant.inStock && <div className="out-of-stock">Out of Stock</div>}
+                        </button>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Dynamic Pricing Display */}
+              {selectedVariant && (
+                <div className="product-price-section">
+                  <div className="pricing-display">
+                    <span className="product-price">₹{selectedVariant.discountedPrice}</span>
+                    {selectedVariant.actualPrice > selectedVariant.discountedPrice && (
+                      <>
+                        <span className="product-price-original">₹{selectedVariant.actualPrice}</span>
+                        <span className="product-discount-badge">{selectedVariant.discountPercentage}% OFF</span>
+                      </>
+                    )}
+                  </div>
+                  {selectedVariant.inStock && selectedVariant.stockQuantity < 10 && (
+                    <div className="low-stock-warning">
+                      ⚠️ Only {selectedVariant.stockQuantity} left in stock!
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Quantity Selector */}
               <div className="option-group">
-                <h3 className="option-title">Size</h3>
-                <div className="option-row">
-                  {(['A4','A3','A2','A1'] as const).map((sz) => (
-                    <button
-                      key={sz}
-                      type="button"
-                      className={`option-chip ${selectedSize === sz ? 'is-active' : ''}`}
-                      onClick={() => setSelectedSize(sz)}
-                    >
-                      {sz}
-                    </button>
-                  ))}
+                <h3 className="option-title">Quantity</h3>
+                <div className="quantity-selector">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="quantity-btn"
+                  >
+                    -
+                  </button>
+                  <span className="quantity-display">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="quantity-btn"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
 
               <div className="product-actions">
-                {isInCart(product.id) ? (
-                  <div className="cart-controls">
-                    <button 
-                      onClick={() => handleQuantityChange(-1)}
-                      className="quantity-btn"
-                    >
-                      -
-                    </button>
-                    <span className="quantity-display">
-                      {getCartItem(product.id)?.quantity || 0}
-                    </span>
-                    <button 
-                      onClick={() => handleQuantityChange(1)}
-                      className="quantity-btn"
-                    >
-                      +
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={handleAddToCart}
-                    className="add-to-cart-btn"
-                  >
-                    {addedToCart ? 'Added to Cart' : 'Add to Cart'}
-                  </button>
-                )}
+                <button
+                  onClick={handleAddToCart}
+                  className="add-to-cart-btn"
+                  disabled={!selectedVariant || !selectedVariant.inStock}
+                >
+                  {addedToCart ? '✓ Added to Cart' : 'Add to Cart'}
+                </button>
               </div>
 
               {/* Reviews Section */}
@@ -334,7 +395,7 @@ export default function ProductDetailPage() {
                   <label className="pd-field">
                     <span>Rating</span>
                     <select value={newReview.rating} onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}>
-                      {[5,4,3,2,1].map(n => <option key={n} value={n}>{n}</option>)}
+                      {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n}</option>)}
                     </select>
                   </label>
                   <label className="pd-field">

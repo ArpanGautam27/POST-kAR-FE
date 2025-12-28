@@ -1,8 +1,12 @@
 // Core type definitions for the AR Product Experience application
 
+// Export marker types for variant support
+export * from './marker';
+
 /**
  * Product interface representing a product in the system
  * Based on requirements 6.1, 6.3 - mock data structure that simulates API response
+ * Extended with optional variant data for new variant selection system
  */
 export interface Product {
   id: string;
@@ -17,6 +21,8 @@ export interface Product {
     tags?: string[];
     created_at?: string;
   };
+  // Variant support - optional for backward compatibility
+  productTypes?: import('./marker').ProductType[];
 }
 
 /**
@@ -48,15 +54,15 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-export interface ProductsResponse extends ApiResponse<Product[]> {}
+export interface ProductsResponse extends ApiResponse<Product[]> { }
 
-export interface ProductResponse extends ApiResponse<Product> {}
+export interface ProductResponse extends ApiResponse<Product> { }
 
 export interface MediaResponse extends ApiResponse<{
   url: string;
   type: 'image' | 'video';
   metadata?: Record<string, any>;
-}> {}
+}> { }
 
 /**
  * Loading and error states

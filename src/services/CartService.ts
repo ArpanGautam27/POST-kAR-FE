@@ -1,27 +1,49 @@
 import type { Product } from '../types';
 import { config } from '../config/environment';
 
+/**
+ * Cart item with variant information
+ * Matches backend API response structure
+ */
+export interface CartItemData {
+  markerId: string;
+  markerName: string;
+  thumbnailUrl: string;
+  productType: string;
+  size: string;
+  unitPrice: number;
+  quantity: number;
+  totalPrice: number;
+}
+
 export interface CartItem {
   product: Product;
   quantity: number;
+  productType?: string;
+  size?: string;
 }
 
 export interface CartResponse {
   success: boolean;
+  message?: string;
   data?: {
-    items: CartItem[];
-    totalItems: number;
-    totalPrice: number;
+    items: CartItemData[];
+    totalAmount: number;
+    currency: string;
   };
   error?: string;
 }
 
 export interface AddToCartRequest {
-  productId: string;
+  markerId: string;
+  productType: string;
+  size: string;
   quantity: number;
 }
 
 export interface UpdateCartItemRequest {
+  productType: string;
+  size: string;
   quantity: number;
 }
 
@@ -79,10 +101,11 @@ export class CartService {
   }
 
   /**
-   * Add item to cart
+   * Add item to cart with variant information
    */
   async addToCart(request: AddToCartRequest): Promise<CartResponse> {
     try {
+      console.log('🛒 Adding to cart:', request);
       const response = await fetch(`${this.baseUrl}/api/cart/items`, {
         method: 'POST',
         headers: this.getAuthHeaders(),
@@ -90,55 +113,73 @@ export class CartService {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      console.log('✅ Added to cart:', result);
+      return result;
     } catch (error) {
-      console.error('Error adding to cart:', error);
+      console.error('❌ Error adding to cart:', error);
       throw error;
     }
   }
 
   /**
-   * Update cart item quantity
+   * Update cart item quantity with variant information
    */
-  async updateCartItem(itemId: string, request: UpdateCartItemRequest): Promise<CartResponse> {
+  async updateCartItem(markerId: string, request: UpdateCartItemRequest): Promise<CartResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/cart/items/${itemId}`, {
+      console.log(`🔄 Updating cart item ${markerId}:`, request);
+      const response = await fetch(`${this.baseUrl}/api/cart/items/${markerId}`, {
         method: 'PUT',
         headers: this.getAuthHeaders(),
         body: JSON.stringify(request),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      console.log('✅ Updated cart item:', result);
+      return result;
     } catch (error) {
-      console.error(`Error updating cart item ${itemId}:`, error);
+      console.error(`❌ Error updating cart item ${markerId}:`, error);
       throw error;
     }
   }
 
   /**
-   * Remove item from cart
+   * Remove item from cart with variant information
+   * @param markerId - The marker/product ID
+   * @param productType - The product type (Canvas, Poster Cards)
+   * @param size - The size (A5, A4)
    */
-  async removeFromCart(itemId: string): Promise<CartResponse> {
+  async removeFromCart(markerId: string, productType: string, size: string): Promise<CartResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/cart/items/${itemId}`, {
+      const encodedType = encodeURIComponent(productType);
+      const encodedSize = encodeURIComponent(size);
+      const url = `${this.baseUrl}/api/cart/items/${markerId}/${encodedType}/${encodedSize}`;
+
+      console.log(`🗑️ Removing from cart: ${url}`);
+      const response = await fetch(url, {
         method: 'DELETE',
         headers: this.getAuthHeaders(),
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const result = await response.json();
+      console.log('✅ Removed from cart:', result);
+      return result;
     } catch (error) {
-      console.error(`Error removing cart item ${itemId}:`, error);
+      console.error(`❌ Error removing cart item:`, error);
       throw error;
     }
   }

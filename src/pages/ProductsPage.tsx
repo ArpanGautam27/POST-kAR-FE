@@ -3,7 +3,7 @@ import Navigation from '../components/layout/Navigation';
 import Mascot from '../components/common/Mascot';
 import ProductGrid from '../components/product/ProductGrid';
 import { ProductService } from '../services/ProductService';
- 
+
 import type { Product } from '../types';
 import './ProductsPage.css';
 
@@ -20,7 +20,7 @@ export default function ProductsPage() {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Use either real API or mock service based on config
         const productsData: Product[] = await productService.getProducts();
         setProducts(productsData);
@@ -46,8 +46,8 @@ export default function ProductsPage() {
           <div className="error-state">
             <h2>Oops! Something went wrong</h2>
             <p>{error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="retry-btn"
             >
               Try Again
@@ -66,11 +66,11 @@ export default function ProductsPage() {
           <h1 className="products-title" style={{ textAlign: 'center', width: '100%', color: '#ffffff' }}>Discover Products</h1>
         </div>
         <div>
-          <ProductGrid 
+          <ProductGrid
             products={products}
             loading={loading}
             onProductClick={(id) => { window.location.href = `/product/${id}`; }}
-            cardProps={{ hideCart: true, hidePrice: true }}
+            cardProps={{ hideCart: true }}
             forceFourColumns={true}
           />
         </div>

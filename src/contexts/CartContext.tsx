@@ -1,22 +1,27 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { Product } from '../types';
+import { cartService, type CartItemData } from '../services/CartService';
 
 interface CartItem {
   product: Product;
   quantity: number;
+  productType?: string;  // Variant support
+  size?: string;          // Variant support
 }
 
 interface CartContextType {
   items: CartItem[];
   totalItems: number;
   totalPrice: number;
+  isLoading: boolean;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   isInCart: (productId: string) => boolean;
   getCartItem: (productId: string) => CartItem | undefined;
+  refreshCart: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -26,28 +31,85 @@ interface CartProviderProps {
 }
 
 /**
+ * Convert backend CartItemData to frontend CartItem format
+ */
+const convertToCartItem = (backendItem: CartItemData): CartItem => {
+  const product: Product = {
+    id: backendItem.markerId,
+    name: backendItem.markerName,
+    description: '', // Backend doesn't provide this
+    thumbnail_url: backendItem.thumbnailUrl,
+    image_url: backendItem.thumbnailUrl, // Use thumbnail as image URL
+    image_id: '', // Backend doesn't provide this
+    video_url: '', // Backend doesn't provide this
+    metadata: {},
+  };
+
+  return {
+    product,
+    quantity: backendItem.quantity,
+    productType: backendItem.productType,
+    size: backendItem.size,
+  };
+};
+
+/**
  * CartProvider component manages shopping cart state
  * Provides cart functionality throughout the application
  */
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
-  const [items, setItems] = useState<CartItem[]>(() => {
-    // Load cart from localStorage on initialization
-    if (typeof window !== 'undefined') {
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Fetch cart from backend on mount
+  const fetchCartFromBackend = async () => {
+    try {
+      const token = localStorage.getItem('postkar-auth-token');
+      if (!token) {
+        // No authentication, use localStorage fallback
+        const savedCart = localStorage.getItem('postkar-cart');
+        setItems(savedCart ? JSON.parse(savedCart) : []);
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('🛒 Fetching cart from backend...');
+      const response = await cartService.getCart();
+
+      if (response.success && response.data?.items) {
+        console.log('✅ Cart fetched:', response.data.items);
+        const cartItems = response.data.items.map(convertToCartItem);
+        setItems(cartItems);
+        // Also save to localStorage for offline access
+        localStorage.setItem('postkar-cart', JSON.stringify(cartItems));
+      } else {
+        console.log('⚠️ Empty cart or no data');
+        setItems([]);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching cart:', error);
+      // Fallback to localStorage on error
       const savedCart = localStorage.getItem('postkar-cart');
-      return savedCart ? JSON.parse(savedCart) : [];
+      setItems(savedCart ? JSON.parse(savedCart) : []);
+    } finally {
+      setIsLoading(false);
     }
-    return [];
-  });
+  };
+
+  // Fetch cart on mount
+  useEffect(() => {
+    fetchCartFromBackend();
+  }, []);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (!isLoading && typeof window !== 'undefined') {
       localStorage.setItem('postkar-cart', JSON.stringify(items));
     }
-  }, [items]);
+  }, [items, isLoading]);
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  
+
   // For now, using a placeholder price since products don't have prices in the current schema
   // You can update this when price is added to the Product type
   const totalPrice = items.reduce((sum, item) => sum + (item.quantity * 99.99), 0);
@@ -55,7 +117,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const addToCart = (product: Product) => {
     setItems((currentItems) => {
       const existingItem = currentItems.find(item => item.product.id === product.id);
-      
+
       if (existingItem) {
         // Increase quantity if item already exists
         return currentItems.map(item =>
@@ -71,7 +133,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   };
 
   const removeFromCart = (productId: string) => {
-    setItems((currentItems) => 
+    setItems((currentItems) =>
       currentItems.filter(item => item.product.id !== productId)
     );
   };
@@ -81,7 +143,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       removeFromCart(productId);
       return;
     }
-    
+
     setItems((currentItems) =>
       currentItems.map(item =>
         item.product.id === productId
@@ -107,12 +169,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     items,
     totalItems,
     totalPrice,
+    isLoading,
     addToCart,
     removeFromCart,
     updateQuantity,
     clearCart,
     isInCart,
     getCartItem,
+    refreshCart: fetchCartFromBackend,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

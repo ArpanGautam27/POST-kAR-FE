@@ -58,7 +58,7 @@ export default function OrderDetailPage() {
         await navigator.clipboard.writeText(url);
         alert('Link copied to clipboard');
       }
-    } catch {}
+    } catch { }
   };
 
   const openInvoice = () => {
@@ -95,7 +95,7 @@ export default function OrderDetailPage() {
           <div class="muted">Payment Method: ${order.paymentMethod}</div>
           <h2 style="margin-top:16px;">Billing & Shipping</h2>
           <div>${order.address.fullName}</div>
-          <div>${order.address.line1}${order.address.line2 ? ', ' + order.address.line2 : ''}</div>
+          <div>${order.address.addressLine1}${order.address.addressLine2 ? ', ' + order.address.addressLine2 : ''}</div>
           <div>${order.address.city}, ${order.address.state} ${order.address.postalCode}</div>
           <div>${order.address.country}</div>
           <table>
@@ -161,7 +161,7 @@ export default function OrderDetailPage() {
           <section className="card">
             <h2 className="section-title">Shipping Address</h2>
             <div>{order.address.fullName}</div>
-            <div>{order.address.line1}{order.address.line2 ? `, ${order.address.line2}` : ''}</div>
+            <div>{order.address.addressLine1}{order.address.addressLine2 ? `, ${order.address.addressLine2}` : ''}</div>
             <div>{order.address.city}, {order.address.state} {order.address.postalCode}</div>
             <div>{order.address.country}</div>
             <div className="muted" style={{ marginTop: 6 }}>Phone: {order.address.phone}</div>

@@ -12,8 +12,8 @@ export interface OrderItem {
 export interface OrderAddress {
   fullName: string;
   phone: string;
-  line1: string;
-  line2?: string;
+  addressLine1: string;
+  addressLine2?: string;
   city: string;
   state: string;
   postalCode: string;
@@ -38,12 +38,15 @@ export interface Order {
 }
 
 export interface CreateOrderRequest {
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  shippingAddress: OrderAddress;
+  billingAddress?: OrderAddress;
   items: Array<{
     productId: string;
     quantity: number;
   }>;
-  address: OrderAddress;
-  email: string;
   paymentMethod: 'COD' | 'CARD';
 }
 
@@ -96,20 +99,34 @@ export class OrderService {
    */
   async createOrder(request: CreateOrderRequest): Promise<OrderResponse> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/orders`, {
+      const url = `${this.baseUrl}/api/orders`;
+      const headers = this.getAuthHeaders();
+
+      console.log('🌐 OrderService.createOrder called');
+      console.log('📍 API URL:', url);
+      console.log('🔑 Headers:', headers);
+      console.log('📦 Request body:', request);
+
+      const response = await fetch(url, {
         method: 'POST',
-        headers: this.getAuthHeaders(),
+        headers,
         body: JSON.stringify(request),
       });
 
+      console.log('📡 Response status:', response.status, response.statusText);
+      console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error('❌ API Error response:', errorData);
         throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
       }
 
-      return await response.json();
+      const responseData = await response.json();
+      console.log('✅ API Success response:', responseData);
+      return responseData;
     } catch (error) {
-      console.error('Error creating order:', error);
+      console.error('❌ Error creating order:', error);
       throw error;
     }
   }

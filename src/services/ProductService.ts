@@ -41,6 +41,9 @@ export class ProductService {
 
     const videoUrl = activeVideo?.videoUrl || '';
 
+    // Extract productTypes for variant support
+    const productTypes = marker.productTypes || [];
+
     return {
       id,
       name,
@@ -52,6 +55,7 @@ export class ProductService {
       metadata: {
         created_at: marker.createdAt,
       },
+      productTypes, // Include variant data
     };
   }
 
@@ -62,7 +66,7 @@ export class ProductService {
     console.log('🔵 [ProductService] getProducts() called');
     console.log('🔵 [ProductService] Base URL:', this.baseUrl);
     console.log('🔵 [ProductService] Mock data enabled:', config.enableMockData);
-    
+
     // Use mock data if enabled
     if (config.enableMockData) {
       console.log('⚠️ [ProductService] Using mock data for products');
@@ -120,7 +124,7 @@ export class ProductService {
     console.log('🔵 [ProductService] getProduct() called for ID:', id);
     console.log('🔵 [ProductService] Base URL:', this.baseUrl);
     console.log('🔵 [ProductService] Mock data enabled:', config.enableMockData);
-    
+
     // Use mock data if enabled
     if (config.enableMockData) {
       console.log(`⚠️ [ProductService] Using mock data for product ${id}`);
@@ -181,8 +185,8 @@ export class ProductService {
       console.log(`Using mock data for product search: ${query}`);
       const allProducts = await mockProductService.getProducts();
       const lowerQuery = query.toLowerCase();
-      return allProducts.filter(p => 
-        p.name.toLowerCase().includes(lowerQuery) || 
+      return allProducts.filter(p =>
+        p.name.toLowerCase().includes(lowerQuery) ||
         p.description.toLowerCase().includes(lowerQuery)
       );
     }
@@ -211,8 +215,8 @@ export class ProductService {
       // Fallback to mock data on error
       const allProducts = await mockProductService.getProducts();
       const lowerQuery = query.toLowerCase();
-      return allProducts.filter(p => 
-        p.name.toLowerCase().includes(lowerQuery) || 
+      return allProducts.filter(p =>
+        p.name.toLowerCase().includes(lowerQuery) ||
         p.description.toLowerCase().includes(lowerQuery)
       );
     }
