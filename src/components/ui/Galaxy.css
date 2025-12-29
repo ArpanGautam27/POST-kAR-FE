@@ -24,8 +24,10 @@
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  /* Prevent white background on canvas */
+  /* CRITICAL: Prevent white background on canvas */
   background: transparent !important;
+  background-color: transparent !important;
+  -webkit-background-color: transparent !important;
 }
 
 /* Mobile-specific fixes */
