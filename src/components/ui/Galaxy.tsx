@@ -259,20 +259,35 @@ export default function Galaxy({
     }
 
     let program: Program;
+    let resizeTimeout: ReturnType<typeof setTimeout>;
 
     function resize() {
-      const scale = 1;
-      renderer.setSize(ctn.offsetWidth * scale, ctn.offsetHeight * scale);
-      if (program) {
-        program.uniforms.uResolution.value = new Color(
-          gl.canvas.width,
-          gl.canvas.height,
-          gl.canvas.width / gl.canvas.height
-        );
-      }
+      // Debounce resize to prevent context thrashing on mobile scroll
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        if (!gl || !program) return;
+
+        // Safety check for dimensions - prevent 0 values which can break WebGL
+        const w = Math.max(ctn.offsetWidth || window.innerWidth, 100);
+        const h = Math.max(ctn.offsetHeight || window.innerHeight, 100);
+
+        try {
+          renderer.setSize(w, h);
+          program.uniforms.uResolution.value = new Color(
+            gl.canvas.width,
+            gl.canvas.height,
+            gl.canvas.width / gl.canvas.height
+          );
+        } catch (e) {
+          console.error('[Galaxy] Error during resize:', e);
+        }
+      }, 100);
     }
     window.addEventListener('resize', resize, false);
-    resize();
+    // Initial size setup (immediate)
+    const initialW = Math.max(ctn.offsetWidth || window.innerWidth, 100);
+    const initialH = Math.max(ctn.offsetHeight || window.innerHeight, 100);
+    renderer.setSize(initialW, initialH);
 
     const geometry = new Triangle(gl);
 
@@ -316,22 +331,31 @@ export default function Galaxy({
 
     function update(t: number) {
       animateId = requestAnimationFrame(update);
-      if (!disableAnimation) {
-        program.uniforms.uTime.value = t * 0.001;
-        program.uniforms.uStarSpeed.value = (t * 0.001 * starSpeed) / 10.0;
+
+      try {
+        if (!disableAnimation) {
+          program.uniforms.uTime.value = t * 0.001;
+          program.uniforms.uStarSpeed.value = (t * 0.001 * starSpeed) / 10.0;
+        }
+
+        const lerpFactor = 0.05;
+        smoothMousePos.current.x += (targetMousePos.current.x - smoothMousePos.current.x) * lerpFactor;
+        smoothMousePos.current.y += (targetMousePos.current.y - smoothMousePos.current.y) * lerpFactor;
+
+        smoothMouseActive.current += (targetMouseActive.current - smoothMouseActive.current) * lerpFactor;
+
+        program.uniforms.uMouse.value[0] = smoothMousePos.current.x;
+        program.uniforms.uMouse.value[1] = smoothMousePos.current.y;
+        program.uniforms.uMouseActiveFactor.value = smoothMouseActive.current;
+
+        renderer.render({ scene: mesh });
+      } catch (e) {
+        console.error('[Galaxy] Render error, removing canvas to show fallback:', e);
+        cancelAnimationFrame(animateId);
+        if (gl.canvas instanceof HTMLCanvasElement && gl.canvas.parentNode) {
+          gl.canvas.parentNode.removeChild(gl.canvas);
+        }
       }
-
-      const lerpFactor = 0.05;
-      smoothMousePos.current.x += (targetMousePos.current.x - smoothMousePos.current.x) * lerpFactor;
-      smoothMousePos.current.y += (targetMousePos.current.y - smoothMousePos.current.y) * lerpFactor;
-
-      smoothMouseActive.current += (targetMouseActive.current - smoothMouseActive.current) * lerpFactor;
-
-      program.uniforms.uMouse.value[0] = smoothMousePos.current.x;
-      program.uniforms.uMouse.value[1] = smoothMousePos.current.y;
-      program.uniforms.uMouseActiveFactor.value = smoothMouseActive.current;
-
-      renderer.render({ scene: mesh });
     }
     animateId = requestAnimationFrame(update);
 
@@ -343,8 +367,26 @@ export default function Galaxy({
       gl.canvas.style.width = '100%';
       gl.canvas.style.height = '100%';
       gl.canvas.style.display = 'block';
+      gl.canvas.style.opacity = '0'; // Start invisible to prevent white flash
+      gl.canvas.style.transition = 'opacity 0.5s ease-in';
+
       ctn.appendChild(gl.canvas);
       console.log('[Galaxy] Canvas appended to DOM');
+
+      // Fade in after a short delay if no error occurred
+      setTimeout(() => {
+        if (gl.canvas) gl.canvas.style.opacity = '1';
+      }, 100);
+
+      // Handle context loss
+      gl.canvas.addEventListener('webglcontextlost', (e) => {
+        e.preventDefault();
+        console.log('[Galaxy] Context lost, removing canvas');
+        if (gl.canvas && gl.canvas.parentNode) {
+          gl.canvas.parentNode.removeChild(gl.canvas);
+        }
+        cancelAnimationFrame(animateId);
+      });
     }
 
     function handleMouseMove(e: MouseEvent) {
@@ -366,6 +408,7 @@ export default function Galaxy({
 
     return () => {
       cancelAnimationFrame(animateId);
+      clearTimeout(resizeTimeout);
       window.removeEventListener('resize', resize);
       if (mouseInteraction) {
         ctn.removeEventListener('mousemove', handleMouseMove);
