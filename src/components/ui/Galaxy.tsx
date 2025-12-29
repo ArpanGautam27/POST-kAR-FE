@@ -224,7 +224,12 @@ export default function Galaxy({
     try {
       renderer = new Renderer({
         alpha: transparent,
-        premultipliedAlpha: false
+        premultipliedAlpha: false,
+        width: ctn.offsetWidth || window.innerWidth,
+        height: ctn.offsetHeight || window.innerHeight,
+        dpr: Math.min(window.devicePixelRatio || 1, 2), // Limit DPR for mobile performance
+        antialias: false, // Disable antialiasing for better mobile performance
+        powerPreference: 'high-performance'
       });
       gl = renderer.gl;
 
@@ -235,6 +240,8 @@ export default function Galaxy({
       }
 
       console.log('[Galaxy] WebGL context created successfully');
+      console.log('[Galaxy] Canvas dimensions:', gl.canvas.width, 'x', gl.canvas.height);
+      console.log('[Galaxy] Device pixel ratio:', window.devicePixelRatio);
 
       if (transparent) {
         gl.enable(gl.BLEND);
@@ -243,6 +250,9 @@ export default function Galaxy({
       } else {
         gl.clearColor(0, 0, 0, 1);
       }
+
+      // Force initial clear to ensure canvas is not blank
+      gl.clear(gl.COLOR_BUFFER_BIT);
     } catch (error) {
       console.error('[Galaxy] Error creating WebGL renderer:', error);
       return;
