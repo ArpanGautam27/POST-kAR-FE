@@ -15,7 +15,7 @@ void main() {
 `;
 
 const fragmentShader = `
-precision highp float;
+precision mediump float;
 
 uniform float uTime;
 uniform vec3 uResolution;
@@ -217,18 +217,35 @@ export default function Galaxy({
   useEffect(() => {
     if (!ctnDom.current) return;
     const ctn = ctnDom.current;
-    const renderer = new Renderer({
-      alpha: transparent,
-      premultipliedAlpha: false
-    });
-    const gl = renderer.gl;
 
-    if (transparent) {
-      gl.enable(gl.BLEND);
-      gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-      gl.clearColor(0, 0, 0, 0);
-    } else {
-      gl.clearColor(0, 0, 0, 1);
+    let renderer: Renderer;
+    let gl: typeof renderer.gl;
+
+    try {
+      renderer = new Renderer({
+        alpha: transparent,
+        premultipliedAlpha: false
+      });
+      gl = renderer.gl;
+
+      // Validate WebGL context
+      if (!gl) {
+        console.error('[Galaxy] Failed to create WebGL context');
+        return;
+      }
+
+      console.log('[Galaxy] WebGL context created successfully');
+
+      if (transparent) {
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        gl.clearColor(0, 0, 0, 0);
+      } else {
+        gl.clearColor(0, 0, 0, 1);
+      }
+    } catch (error) {
+      console.error('[Galaxy] Error creating WebGL renderer:', error);
+      return;
     }
 
     let program: Program;
@@ -248,34 +265,41 @@ export default function Galaxy({
     resize();
 
     const geometry = new Triangle(gl);
-    program = new Program(gl, {
-      vertex: vertexShader,
-      fragment: fragmentShader,
-      uniforms: {
-        uTime: { value: 0 },
-        uResolution: {
-          value: new Color(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height)
-        },
-        uFocal: { value: new Float32Array(focal) },
-        uRotation: { value: new Float32Array(rotation) },
-        uStarSpeed: { value: starSpeed },
-        uDensity: { value: density },
-        uHueShift: { value: hueShift },
-        uSpeed: { value: speed },
-        uMouse: {
-          value: new Float32Array([smoothMousePos.current.x, smoothMousePos.current.y])
-        },
-        uGlowIntensity: { value: glowIntensity },
-        uSaturation: { value: saturation },
-        uMouseRepulsion: { value: mouseRepulsion },
-        uTwinkleIntensity: { value: twinkleIntensity },
-        uRotationSpeed: { value: rotationSpeed },
-        uRepulsionStrength: { value: repulsionStrength },
-        uMouseActiveFactor: { value: 0.0 },
-        uAutoCenterRepulsion: { value: autoCenterRepulsion },
-        uTransparent: { value: transparent }
-      }
-    });
+
+    try {
+      program = new Program(gl, {
+        vertex: vertexShader,
+        fragment: fragmentShader,
+        uniforms: {
+          uTime: { value: 0 },
+          uResolution: {
+            value: new Color(gl.canvas.width, gl.canvas.height, gl.canvas.width / gl.canvas.height)
+          },
+          uFocal: { value: new Float32Array(focal) },
+          uRotation: { value: new Float32Array(rotation) },
+          uStarSpeed: { value: starSpeed },
+          uDensity: { value: density },
+          uHueShift: { value: hueShift },
+          uSpeed: { value: speed },
+          uMouse: {
+            value: new Float32Array([smoothMousePos.current.x, smoothMousePos.current.y])
+          },
+          uGlowIntensity: { value: glowIntensity },
+          uSaturation: { value: saturation },
+          uMouseRepulsion: { value: mouseRepulsion },
+          uTwinkleIntensity: { value: twinkleIntensity },
+          uRotationSpeed: { value: rotationSpeed },
+          uRepulsionStrength: { value: repulsionStrength },
+          uMouseActiveFactor: { value: 0.0 },
+          uAutoCenterRepulsion: { value: autoCenterRepulsion },
+          uTransparent: { value: transparent }
+        }
+      });
+      console.log('[Galaxy] Shader program compiled successfully');
+    } catch (error) {
+      console.error('[Galaxy] Error compiling shader program:', error);
+      return;
+    }
 
     const mesh = new Mesh(gl, { geometry, program });
     let animateId: number;
@@ -300,7 +324,18 @@ export default function Galaxy({
       renderer.render({ scene: mesh });
     }
     animateId = requestAnimationFrame(update);
-    ctn.appendChild(gl.canvas);
+
+    // Apply explicit styling to canvas for mobile compatibility
+    if (gl.canvas instanceof HTMLCanvasElement) {
+      gl.canvas.style.position = 'absolute';
+      gl.canvas.style.top = '0';
+      gl.canvas.style.left = '0';
+      gl.canvas.style.width = '100%';
+      gl.canvas.style.height = '100%';
+      gl.canvas.style.display = 'block';
+      ctn.appendChild(gl.canvas);
+      console.log('[Galaxy] Canvas appended to DOM');
+    }
 
     function handleMouseMove(e: MouseEvent) {
       const rect = ctn.getBoundingClientRect();
@@ -326,8 +361,11 @@ export default function Galaxy({
         ctn.removeEventListener('mousemove', handleMouseMove);
         ctn.removeEventListener('mouseleave', handleMouseLeave);
       }
-      ctn.removeChild(gl.canvas);
+      if (gl.canvas instanceof HTMLCanvasElement && ctn.contains(gl.canvas)) {
+        ctn.removeChild(gl.canvas);
+      }
       gl.getExtension('WEBGL_lose_context')?.loseContext();
+      console.log('[Galaxy] Cleanup completed');
     };
   }, [
     focal,

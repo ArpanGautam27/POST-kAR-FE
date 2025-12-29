@@ -85,7 +85,7 @@ export default function LandingPage() {
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  
+
   // Cinematic scroll states
   const containerRef = useRef(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -124,7 +124,7 @@ export default function LandingPage() {
         const shouldMute = next[i];
         v.muted = shouldMute;
         if (!shouldMute) {
-          v.play().catch(() => {});
+          v.play().catch(() => { });
         }
       });
 
@@ -319,24 +319,24 @@ export default function LandingPage() {
         const newImages = [...current];
         const randomIndex1 = Math.floor(Math.random() * heroImages.length);
         let randomIndex2 = Math.floor(Math.random() * heroImages.length);
-        
+
         // Ensure we pick 2 different indices
         while (randomIndex2 === randomIndex1 && heroImages.length > 1) {
           randomIndex2 = Math.floor(Math.random() * heroImages.length);
         }
-        
+
         // Replace 2 random positions with different images from heroImages
         const availableIndices = heroImages.map((_, idx) => idx);
         const newImgIdx1 = availableIndices[Math.floor(Math.random() * availableIndices.length)];
         let newImgIdx2 = availableIndices[Math.floor(Math.random() * availableIndices.length)];
-        
+
         while (newImgIdx2 === newImgIdx1 && heroImages.length > 1) {
           newImgIdx2 = availableIndices[Math.floor(Math.random() * availableIndices.length)];
         }
-        
+
         newImages[randomIndex1] = heroImages[newImgIdx1];
         newImages[randomIndex2] = heroImages[newImgIdx2];
-        
+
         return newImages;
       });
     }, 3000);
@@ -345,26 +345,26 @@ export default function LandingPage() {
   }, [heroImages]);
 
   // Prepare hero images for HeroParallax (ensure we always have images)
-  const heroProducts = displayHeroImages.length > 0 
+  const heroProducts = displayHeroImages.length > 0
     ? displayHeroImages.slice(0, 15).map((image) => {
-        console.log('[LandingPage] Mapping image:', image.id, image.imageUrl);
-        return {
-          id: image.id,
-          title: image.title || 'Hero Image',
-          link: '#',
-          thumbnail: image.imageUrl,
-        };
-      })
+      console.log('[LandingPage] Mapping image:', image.id, image.imageUrl);
+      return {
+        id: image.id,
+        title: image.title || 'Hero Image',
+        link: '#',
+        thumbnail: image.imageUrl,
+      };
+    })
     : (() => {
-        console.warn('[LandingPage] No hero images, using placeholders');
-        return Array(15).fill(null).map((_, i) => ({
-          id: `placeholder-${i}`,
-          title: `Hero ${i + 1}`,
-          link: '#',
-          thumbnail: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80',
-        }));
-      })();
-  
+      console.warn('[LandingPage] No hero images, using placeholders');
+      return Array(15).fill(null).map((_, i) => ({
+        id: `placeholder-${i}`,
+        title: `Hero ${i + 1}`,
+        link: '#',
+        thumbnail: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80',
+      }));
+    })();
+
   console.log('[LandingPage] heroProducts prepared:', heroProducts.length, 'items');
 
   // Ensure we have products for the featured section
@@ -388,327 +388,333 @@ export default function LandingPage() {
       <div>
         {/* Community Spotlight: Video Stories */}
         <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={0}>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-          <Particles
-            particleColors={['#f093fb', '#f5576c']}
-            particleCount={window.innerWidth < 768 ? 100 : 200}
-            particleSpread={10}
-            speed={0.1}
-            particleBaseSize={100}
-            moveParticlesOnHover={window.innerWidth >= 768}
-            alphaParticles={false}
-            disableRotation={false}
-          />
-        </div>
-        
-        <div style={{ position: 'relative', zIndex: 1 }}>
-        <SectionCard
-          tag="Community Spotlight"
-          title="See POST-kAR in Action"
-          description="Watch how our community brings their spaces to life with augmented reality experiences. Real stories, real transformations."
-          visual={
-            <AnimatedTestimonials 
-              testimonials={feedbackVideos.map((src, idx) => ({
-                src,
-                isVideo: true,
-                muted: muted[idx]
-              }))}
-              autoplay={true}
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+            <Particles
+              particleColors={['#f093fb', '#f5576c']}
+              particleCount={window.innerWidth < 768 ? 100 : 200}
+              particleSpread={10}
+              speed={0.1}
+              particleBaseSize={100}
+              moveParticlesOnHover={window.innerWidth >= 768}
+              alphaParticles={false}
+              disableRotation={false}
             />
-          }
-        />
-        </div>
-      </ParallaxSection>
+          </div>
 
-      {/* Featured Products */}
-      <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={1}>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
-          <Hyperspeed
-            effectOptions={{
-              distortion: 'turbulentDistortion',
-              length: 400,
-              roadWidth: 10,
-              islandWidth: 2,
-              lanesPerRoad: 4,
-              fov: 90,
-              colors: {
-                roadColor: 0x080808,
-                islandColor: 0x0a0a0a,
-                background: 0x000000,
-                shoulderLines: 0xFFFFFF,
-                brokenLines: 0xFFFFFF,
-                leftCars: [0xD856BF, 0x6750A2, 0xC247AC],
-                rightCars: [0x03B3C3, 0x0E5EA5, 0x324555],
-                sticks: 0x03B3C3,
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <SectionCard
+              tag="Community Spotlight"
+              title="See POST-kAR in Action"
+              description="Watch how our community brings their spaces to life with augmented reality experiences. Real stories, real transformations."
+              visual={
+                <AnimatedTestimonials
+                  testimonials={feedbackVideos.map((src, idx) => ({
+                    src,
+                    isVideo: true,
+                    muted: muted[idx]
+                  }))}
+                  autoplay={true}
+                />
               }
-            }}
-          />
-        </div>
-        
-        {/* Content on top */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-        <SectionCard
-          tag="Featured Products"
-          title="Premium AR Posters"
-          description="Discover our curated collection of premium posters. Each design comes to life with augmented reality, telling unique stories."
-          reverse={true}
-          visual={
-            <div className="featured-products-wrapper">
-              <CardSwap
-                width={350}
-                height={400}
-                cardDistance={50}
-                verticalDistance={60}
-                delay={5000}
-                pauseOnHover={false}
-                easing="elastic"
-                onCardClick={(idx) => {
-                  const product = featuredProducts.slice(0, 4)[idx];
-                  if (product) {
-                    window.location.href = `/product/${product.id}`;
-                  }
-                }}
-              >
-                {featuredProducts.slice(0, 4).map((product) => (
-                  <Card key={product.id}>
-                    <img 
-                      src={product.thumbnail_url || product.image_url}
-                      alt={product.name}
-                      style={{
-                        width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        display: 'block',
-                        borderRadius: '8px'
-                      }}
-                    />
-                  </Card>
-                ))}
-              </CardSwap>
-            </div>
-          }
-        />
-        </div>
-      </ParallaxSection>
+            />
+          </div>
+        </ParallaxSection>
 
-      {/* Services */}
-      <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={2}>
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
-          <Galaxy 
-            mouseRepulsion={true}
-            mouseInteraction={true}
-            density={1.5}
-            glowIntensity={0.5}
-            saturation={0.8}
-            hueShift={140}
-            transparent={true}
-          />
-        </div>
-        
-        <div style={{ position: 'relative', zIndex: 1 }}>
-        <SectionCard
-          tag="Our Services"
-          title="AR Solutions for Everyone"
-          description="From custom AR campaigns to creator tools, we provide innovative solutions that blend reality with imagination."
-          visual={
-            (() => {
-              const LottiePlayer = 'lottie-player' as any;
-              
-              const services = [
-                { 
-                  title: 'AR Interior Designer', 
-                  animation: arFurnitureAnimation,
-                  comingSoon: false
-                },
-                { 
-                  title: 'Creator Tools', 
-                  animation: studioAnimation,
-                  comingSoon: true
-                },
-                { 
-                  title: 'Mobile App', 
-                  animation: phoneAnimation,
-                  comingSoon: true
-                },
-                { 
-                  title: 'Mixed Reality', 
-                  animation: xrAnimation,
-                  comingSoon: false
-                },
-              ];
+        {/* Featured Products */}
+        <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={1}>
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+            <Hyperspeed
+              effectOptions={{
+                distortion: 'turbulentDistortion',
+                length: 400,
+                roadWidth: 10,
+                islandWidth: 2,
+                lanesPerRoad: 4,
+                fov: 90,
+                colors: {
+                  roadColor: 0x080808,
+                  islandColor: 0x0a0a0a,
+                  background: 0x000000,
+                  shoulderLines: 0xFFFFFF,
+                  brokenLines: 0xFFFFFF,
+                  leftCars: [0xD856BF, 0x6750A2, 0xC247AC],
+                  rightCars: [0x03B3C3, 0x0E5EA5, 0x324555],
+                  sticks: 0x03B3C3,
+                }
+              }}
+            />
+          </div>
 
-              const serviceCards = services.map((service, i) => (
-                <div key={i} style={{
-                  position: 'relative',
-                  width: '120px',
-                  height: '120px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textAlign: 'center'
-                }}>
-                  {service.comingSoon && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '-8px',
-                      right: '-8px',
-                      background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                      color: '#fff',
-                      padding: '0.25rem 0.5rem',
-                      borderRadius: '50px',
-                      fontSize: '0.6rem',
-                      fontWeight: '700',
-                      letterSpacing: '0.5px',
-                      textTransform: 'uppercase',
-                      boxShadow: '0 4px 15px rgba(240, 147, 251, 0.6)',
-                      zIndex: 10
+          {/* Content on top */}
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <SectionCard
+              tag="Featured Products"
+              title="Premium AR Posters"
+              description="Discover our curated collection of premium posters. Each design comes to life with augmented reality, telling unique stories."
+              reverse={true}
+              visual={
+                <div className="featured-products-wrapper">
+                  <CardSwap
+                    width={350}
+                    height={400}
+                    cardDistance={50}
+                    verticalDistance={60}
+                    delay={5000}
+                    pauseOnHover={false}
+                    easing="elastic"
+                    onCardClick={(idx) => {
+                      const product = featuredProducts.slice(0, 4)[idx];
+                      if (product) {
+                        window.location.href = `/product/${product.id}`;
+                      }
+                    }}
+                  >
+                    {featuredProducts.slice(0, 4).map((product) => (
+                      <Card key={product.id}>
+                        <img
+                          src={product.thumbnail_url || product.image_url}
+                          alt={product.name}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            display: 'block',
+                            borderRadius: '8px'
+                          }}
+                        />
+                      </Card>
+                    ))}
+                  </CardSwap>
+                </div>
+              }
+            />
+          </div>
+        </ParallaxSection>
+
+        {/* Services */}
+        <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={2}>
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 0,
+            overflow: 'hidden',
+            background: 'radial-gradient(ellipse at center, #1a1a2e 0%, #0a0a0f 100%)'
+          }}>
+            <Galaxy
+              mouseRepulsion={true}
+              mouseInteraction={true}
+              density={1.5}
+              glowIntensity={0.5}
+              saturation={0.8}
+              hueShift={140}
+              transparent={true}
+            />
+          </div>
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <SectionCard
+              tag="Our Services"
+              title="AR Solutions for Everyone"
+              description="From custom AR campaigns to creator tools, we provide innovative solutions that blend reality with imagination."
+              visual={
+                (() => {
+                  const LottiePlayer = 'lottie-player' as any;
+
+                  const services = [
+                    {
+                      title: 'AR Interior Designer',
+                      animation: arFurnitureAnimation,
+                      comingSoon: false
+                    },
+                    {
+                      title: 'Creator Tools',
+                      animation: studioAnimation,
+                      comingSoon: true
+                    },
+                    {
+                      title: 'Mobile App',
+                      animation: phoneAnimation,
+                      comingSoon: true
+                    },
+                    {
+                      title: 'Mixed Reality',
+                      animation: xrAnimation,
+                      comingSoon: false
+                    },
+                  ];
+
+                  const serviceCards = services.map((service, i) => (
+                    <div key={i} style={{
+                      position: 'relative',
+                      width: '120px',
+                      height: '120px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      textAlign: 'center'
                     }}>
-                      Soon
-                    </div>
-                  )}
-                  <div style={{
-                    width: '100px',
-                    height: '100px',
-                    borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.08)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    border: '2px solid rgba(255,255,255,0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
-                    overflow: 'visible',
-                    padding: '1.2rem',
-                    marginBottom: '0.5rem'
-                  }}>
-                    <LottiePlayer
-                      src={JSON.stringify(service.animation)}
-                      background="transparent"
-                      speed="1"
-                      loop
-                      autoplay
-                      style={{ width: '100%', height: '100%' }}
-                    />
-                  </div>
-                  <h3 style={{
-                    fontSize: '0.75rem',
-                    fontWeight: '700',
-                    color: '#fff',
-                    lineHeight: '1.2',
-                    textShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                    margin: 0
-                  }}>
-                    {service.title}
-                  </h3>
-                </div>
-              ));
-
-              return (
-                <div className="orbiting-services-wrapper" style={{ padding: '2rem', position: 'relative' }}>
-                  {/* Visible Orbit Path */}
-                  <div className="orbit-path" style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '400px',
-                    height: '400px',
-                    borderRadius: '50%',
-                    border: '2px dashed rgba(255,255,255,0.25)',
-                    boxShadow: '0 0 20px rgba(255,255,255,0.1), inset 0 0 20px rgba(255,255,255,0.05)',
-                    pointerEvents: 'none',
-                    zIndex: 0
-                  }} />
-                  
-                  <OrbitingCircles iconSize={120} radius={180} speed={1.5}>
-                    {serviceCards[0]}
-                    {serviceCards[1]}
-                    {serviceCards[2]}
-                    {serviceCards[3]}
-                  </OrbitingCircles>
-                </div>
-              );
-            })()
-          }
-        />
-        </div>
-      </ParallaxSection>
-
-      {/* Join Our Growing Community */}
-      <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={3}>
-        <div className="join-us-orb-container" style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
-          <Orb
-            hoverIntensity={0.5}
-            rotateOnHover={true}
-            hue={260}
-            forceHoverState={false}
-          />
-        </div>
-        
-        <div style={{ position: 'relative', zIndex: 1 }}>
-        <SectionCard
-          tag="Join Us"
-          title="Growing Together"
-          description="Be part of our thriving community. Experience the future of augmented reality with POST-kAR."
-          reverse={true}
-          visual={
-            <GlassIcons 
-              className="community-glass-icons"
-              items={[
-                { 
-                  icon: (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
-                      <span style={{ fontSize: '2.5rem' }}>👁️</span>
-                      <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
-                        {visitsCount}
-                      </div>
-                    </div>
-                  ), 
-                  color: 'purple', 
-                  label: 'Visits'
-                },
-                { 
-                  icon: (
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
-                      <span style={{ fontSize: '2.5rem' }}>👥</span>
-                      <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
-                        {activeUsersCount}
-                      </div>
-                    </div>
-                  ), 
-                  color: 'red', 
-                  label: 'Active Users'
-                },
-                { 
-                  icon: (() => {
-                    const LottiePlayer = 'lottie-player' as any;
-                    return (
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
+                      {service.comingSoon && (
+                        <div style={{
+                          position: 'absolute',
+                          top: '-8px',
+                          right: '-8px',
+                          background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                          color: '#fff',
+                          padding: '0.25rem 0.5rem',
+                          borderRadius: '50px',
+                          fontSize: '0.6rem',
+                          fontWeight: '700',
+                          letterSpacing: '0.5px',
+                          textTransform: 'uppercase',
+                          boxShadow: '0 4px 15px rgba(240, 147, 251, 0.6)',
+                          zIndex: 10
+                        }}>
+                          Soon
+                        </div>
+                      )}
+                      <div style={{
+                        width: '100px',
+                        height: '100px',
+                        borderRadius: '50%',
+                        background: 'rgba(255,255,255,0.08)',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '2px solid rgba(255,255,255,0.2)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                        overflow: 'visible',
+                        padding: '1.2rem',
+                        marginBottom: '0.5rem'
+                      }}>
                         <LottiePlayer
-                          src={indianFlagAnim}
+                          src={JSON.stringify(service.animation)}
                           background="transparent"
                           speed="1"
                           loop
                           autoplay
-                          style={{ width: 60, height: 60 }}
+                          style={{ width: '100%', height: '100%' }}
                         />
-                        <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.3)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                          Connected
-                        </div>
                       </div>
-                    );
-                  })(), 
-                  color: 'green', 
-                  label: 'Connected'
-                },
-              ]}
+                      <h3 style={{
+                        fontSize: '0.75rem',
+                        fontWeight: '700',
+                        color: '#fff',
+                        lineHeight: '1.2',
+                        textShadow: '0 2px 10px rgba(0,0,0,0.5)',
+                        margin: 0
+                      }}>
+                        {service.title}
+                      </h3>
+                    </div>
+                  ));
+
+                  return (
+                    <div className="orbiting-services-wrapper" style={{ padding: '2rem', position: 'relative' }}>
+                      {/* Visible Orbit Path */}
+                      <div className="orbit-path" style={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '400px',
+                        height: '400px',
+                        borderRadius: '50%',
+                        border: '2px dashed rgba(255,255,255,0.25)',
+                        boxShadow: '0 0 20px rgba(255,255,255,0.1), inset 0 0 20px rgba(255,255,255,0.05)',
+                        pointerEvents: 'none',
+                        zIndex: 0
+                      }} />
+
+                      <OrbitingCircles iconSize={120} radius={180} speed={1.5}>
+                        {serviceCards[0]}
+                        {serviceCards[1]}
+                        {serviceCards[2]}
+                        {serviceCards[3]}
+                      </OrbitingCircles>
+                    </div>
+                  );
+                })()
+              }
             />
-          }
-        />
-        </div>
-      </ParallaxSection>
+          </div>
+        </ParallaxSection>
+
+        {/* Join Our Growing Community */}
+        <ParallaxSection gradient="linear-gradient(135deg, #000000 0%, #000000 100%)" index={3}>
+          <div className="join-us-orb-container" style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
+            <Orb
+              hoverIntensity={0.5}
+              rotateOnHover={true}
+              hue={260}
+              forceHoverState={false}
+            />
+          </div>
+
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <SectionCard
+              tag="Join Us"
+              title="Growing Together"
+              description="Be part of our thriving community. Experience the future of augmented reality with POST-kAR."
+              reverse={true}
+              visual={
+                <GlassIcons
+                  className="community-glass-icons"
+                  items={[
+                    {
+                      icon: (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
+                          <span style={{ fontSize: '2.5rem' }}>👁️</span>
+                          <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+                            {visitsCount}
+                          </div>
+                        </div>
+                      ),
+                      color: 'purple',
+                      label: 'Visits'
+                    },
+                    {
+                      icon: (
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
+                          <span style={{ fontSize: '2.5rem' }}>👥</span>
+                          <div style={{ fontSize: '1.8rem', fontWeight: '800', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+                            {activeUsersCount}
+                          </div>
+                        </div>
+                      ),
+                      color: 'red',
+                      label: 'Active Users'
+                    },
+                    {
+                      icon: (() => {
+                        const LottiePlayer = 'lottie-player' as any;
+                        return (
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.3rem' }}>
+                            <LottiePlayer
+                              src={indianFlagAnim}
+                              background="transparent"
+                              speed="1"
+                              loop
+                              autoplay
+                              style={{ width: 60, height: 60 }}
+                            />
+                            <div style={{ fontSize: '1.1rem', fontWeight: '700', color: '#fff', textShadow: '0 2px 8px rgba(0,0,0,0.3)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                              Connected
+                            </div>
+                          </div>
+                        );
+                      })(),
+                      color: 'green',
+                      label: 'Connected'
+                    },
+                  ]}
+                />
+              }
+            />
+          </div>
+        </ParallaxSection>
       </div>
       {/* End Stacked Parallax Sections */}
 
@@ -716,87 +722,87 @@ export default function LandingPage() {
 
       {/* Cinematic Hero Section - ALL SLIDES (hidden for minimal landing) */}
       {false && (
-      <section
-        id="cinematic-hero"
-        className="cinematic-hero-section"
-        ref={containerRef}
-        style={{ height: `${totalPanels * 100}vh` }}
-      >
-        <div className="scroll-indicator">
-          <span className="scroll-text">SCROLL</span>
-          <div className="scroll-line">
-            <div 
-              className="scroll-progress-fill"
-              style={{ height: `${scrollProgress * 100}%` }}
+        <section
+          id="cinematic-hero"
+          className="cinematic-hero-section"
+          ref={containerRef}
+          style={{ height: `${totalPanels * 100}vh` }}
+        >
+          <div className="scroll-indicator">
+            <span className="scroll-text">SCROLL</span>
+            <div className="scroll-line">
+              <div
+                className="scroll-progress-fill"
+                style={{ height: `${scrollProgress * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="cinematic-viewport">
+            <div
+              className="cinematic-panels-container"
+              style={{ width: `${totalPanels * 100}vw`, transform: `translateX(${translateVW}vw)` }}
+            >
+              {cinematicPanels.map((panel, index) => {
+                const isActive = activePanel === index;
+                const isPast = activePanel > index;
+
+                return (
+                  <div key={panel.id} className="cinematic-panel">
+                    {/* Background - you can add different backgrounds per slide */}
+                    <div
+                      className="panel-background"
+                      style={{
+                        backgroundColor: '#0a1128', // Dark blue background
+                        transform: isActive ? 'scale(1)' : 'scale(1.1)',
+                        filter: isPast ? 'brightness(0.5)' : 'brightness(0.8)'
+                      }}
+                    />
+
+                    <div className="panel-overlay" />
+
+                    <div
+                      className="panel-content"
+                      style={{
+                        opacity: isActive ? 1 : 0.3,
+                        transform: isActive ? 'translateY(0)' : 'translateY(50px)'
+                      }}
+                    >
+                      <h1 className="panel-heading">{panel.heading}</h1>
+                      <p className="panel-subtitle">{panel.subtitle}</p>
+                      {panel.description && (
+                        <p className="panel-description">{panel.description}</p>
+                      )}
+
+                      {/* Show CTA button on slide 8 */}
+                      {panel.id === 'cta' && (
+                        <Link to="/products" className="submit-btn" style={{ marginTop: '2rem' }}>
+                          Explore Products
+                        </Link>
+                      )}
+
+                      <div
+                        className="panel-line"
+                        style={{ width: isActive ? '96px' : '0px' }}
+                      />
+                    </div>
+
+                    <div className="panel-number">
+                      {String(index + 1).padStart(2, '0')} / {String(totalPanels).padStart(2, '0')}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="cinematic-progress-bar">
+            <div
+              className="cinematic-progress-fill"
+              style={{ width: `${scrollProgress * 100}%` }}
             />
           </div>
-        </div>
-
-        <div className="cinematic-viewport">
-          <div 
-            className="cinematic-panels-container"
-            style={{ width: `${totalPanels * 100}vw`, transform: `translateX(${translateVW}vw)` }}
-          >
-            {cinematicPanels.map((panel, index) => {
-              const isActive = activePanel === index;
-              const isPast = activePanel > index;
-              
-              return (
-                <div key={panel.id} className="cinematic-panel">
-                  {/* Background - you can add different backgrounds per slide */}
-                  <div 
-                    className="panel-background"
-                    style={{
-                      backgroundColor: '#0a1128', // Dark blue background
-                      transform: isActive ? 'scale(1)' : 'scale(1.1)',
-                      filter: isPast ? 'brightness(0.5)' : 'brightness(0.8)'
-                    }}
-                  />
-                  
-                  <div className="panel-overlay" />
-                  
-                  <div 
-                    className="panel-content"
-                    style={{
-                      opacity: isActive ? 1 : 0.3,
-                      transform: isActive ? 'translateY(0)' : 'translateY(50px)'
-                    }}
-                  >
-                    <h1 className="panel-heading">{panel.heading}</h1>
-                    <p className="panel-subtitle">{panel.subtitle}</p>
-                    {panel.description && (
-                      <p className="panel-description">{panel.description}</p>
-                    )}
-                    
-                    {/* Show CTA button on slide 8 */}
-                    {panel.id === 'cta' && (
-                      <Link to="/products" className="submit-btn" style={{ marginTop: '2rem' }}>
-                        Explore Products
-                      </Link>
-                    )}
-                    
-                    <div 
-                      className="panel-line"
-                      style={{ width: isActive ? '96px' : '0px' }}
-                    />
-                  </div>
-
-                  <div className="panel-number">
-                    {String(index + 1).padStart(2, '0')} / {String(totalPanels).padStart(2, '0')}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="cinematic-progress-bar">
-          <div 
-            className="cinematic-progress-fill"
-            style={{ width: `${scrollProgress * 100}%` }}
-          />
-        </div>
-      </section>
+        </section>
       )}
 
       {/* Contact Section - Keep this below slides */}
@@ -965,7 +971,7 @@ export default function LandingPage() {
 
       {/* Fullscreen Video Modal */}
       {fullscreenVideo && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             inset: 0,
