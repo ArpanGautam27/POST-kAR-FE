@@ -215,18 +215,9 @@ export default function AddressesPage() {
       <div className="addresses-container">
         <div className={`addresses-header ${hasAny ? 'addresses-header--has' : ''}`}>
           <h1 className="addresses-title">Your Addresses</h1>
-          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            {/* ✅ Add navigation buttons */}
-            <a href="/cart" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-              Go to Cart
-            </a>
-            <a href="/checkout" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
-              Go to Checkout
-            </a>
-            {hasAny && (
-              <button className="btn btn-primary" onClick={openAdd}>Add Address</button>
-            )}
-          </div>
+          {hasAny && (
+            <button className="btn btn-primary" onClick={openAdd}>Add Address</button>
+          )}
         </div>
 
         {!hasAny && (
@@ -349,6 +340,40 @@ export default function AddressesPage() {
             loadAddresses();
           }}
         />
+
+        {/* ✅ Fixed navigation buttons in bottom corners */}
+        <a
+          href="/cart"
+          className="btn btn-secondary"
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            left: '2rem',
+            textDecoration: 'none',
+            zIndex: 1000,
+            padding: '0.75rem 1.5rem',
+            fontSize: '1rem',
+            fontWeight: '500'
+          }}
+        >
+          Cart
+        </a>
+        <a
+          href="/checkout"
+          className="btn btn-primary"
+          style={{
+            position: 'fixed',
+            bottom: '2rem',
+            right: '2rem',
+            textDecoration: 'none',
+            zIndex: 1000,
+            padding: '0.75rem 1.5rem',
+            fontSize: '1rem',
+            fontWeight: '500'
+          }}
+        >
+          Checkout
+        </a>
       </div>
     </div>
   );
