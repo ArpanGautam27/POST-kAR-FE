@@ -30,8 +30,23 @@ export default function CartPage() {
       return;
     }
 
-    // ✅ Removed address check - let users go directly to checkout
-    // Checkout page will handle address selection and "Add New Address" option
+    // ✅ Check if user has at least one address
+    // If they have NO addresses, redirect to add one
+    // If they have addresses, let them go to checkout (no forced edit)
+    let hasAddress = false;
+    try {
+      const raw = localStorage.getItem('pk_addresses_v1');
+      const list = raw ? JSON.parse(raw) : [];
+      hasAddress = Array.isArray(list) && list.length > 0;
+    } catch { }
+
+    if (!hasAddress) {
+      // No addresses - redirect to add address first
+      navigate('/addresses');
+      return;
+    }
+
+    // Has addresses - proceed to checkout
     navigate('/checkout');
   };
 
@@ -224,9 +239,18 @@ export default function CartPage() {
                 </label>
                 {/* ✅ Show error message when terms not accepted */}
                 {termsError && (
-                  <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', marginLeft: '0.5rem' }}>
-                    Please accept the Terms & Conditions to proceed.
-                  </p>
+                  <div style={{
+                    color: '#ef4444',
+                    fontSize: '0.875rem',
+                    marginTop: '0.5rem',
+                    padding: '0.75rem',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderRadius: '0.375rem',
+                    border: '1px solid #ef4444',
+                    fontWeight: '500'
+                  }}>
+                    ⚠️ Please accept the Terms & Conditions to proceed.
+                  </div>
                 )}
                 <Link to="/products" className="continue-shopping-link">
                   ← Continue Shopping
