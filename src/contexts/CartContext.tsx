@@ -18,9 +18,9 @@ interface CartContextType {
   totalPrice: number;
   isLoading: boolean;
   addToCart: (product: Product) => void;
-  removeFromCart: (productId: string) => void;
+  removeFromCart: (productId: string, productType?: string, size?: string) => Promise<void>;  // ✅ Made async, added variant params
   updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
+  clearCart: () => Promise<void>;  // ✅ Made async
   isInCart: (productId: string) => boolean;
   getCartItem: (productId: string) => CartItem | undefined;
   refreshCart: () => Promise<void>;
@@ -147,10 +147,44 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   };
 
-  const removeFromCart = (productId: string) => {
-    setItems((currentItems) =>
-      currentItems.filter(item => item.product.id !== productId)
-    );
+  /**
+   * Remove item from cart
+   * Calls backend API and refreshes cart state
+   */
+  const removeFromCart = async (productId: string, productType?: string, size?: string) => {
+    try {
+      const token = localStorage.getItem('postkar-auth-token');
+      if (!token) {
+        // No auth, just remove from local state
+        setItems((currentItems) =>
+          currentItems.filter(item => item.product.id !== productId)
+        );
+        return;
+      }
+
+      // Find the item to get variant info if not provided
+      const itemToRemove = items.find(item => item.product.id === productId);
+      if (!itemToRemove) return;
+
+      const itemProductType = productType || itemToRemove.productType || '';
+      const itemSize = size || itemToRemove.size || '';
+
+      console.log('🗑️ Removing item from cart:', { productId, itemProductType, itemSize });
+
+      // Call backend API
+      await cartService.removeFromCart(productId, itemProductType, itemSize);
+
+      // Refresh cart from backend to ensure sync
+      await fetchCartFromBackend();
+
+      console.log('✅ Item removed from cart');
+    } catch (error) {
+      console.error('❌ Error removing item from cart:', error);
+      // Fallback: remove from local state
+      setItems((currentItems) =>
+        currentItems.filter(item => item.product.id !== productId)
+      );
+    }
   };
 
   const updateQuantity = (productId: string, quantity: number) => {
@@ -172,8 +206,33 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     );
   };
 
-  const clearCart = () => {
-    setItems([]);
+  /**
+   * Clear entire cart
+   * Calls backend API and refreshes cart state
+   */
+  const clearCart = async () => {
+    try {
+      const token = localStorage.getItem('postkar-auth-token');
+      if (!token) {
+        // No auth, just clear local state
+        setItems([]);
+        return;
+      }
+
+      console.log('🗑️ Clearing entire cart...');
+
+      // Call backend API
+      await cartService.clearCart();
+
+      // Refresh cart from backend to ensure sync
+      await fetchCartFromBackend();
+
+      console.log('✅ Cart cleared');
+    } catch (error) {
+      console.error('❌ Error clearing cart:', error);
+      // Fallback: clear local state
+      setItems([]);
+    }
   };
 
   const isInCart = (productId: string): boolean => {

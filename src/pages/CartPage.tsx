@@ -36,9 +36,9 @@ export default function CartPage() {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'INR'  // ✅ Changed from USD to INR
     }).format(price);
   };
 
@@ -79,6 +79,20 @@ export default function CartPage() {
         <div className="cart-header">
           <h1>Shopping Cart</h1>
           <span className="cart-count">{totalItems} {totalItems === 1 ? 'item' : 'items'}</span>
+          {/* ✅ Add Clear Cart button */}
+          {items.length > 0 && (
+            <button
+              className="btn btn-danger"
+              onClick={async () => {
+                if (window.confirm('Are you sure you want to clear your entire cart?')) {
+                  await clearCart();
+                }
+              }}
+              style={{ marginLeft: 'auto' }}
+            >
+              Clear Cart
+            </button>
+          )}
         </div>
 
         {isCheckingOut ? (
@@ -157,7 +171,10 @@ export default function CartPage() {
 
                   <button
                     className="remove-btn"
-                    onClick={() => removeFromCart(item.product.id)}
+                    onClick={async () => {
+                      // ✅ Pass productType and size to removeFromCart for correct API call
+                      await removeFromCart(item.product.id, item.productType, item.size);
+                    }}
                     aria-label={`Remove ${item.product.name} from cart`}
                   >
                     ✕

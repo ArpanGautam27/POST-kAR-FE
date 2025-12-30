@@ -215,9 +215,18 @@ export default function AddressesPage() {
       <div className="addresses-container">
         <div className={`addresses-header ${hasAny ? 'addresses-header--has' : ''}`}>
           <h1 className="addresses-title">Your Addresses</h1>
-          {hasAny && (
-            <button className="btn btn-primary" onClick={openAdd}>Add Address</button>
-          )}
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            {/* ✅ Add navigation buttons */}
+            <a href="/cart" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
+              Go to Cart
+            </a>
+            <a href="/checkout" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
+              Go to Checkout
+            </a>
+            {hasAny && (
+              <button className="btn btn-primary" onClick={openAdd}>Add Address</button>
+            )}
+          </div>
         </div>
 
         {!hasAny && (

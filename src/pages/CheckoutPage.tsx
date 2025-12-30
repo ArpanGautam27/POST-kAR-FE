@@ -110,7 +110,7 @@ export default function CheckoutPage() {
   });
 
   const formatPrice = (price: number) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
+    new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(price);  // ✅ Changed from USD to INR
 
   const placeOrder = async () => {
     console.log('🛒 Place Order button clicked!');
