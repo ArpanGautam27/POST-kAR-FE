@@ -8,6 +8,8 @@ interface CartItem {
   quantity: number;
   productType?: string;  // Variant support
   size?: string;          // Variant support
+  unitPrice: number;      // Price from backend
+  totalPrice: number;     // Total for this item from backend
 }
 
 interface CartContextType {
@@ -50,6 +52,8 @@ const convertToCartItem = (backendItem: CartItemData): CartItem => {
     quantity: backendItem.quantity,
     productType: backendItem.productType,
     size: backendItem.size,
+    unitPrice: backendItem.unitPrice,      // ✅ Use backend price
+    totalPrice: backendItem.totalPrice,    // ✅ Use backend total
   };
 };
 
@@ -110,9 +114,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
 
-  // For now, using a placeholder price since products don't have prices in the current schema
-  // You can update this when price is added to the Product type
-  const totalPrice = items.reduce((sum, item) => sum + (item.quantity * 99.99), 0);
+  // ✅ Use actual backend prices instead of hardcoded $99.99
+  const totalPrice = items.reduce((sum, item) => sum + item.totalPrice, 0);
 
   const addToCart = (product: Product) => {
     setItems((currentItems) => {
@@ -120,14 +123,26 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
       if (existingItem) {
         // Increase quantity if item already exists
+        // Note: In practice, backend API should be called instead
+        const newQuantity = existingItem.quantity + 1;
         return currentItems.map(item =>
           item.product.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? {
+              ...item,
+              quantity: newQuantity,
+              totalPrice: existingItem.unitPrice * newQuantity
+            }
             : item
         );
       } else {
         // Add new item with quantity 1
-        return [...currentItems, { product, quantity: 1 }];
+        // Default price (will be overridden by backend on refresh)
+        return [...currentItems, {
+          product,
+          quantity: 1,
+          unitPrice: 0,
+          totalPrice: 0
+        }];
       }
     });
   };
@@ -147,7 +162,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setItems((currentItems) =>
       currentItems.map(item =>
         item.product.id === productId
-          ? { ...item, quantity }
+          ? {
+            ...item,
+            quantity,
+            totalPrice: item.unitPrice * quantity  // ✅ Recalculate total
+          }
           : item
       )
     );

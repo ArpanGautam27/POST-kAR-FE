@@ -11,6 +11,7 @@ export default function CartPage() {
   const { navigate } = useNavigation();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsError, setTermsError] = useState(false);  // ✅ Add error state for terms checkbox
 
   const handleQuantityChange = (productId: string, newQuantity: string) => {
     const quantity = parseInt(newQuantity, 10);
@@ -20,23 +21,17 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
+    // ✅ Clear previous error
+    setTermsError(false);
+
     if (!termsAccepted) {
-      alert('Please accept the Terms & Conditions before proceeding.');
-      return;
-    }
-    // Check for at least one saved address
-    let hasAddress = false;
-    try {
-      const raw = localStorage.getItem('pk_addresses_v1');
-      const list = raw ? JSON.parse(raw) : [];
-      hasAddress = Array.isArray(list) && list.length > 0;
-    } catch { }
-
-    if (!hasAddress) {
-      navigate('/addresses?return=/cart');
+      // ✅ Set error state for visual feedback
+      setTermsError(true);
       return;
     }
 
+    // ✅ Removed address check - let users go directly to checkout
+    // Checkout page will handle address selection and "Add New Address" option
     navigate('/checkout');
   };
 
@@ -155,28 +150,9 @@ export default function CartPage() {
                   </div>
 
                   <div className="cart-item-price">
-                    {/* Use variant pricing if available, otherwise fallback to placeholder */}
-                    {(() => {
-                      let unitPrice = 99.99; // default fallback
-
-                      // Try to find variant price if type and size are specified
-                      if (item.productType && item.size && item.product.productTypes) {
-                        const productType = item.product.productTypes.find(pt => pt.type === item.productType);
-                        if (productType) {
-                          const variant = productType.variants.find(v => v.size === item.size);
-                          if (variant) {
-                            unitPrice = variant.discountedPrice;
-                          }
-                        }
-                      }
-
-                      return (
-                        <>
-                          <p className="item-price">₹{(unitPrice * item.quantity).toFixed(2)}</p>
-                          <p className="item-unit-price">@ ₹{unitPrice.toFixed(2)} each</p>
-                        </>
-                      );
-                    })()}
+                    {/* ✅ Use backend pricing from cart item */}
+                    <p className="item-price">₹{item.totalPrice.toFixed(2)}</p>
+                    <p className="item-unit-price">@ ₹{item.unitPrice.toFixed(2)} each</p>
                   </div>
 
                   <button
@@ -205,16 +181,36 @@ export default function CartPage() {
               </div>
 
               <div className="cart-actions">
-                <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <label
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '0.5rem',
+                    borderRadius: '0.375rem',
+                    border: termsError ? '2px solid #ef4444' : '2px solid transparent',  // ✅ Red border on error
+                    backgroundColor: termsError ? 'rgba(239, 68, 68, 0.1)' : 'transparent',  // ✅ Light red background on error
+                    transition: 'all 0.2s ease'
+                  }}
+                >
                   <input
                     type="checkbox"
                     checked={termsAccepted}
-                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    onChange={(e) => {
+                      setTermsAccepted(e.target.checked);
+                      if (e.target.checked) setTermsError(false);  // ✅ Clear error when checked
+                    }}
                   />
                   <span>
                     I agree to the <a href="#terms">Terms & Conditions</a>
                   </span>
                 </label>
+                {/* ✅ Show error message when terms not accepted */}
+                {termsError && (
+                  <p style={{ color: '#ef4444', fontSize: '0.875rem', marginTop: '0.25rem', marginLeft: '0.5rem' }}>
+                    Please accept the Terms & Conditions to proceed.
+                  </p>
+                )}
                 <Link to="/products" className="continue-shopping-link">
                   ← Continue Shopping
                 </Link>

@@ -123,12 +123,8 @@ export default function AddressesPage() {
         setFormOpen(false);
         setEditing(null);
 
-        // If a return path is specified, navigate back to it
-        const params = new URLSearchParams(window.location.search);
-        const ret = params.get('return');
-        if (ret) {
-          window.location.href = ret;
-        }
+        // ✅ Removed automatic redirect - let user stay on address page
+        // User can manually navigate back to cart or checkout if needed
       } else {
         // Check if error is due to unauthorized access
         const isUnauthorized = response.status === 401 ||
@@ -169,12 +165,9 @@ export default function AddressesPage() {
         setFormOpen(false);
         setEditing(null);
 
-        // If a return path is specified, navigate back to it
-        const params = new URLSearchParams(window.location.search);
-        const ret = params.get('return');
-        if (ret) {
-          window.location.href = ret;
-        }
+        // ✅ Removed automatic redirect - let user stay on address page
+        // This allows them to set default, add more addresses, etc.
+        // User can manually navigate back to cart or checkout
       } else {
         // Check if error is due to unauthorized access
         const isUnauthorized = response.status === 401 ||

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import Navigation from '../components/layout/Navigation';
 import { useCart } from '../contexts/CartContext';
+import { useAuth } from '../contexts/AuthContext';  // ✅ Import useAuth
 import { orderService } from '../services/OrderService';
 import './CheckoutPage.css';
 
@@ -22,6 +23,7 @@ type Address = {
 
 export default function CheckoutPage() {
   const { items, totalItems, totalPrice, clearCart } = useCart();
+  const { user } = useAuth();  // ✅ Get user from auth context
   const [placing, setPlacing] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
 
@@ -57,7 +59,7 @@ export default function CheckoutPage() {
     if (!selectedAddressId && defaultAddress) {
       setSelectedAddressId(defaultAddress.id);
       setFormData({
-        email: formData.email,
+        email: user?.email || '',  // ✅ Pre-fill email from auth context
         fullName: defaultAddress.fullName,
         phone: defaultAddress.phone,
         line1: defaultAddress.line1,
@@ -68,7 +70,7 @@ export default function CheckoutPage() {
         country: defaultAddress.country,
       });
     }
-  }, [addresses]);
+  }, [addresses, user]);  // ✅ Add user as dependency
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -82,7 +84,7 @@ export default function CheckoutPage() {
     if (selected) {
       setSelectedAddressId(addressId);
       setFormData({
-        email: formData.email,
+        email: formData.email || user?.email || '',  // ✅ Keep email or use user's email
         fullName: selected.fullName,
         phone: selected.phone,
         line1: selected.line1,
@@ -227,6 +229,20 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   )}
+                  {/* ✅ Add link to add new address */}
+                  <div style={{ marginTop: '1rem' }}>
+                    <a
+                      href="/addresses"
+                      style={{
+                        color: 'var(--primary-color, #6366f1)',
+                        textDecoration: 'none',
+                        fontSize: '0.875rem',
+                        fontWeight: '500'
+                      }}
+                    >
+                      + Add New Address
+                    </a>
+                  </div>
                 </>
               ) : (
                 <>
@@ -366,7 +382,8 @@ export default function CheckoutPage() {
                       <div className="summary-qty">Qty: {it.quantity}</div>
                     </div>
                   </div>
-                  <div className="summary-price">{formatPrice(99.99 * it.quantity)}</div>
+                  {/* ✅ Use backend pricing from cart items */}
+                  <div className="summary-price">₹{it.totalPrice.toFixed(2)}</div>
                 </div>
               ))}
             </div>

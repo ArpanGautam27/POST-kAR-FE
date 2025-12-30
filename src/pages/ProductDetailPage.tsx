@@ -5,6 +5,7 @@ import ProductGrid from '../components/product/ProductGrid';
 import Modal from '../components/common/Modal';
 import { ProductService } from '../services/ProductService';
 import { cartService } from '../services/CartService';
+import { useCart } from '../contexts/CartContext';  // ✅ Import useCart
 import { useNavigation } from '../hooks/useNavigation';
 import { useBreadcrumbs } from '../hooks/useBreadcrumbs';
 import { findVariant } from '../types/marker';
@@ -19,6 +20,7 @@ export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { navigate } = useNavigation();
   const { updateBreadcrumbsForPage } = useBreadcrumbs();
+  const { refreshCart } = useCart();  // ✅ Get refreshCart function
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -158,6 +160,10 @@ export default function ProductDetailPage() {
         size: selectedSize,
         quantity: quantity
       });
+
+      // ✅ Refresh cart to update navbar count immediately
+      await refreshCart();
+
       setTimeout(() => setAddedToCart(false), 2000);
     } catch (error) {
       console.error('Failed to add to cart:', error);
