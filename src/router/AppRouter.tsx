@@ -7,6 +7,7 @@ import { withLazyLoading, preloadComponent } from '../utils/lazyLoad';
 // Lazy load pages for better performance
 const LandingPage = withLazyLoading(() => import('../pages/LandingPage'));
 const ProductsPage = withLazyLoading(() => import('../pages/ProductsPage'));
+const CategoryPage = withLazyLoading(() => import('../pages/CategoryPage'));
 const FreeExperiencePage = withLazyLoading(() => import('../pages/FreeExperiencePage'));
 const ProductDetailPage = withLazyLoading(() => import('../pages/ProductDetailPage'));
 const CartPage = withLazyLoading(() => import('../pages/CartPage'));
@@ -37,12 +38,13 @@ export default function AppRouter() {
             <Routes>
               {/* Landing page route */}
               <Route path="/" element={<LandingPage />} />
-              
+
               {/* Product routes */}
               <Route path="/free-experience" element={<FreeExperiencePage />} />
               <Route path="/products" element={<ProductsPage />} />
+              <Route path="/category/:categoryId" element={<CategoryPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
-              
+
               {/* Cart route */}
               <Route path="/cart" element={<CartPage />} />
               {/* Checkout route */}
@@ -54,18 +56,18 @@ export default function AppRouter() {
               <Route path="/order/:orderId" element={<OrderDetailPage />} />
               {/* Addresses route */}
               <Route path="/addresses" element={<AddressesPage />} />
-              
+
               {/* Profile route - protected */}
               <Route path="/profile" element={<ProfilePage />} />
-              
+
               {/* OAuth callback routes */}
               <Route path="/auth/callback" element={<OAuthCallbackPage />} />
               <Route path="/login/oauth2/code/google" element={<OAuthCallbackPage />} />
-              
+
               {/* Scanner route */}
               {/* Scanner is served as a static page under public/scanner/scan_mind.html */}
               {/* Links should use <a href="/scanner/scan_mind.html"> to trigger a full-page load */}
-              
+
               {/* 404 Not Found */}
               <Route path="*" element={<NotFoundPage />} />
             </Routes>

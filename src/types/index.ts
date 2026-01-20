@@ -4,6 +4,17 @@
 export * from './marker';
 
 /**
+ * Category interface for organizing products/markers
+ * Matches backend CategoryResponse structure
+ */
+export interface Category {
+  id: string;
+  name: string;
+  description?: string;
+  markerCount?: number;
+}
+
+/**
  * Product interface representing a product in the system
  * Based on requirements 6.1, 6.3 - mock data structure that simulates API response
  * Extended with optional variant data for new variant selection system
