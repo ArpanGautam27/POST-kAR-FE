@@ -1,22 +1,19 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { LogIn } from 'lucide-react';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, LogIn } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { AuthModal } from '../auth/AuthModal';
 import { ProfileDropdown } from '../auth/ProfileDropdown';
 import './Navigation.css';
 import headerLogoVideo from '../../assets/logo_new.mp4';
-import scannerButtonAnim from '../../assets/scanner_button.json?url';
 
-interface NavigationProps {}
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar';
+const WHATSAPP_NUMBER = '917579122216';
+const WHATSAPP_GENERAL_MSG = encodeURIComponent('Hi, I want to buy a Post-kAR product.');
 
-/**
- * Navigation component provides consistent header with navigation options
- * Implements requirements 5.2, 5.5, 2.5 - responsive navigation with breadcrumbs
- * Now integrated with NavigationContext for consistent state management
- */
+interface NavigationProps { }
+
 export const Navigation: React.FC<NavigationProps> = () => {
   const { totalItems } = useCart();
   const { isAuthenticated, isLoading } = useAuth();
@@ -31,28 +28,19 @@ export const Navigation: React.FC<NavigationProps> = () => {
     const handleLoadedData = () => {
       setVideoLoaded(true);
       video.setAttribute('data-loaded', 'true');
-      // Ensure video plays after loading
       video.play().catch(() => {
-        // Fallback: try playing again after a short delay
-        setTimeout(() => {
-          video.play().catch(() => {});
-        }, 100);
+        setTimeout(() => { video.play().catch(() => { }); }, 100);
       });
     };
 
     const handleCanPlay = () => {
-      if (!videoLoaded) {
-        video.play().catch(() => {});
-      }
+      if (!videoLoaded) { video.play().catch(() => { }); }
     };
 
     video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('canplay', handleCanPlay);
 
-    // Force load if video is already loaded
-    if (video.readyState >= 2) {
-      handleLoadedData();
-    }
+    if (video.readyState >= 2) { handleLoadedData(); }
 
     return () => {
       video.removeEventListener('loadeddata', handleLoadedData);
@@ -60,10 +48,23 @@ export const Navigation: React.FC<NavigationProps> = () => {
     };
   }, [videoLoaded]);
 
+  const handleDownloadApp = () => {
+    window.open(PLAY_STORE_URL, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleBuyNow = () => {
+    window.open(
+      `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_GENERAL_MSG}`,
+      '_blank',
+      'noopener,noreferrer'
+    );
+  };
+
   return (
     <>
       <nav className="landing-nav">
         <div className="nav-container">
+          {/* Logo */}
           <Link to="/" className="nav-logo" aria-label="Home: POST-kAR">
             <video
               ref={videoRef}
@@ -76,31 +77,19 @@ export const Navigation: React.FC<NavigationProps> = () => {
               preload="metadata"
             />
           </Link>
+
+          {/* Nav Links */}
           <div className="nav-links">
-            <Link to="/free-experience" className="nav-link">Freeverse</Link>
             <Link to="/products" className="nav-link">Products</Link>
-            <a href="/scanner/scan_mind.html" className="nav-link" aria-label="Scanner" title="Scanner">
-              {(() => {
-                const LottiePlayer = 'lottie-player' as any;
-                return (
-                  <LottiePlayer
-                    src={scannerButtonAnim}
-                    background="transparent"
-                    speed="1"
-                    loop
-                    autoplay
-                    style={{ width: 50, height: 50 }}
-                  />
-                );
-              })()}
-            </a>
+
             {totalItems > 0 && (
               <Link to="/cart" className="nav-link nav-cart-link">
                 <ShoppingCart size={18} />
                 {totalItems > 0 && <span className="cart-badge">{totalItems}</span>}
               </Link>
             )}
-            {/* Authentication Section */}
+
+            {/* Auth */}
             <div className="nav-auth">
               {!isLoading && (
                 isAuthenticated ? (
@@ -116,11 +105,32 @@ export const Navigation: React.FC<NavigationProps> = () => {
                 )
               )}
             </div>
+
+            {/* Action Buttons */}
+            <div className="nav-action-buttons">
+              <button
+                className="nav-buynow-btn"
+                onClick={handleBuyNow}
+                id="nav-buynow-btn"
+                aria-label="Buy Now via WhatsApp"
+              >
+                <span className="nav-btn-icon">💬</span>
+                <span className="nav-btn-label">Buy Now</span>
+              </button>
+              <button
+                className="nav-download-btn"
+                onClick={handleDownloadApp}
+                id="nav-download-btn"
+                aria-label="Download Post-kAR App"
+              >
+                <span className="nav-btn-icon">▶</span>
+                <span className="nav-btn-label">Download App</span>
+              </button>
+            </div>
           </div>
         </div>
       </nav>
 
-      {/* Auth Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}

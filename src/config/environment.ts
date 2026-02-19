@@ -27,6 +27,9 @@ export interface AppConfig {
   // Video Configuration
   cloudflareVideoUrl: string;
 
+  // Image Configuration (Cloudflare)
+  cloudflareImageUrl: string;
+
   // Analytics
   googleAnalyticsId?: string;
   mixpanelToken?: string;
@@ -77,6 +80,9 @@ export const config: AppConfig = {
 
   // Video Configuration
   cloudflareVideoUrl: import.meta.env.VITE_CLOUDFLARE_VIDEO_URL || 'https://media.post-kar.com',
+
+  // Cloudflare Image CDN
+  cloudflareImageUrl: import.meta.env.VITE_CLOUDFLARE_IMAGE_URL || import.meta.env.VITE_IMAGE_CDN_URL || 'https://media.post-kar.com',
 
   // Analytics
   googleAnalyticsId: import.meta.env.VITE_GOOGLE_ANALYTICS_ID,

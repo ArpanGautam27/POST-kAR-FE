@@ -1,0 +1,124 @@
+/* ============================================
+   FINAL CTA SECTION — CONVERSION BLOCK
+   ============================================ */
+
+.final-cta-section {
+    position: relative;
+    background: #0a0a0f;
+    padding: 6rem 2rem;
+    text-align: center;
+    overflow: hidden;
+}
+
+.final-cta-bg {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 70% 60% at 50% 50%, rgba(99, 102, 241, 0.2) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 40% at 80% 20%, rgba(217, 70, 239, 0.12) 0%, transparent 60%);
+    z-index: 0;
+}
+
+.final-cta-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+}
+
+.final-cta-eyebrow {
+    display: inline-block;
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    color: #a5b4fc;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 0.4rem 1rem;
+    border-radius: 9999px;
+    margin-bottom: 1.5rem;
+}
+
+.final-cta-headline {
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin: 0 0 2.5rem 0;
+}
+
+.final-cta-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.final-cta-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: #ffffff;
+    border: none;
+    padding: 1rem 2.25rem;
+    border-radius: 9999px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 8px 30px rgba(99, 102, 241, 0.4);
+    white-space: nowrap;
+}
+
+.final-cta-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.55);
+}
+
+.final-cta-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 1rem 2.25rem;
+    border-radius: 9999px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+    white-space: nowrap;
+    backdrop-filter: blur(8px);
+}
+
+.final-cta-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .final-cta-section {
+        padding: 4rem 1.25rem;
+    }
+
+    .final-cta-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .final-cta-btn-primary,
+    .final-cta-btn-secondary {
+        width: 100%;
+        justify-content: center;
+        min-height: 52px;
+    }
+}

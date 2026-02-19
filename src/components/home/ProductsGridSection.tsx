@@ -2,6 +2,13 @@ import { Link } from 'react-router-dom';
 import type { Product } from '../../types';
 import './ProductsGridSection.css';
 
+const WHATSAPP_NUMBER = '917579122216';
+
+function getWhatsAppUrl(productName: string): string {
+    const msg = encodeURIComponent(`Hi, I want to buy this Post-kAR product: ${productName}`);
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
+}
+
 interface ProductsGridSectionProps {
     products: Product[];
 }
@@ -23,7 +30,7 @@ export default function ProductsGridSection({ products }: ProductsGridSectionPro
     const displayProducts = products.slice(0, 8);
 
     return (
-        <section className="products-grid-section">
+        <section className="products-grid-section" id="products">
             <div className="products-container">
                 <div className="products-header">
                     <h2 className="products-title">BEST SELLING</h2>
@@ -55,6 +62,16 @@ export default function ProductsGridSection({ products }: ProductsGridSectionPro
                                     )}
                                     <div className="product-overlay">
                                         <span className="quick-view">Quick View</span>
+                                        <a
+                                            href={getWhatsAppUrl(product.name)}
+                                            className="whatsapp-buy-btn"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => e.stopPropagation()}
+                                            aria-label={`Buy ${product.name} on WhatsApp`}
+                                        >
+                                            💬 Buy
+                                        </a>
                                     </div>
                                 </div>
                                 <div className="product-info">

@@ -424,7 +424,54 @@
   font-weight: var(--font-weight-bold);
 }
 
+/* WhatsApp CTA Button */
+.whatsapp-cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: #25D366;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+  min-height: 52px;
+}
+
+.whatsapp-cta-btn:hover {
+  background: #1ebe5d;
+  transform: translateY(-2px);
+}
+
+/* Play Store CTA Button */
+.playstore-cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.85rem 1.5rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  min-height: 52px;
+}
+
+.playstore-cta-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
 .add-to-cart-btn {
+
   width: 100%;
   background-color: #262626 !important;
   /* neutral-800 */

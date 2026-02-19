@@ -16,6 +16,14 @@ import './ProductDetailPage.css';
 // Use real API service
 const productService = ProductService.getInstance();
 
+const WHATSAPP_NUMBER = '917579122216';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar';
+
+function getWhatsAppProductUrl(productName: string): string {
+  const msg = encodeURIComponent(`Hi, I want to buy this Post-kAR product: ${productName}`);
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
+}
+
 export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { navigate } = useNavigation();
@@ -30,7 +38,6 @@ export default function ProductDetailPage() {
   // Variant selection state
   const [selectedProductType, setSelectedProductType] = useState<string>('');
   const [selectedSize, setSelectedSize] = useState<string>('');
-  const [quantity, setQuantity] = useState(1);
 
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [relatedLoading, setRelatedLoading] = useState<boolean>(true);
@@ -156,9 +163,9 @@ export default function ProductDetailPage() {
       setAddedToCart(true);
       await cartService.addToCart({
         markerId: product.id,
-        productType: selectedProductType,
-        size: selectedSize,
-        quantity: quantity
+        productType: selectedProductType || 'default',
+        size: selectedSize || 'default',
+        quantity: 1
       });
 
       // ✅ Refresh cart to update navbar count immediately
@@ -318,51 +325,40 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* Dynamic Pricing Display */}
-              {selectedVariant && (
-                <div className="product-price-section">
-                  <div className="pricing-display">
-                    <span className="product-price">₹{selectedVariant.discountedPrice}</span>
-                    {selectedVariant.actualPrice > selectedVariant.discountedPrice && (
-                      <>
-                        <span className="product-price-original">₹{selectedVariant.actualPrice}</span>
-                        <span className="product-discount-badge">{selectedVariant.discountPercentage}% OFF</span>
-                      </>
-                    )}
-                  </div>
-                  {selectedVariant.inStock && selectedVariant.stockQuantity < 10 && (
-                    <div className="low-stock-warning">
-                      ⚠️ Only {selectedVariant.stockQuantity} left in stock!
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Quantity Selector */}
-              <div className="option-group">
-                <h3 className="option-title">Quantity</h3>
-                <div className="quantity-selector">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="quantity-btn"
-                  >
-                    -
-                  </button>
-                  <span className="quantity-display">{quantity}</span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="quantity-btn"
-                  >
-                    +
-                  </button>
+              {/* Price — always visible */}
+              <div className="product-price-section">
+                <div className="pricing-display">
+                  <span className="product-price">₹599</span>
+                  <span className="product-price-original">₹799</span>
+                  <span className="product-discount-badge">25% OFF</span>
                 </div>
               </div>
 
+
               <div className="product-actions">
+                <a
+                  href={getWhatsAppProductUrl(product.name)}
+                  className="whatsapp-cta-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  id="pdp-whatsapp-btn"
+                  aria-label={`Buy ${product.name} on WhatsApp`}
+                >
+                  💬 Buy on WhatsApp
+                </a>
+                <a
+                  href={PLAY_STORE_URL}
+                  className="playstore-cta-btn"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  id="pdp-playstore-btn"
+                  aria-label="Get the Post-kAR App from Play Store"
+                >
+                  ▶ Get the App
+                </a>
                 <button
                   onClick={handleAddToCart}
                   className="add-to-cart-btn"
-                  disabled={!selectedVariant || !selectedVariant.inStock}
                 >
                   {addedToCart ? '✓ Added to Cart' : 'Add to Cart'}
                 </button>

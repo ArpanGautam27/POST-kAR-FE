@@ -1,104 +1,88 @@
-import { useState, useRef } from 'react';
-import type { HeroImage } from '../../services/HeroService';
 import './HeroSection.css';
 
-interface HeroSectionProps {
-  heroImages: HeroImage[];
-  wallsCount: number;
-}
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar';
+const WHATSAPP_NUMBER = '917579122216';
 
-export default function HeroSection({ heroImages, wallsCount }: HeroSectionProps) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
-
-  // Promotional offers for the ticker
-  const offers = [
-    'PREPAID ORDERS!',
-    'BUY 4 GET 3 FREE!',
-    'BUY 5 GET 5 FREE!',
-    'BUY 6 GET 12 FREE!',
-    'BUY 10 GET 20 FREE!',
-    'BUY 20 GET 50 FREE!',
-    'FREE DELIVERY FOR PREPAID ORDERS!',
-    '➜ FREE DELIVERY FOR PREPAID ORDERS'
-  ];
-
-  // Drag scroll functionality
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (!scrollRef.current) return;
-    setIsDragging(true);
-    setStartX(e.pageX - scrollRef.current.offsetLeft);
-    setScrollLeft(scrollRef.current.scrollLeft);
+export default function HeroSection() {
+  const handleDownloadClick = () => {
+    // Track click event
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'click', { event_category: 'CTA', event_label: 'Download App - Hero' });
+    }
+    window.open(PLAY_STORE_URL, '_blank', 'noopener,noreferrer');
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !scrollRef.current) return;
+  const handleExploreClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const x = e.pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    scrollRef.current.scrollLeft = scrollLeft - walk;
+    const el = document.getElementById('products');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
-    <section className="hero-section">
-      {/* Promotional Ticker */}
-      <div className="promotional-ticker">
-        <div className="ticker-content">
-          {[...offers, ...offers].map((offer, index) => (
-            <span key={index} className="ticker-item">
-              {offer}
-            </span>
-          ))}
+    <section className="hero-section-new">
+      <div className="hero-bg-gradient" aria-hidden="true" />
+
+      <div className="hero-inner-new">
+        {/* Eyebrow */}
+        <p className="hero-eyebrow">✨ Augmented Reality — Made Simple</p>
+
+        {/* Headline */}
+        <h1 className="hero-headline">
+          Turn Everyday Objects Into{' '}
+          <span className="hero-headline-accent">Living Experiences</span>
+        </h1>
+
+        {/* Sub-headline */}
+        <p className="hero-subheadline">Beyond The Frame</p>
+
+        {/* Body text */}
+        <p className="hero-body">
+          Scan Karo, Experience Karo. Scan posters, frames, gifts, and décor to unlock immersive
+          Augmented Reality — videos, animations, games, and memories that come alive.
+        </p>
+
+        {/* CTA Buttons */}
+        <div className="hero-cta-row">
+          <button
+            className="hero-btn-primary"
+            onClick={handleDownloadClick}
+            id="hero-download-btn"
+            aria-label="Download Post-kAR App on Google Play Store"
+          >
+            <span className="hero-btn-icon">▶</span>
+            Download App
+          </button>
+          <a
+            href="#products"
+            className="hero-btn-secondary"
+            onClick={handleExploreClick}
+            id="hero-explore-btn"
+            aria-label="Explore Post-kAR Products"
+          >
+            Explore Products
+            <span className="hero-btn-arrow">↓</span>
+          </a>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="hero-trust-badges">
+          <span className="trust-badge">
+            <span className="trust-badge-flag">🇮🇳</span>
+            Made in India
+          </span>
+          <span className="trust-badge-divider" aria-hidden="true">·</span>
+          <span className="trust-badge">
+            <span className="trust-badge-icon">🥽</span>
+            No Headset Required
+          </span>
         </div>
       </div>
 
-      {/* Hero Content */}
-      <div className="hero-content-wrapper">
-        <div className="hero-text">
-          <h1 className="hero-heading">
-            TRANSFORMED OVER <span className="highlight-count">{wallsCount.toLocaleString()}+</span> WALLS.
-          </h1>
-          <p className="hero-subheading">Experience Culture Through Augmented Reality</p>
-          <p className="hero-description">
-            Scan. Discover. Interact. Transform your space with AR-enabled posters that bring art to life.
-          </p>
-        </div>
-
-        {/* Customer Gallery */}
-        <div
-          className="customer-gallery"
-          ref={scrollRef}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onMouseMove={handleMouseMove}
-        >
-          <div className="gallery-track">
-            {heroImages.map((image) => (
-              <div key={image.id} className="gallery-item">
-                <img
-                  src={image.imageUrl}
-                  alt={image.title || 'Customer wall transformation'}
-                  loading="lazy"
-                />
-                <div className="gallery-overlay">
-                  <span className="ar-badge">AR Enabled</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="gallery-hint">
-          <span>← Drag to explore customer transformations →</span>
-        </div>
-      </div>
+      {/* Decorative floating orbs */}
+      <div className="hero-orb hero-orb-1" aria-hidden="true" />
+      <div className="hero-orb hero-orb-2" aria-hidden="true" />
     </section>
   );
 }

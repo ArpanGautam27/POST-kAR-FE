@@ -9,9 +9,12 @@ import { mockProductService } from './MockProductService';
 export class ProductService {
   private static instance: ProductService;
   private baseUrl: string;
+  private imageCdnBase: string;
 
   private constructor() {
     this.baseUrl = config.apiBaseUrl;
+    // Cloudflare image CDN base — used to prefix relative image paths from backend
+    this.imageCdnBase = config.imageCdnUrl || 'https://media.post-kar.com';
   }
 
   public static getInstance(): ProductService {
@@ -19,6 +22,24 @@ export class ProductService {
       ProductService.instance = new ProductService();
     }
     return ProductService.instance;
+  }
+
+  /**
+   * Resolve an image URL from the backend.
+   * Backend may return:
+   *  - A full Cloudflare URL (https://...)     → use as-is
+   *  - A relative path (/images/...)            → prefix with imageCdnBase
+   *  - A Cloudflare image ID / filename         → prefix with imageCdnBase
+   *  - Empty string / null                      → return ''
+   */
+  private resolveImageUrl(raw: string | undefined | null): string {
+    if (!raw) return '';
+    // Already a full URL
+    if (raw.startsWith('http://') || raw.startsWith('https://')) return raw;
+    // Relative path — prefix with CDN base
+    const base = this.imageCdnBase.replace(/\/$/, '');
+    const path = raw.startsWith('/') ? raw : `/${raw}`;
+    return `${base}${path}`;
   }
 
   // Map backend Marker object to frontend Product shape
@@ -31,8 +52,29 @@ export class ProductService {
     const name = marker.name || marker.markerId || 'Unknown Marker';
     const description = marker.description || '';
 
-    const thumbnailUrl = marker.thumbnailUrl || marker.markerImageUrl || '';
-    const imageUrl = marker.markerImageUrl || marker.thumbnailUrl || '';
+    // Try every field name the Spring Boot backend might use for the Cloudflare image URL
+    const rawThumbnail =
+      marker.cloudflareImageUrl ||   // explicit Cloudflare field
+      marker.cloudflareImage ||
+      marker.posterImageUrl ||
+      marker.imageUrl ||
+      marker.thumbnailUrl ||
+      marker.markerImageUrl ||
+      marker.thumbnail ||
+      '';
+
+    const rawImage =
+      marker.cloudflareImageUrl ||
+      marker.cloudflareImage ||
+      marker.posterImageUrl ||
+      marker.imageUrl ||
+      marker.markerImageUrl ||
+      marker.thumbnailUrl ||
+      marker.image ||
+      '';
+
+    const thumbnailUrl = this.resolveImageUrl(rawThumbnail);
+    const imageUrl = this.resolveImageUrl(rawImage);
 
     const videos = Array.isArray(marker.videos) ? marker.videos : [];
     const activeVideoId = marker.activeVideoId;
@@ -146,8 +188,8 @@ export class ProductService {
 
       if (!response.ok) {
         if (response.status === 404) {
-          console.warn('⚠️ [ProductService] Product not found (404):', id);
-          return null;
+          console.warn('⚠️ [ProductService] Product not found in API (404), falling back to mock data for id:', id);
+          return mockProductService.getProduct(id);
         }
         console.error('❌ [ProductService] HTTP error! status:', response.status);
         throw new Error(`HTTP error! status: ${response.status}`);

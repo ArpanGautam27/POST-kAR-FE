@@ -92,10 +92,31 @@
     inset: 0;
     background: rgba(0, 0, 0, 0.6);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.6rem;
     opacity: 0;
     transition: opacity 0.3s ease;
+}
+
+.whatsapp-buy-btn {
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 0.6rem 1.25rem;
+    background: #25D366;
+    border-radius: 4px;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.whatsapp-buy-btn:hover {
+    background: #1ebe5d;
+    transform: scale(1.04);
 }
 
 .product-card:hover .product-overlay {
@@ -134,6 +155,7 @@
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
