@@ -902,6 +902,28 @@
   transform: none;
 }
 
+/* Similar / Related Products Section */
+.similar-section {
+  margin-top: var(--spacing-16);
+  padding: 0 var(--spacing-4);
+  clear: both;
+  display: block;
+  width: 100%;
+}
+
+.similar-title {
+  font-size: 2rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-10);
+  display: block;
+  position: static;
+}
+
+.similar-section .product-grid {
+  margin-top: 4rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .product-detail-container {
@@ -924,13 +946,18 @@
   }
 
   .similar-section {
-    margin-top: calc(var(--spacing-16) + var(--spacing-8));
+    margin-top: var(--spacing-12);
+    padding-top: var(--spacing-4);
+    clear: both;
   }
 
   .similar-title {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: var(--font-weight-bold);
     margin-bottom: var(--spacing-6);
+    display: block;
+    position: static;
+    color: var(--color-text-primary);
   }
 
   .product-description {

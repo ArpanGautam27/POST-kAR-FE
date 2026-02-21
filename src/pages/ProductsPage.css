@@ -21,9 +21,6 @@
   color: #ffffff;
   margin-bottom: 12px;
   line-height: 1.15;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .products-subtitle {
@@ -79,19 +76,16 @@
   .products-container {
     padding: 40px 0;
   }
-  
+
   .products-header {
     margin-bottom: 64px;
   }
-  
+
   .products-title {
-    font-size: 32px;
-    line-height: 1.15;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 28px;
+    line-height: 1.2;
   }
-  
+
   .products-subtitle {
     font-size: 16px;
   }

@@ -40,7 +40,7 @@ export default function LandingPage() {
       try {
         const videos = await communityVideoService.getCommunityVideos();
         setFeedbackVideos(videos);
-        setMuted(videos.map(() => true));
+        setMuted(videos.map(() => false));
       } catch (e) {
         console.error('Error loading community videos:', e);
         setFeedbackVideos([]);

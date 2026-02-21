@@ -91,19 +91,7 @@ export const Navigation: React.FC<NavigationProps> = () => {
 
             {/* Auth */}
             <div className="nav-auth">
-              {!isLoading && (
-                isAuthenticated ? (
-                  <ProfileDropdown />
-                ) : (
-                  <button
-                    onClick={() => setIsAuthModalOpen(true)}
-                    className="nav-login-button"
-                  >
-                    <LogIn size={16} />
-                    <span>Login</span>
-                  </button>
-                )
-              )}
+              {/* Login button hidden */}
             </div>
 
             {/* Action Buttons */}

@@ -71,7 +71,7 @@ export default function ProductsPage() {
             loading={loading}
             onProductClick={(id) => { window.location.href = `/product/${id}`; }}
             cardProps={{ hideCart: true }}
-            forceFourColumns={true}
+            forceFourColumns={false}
           />
         </div>
       </div>

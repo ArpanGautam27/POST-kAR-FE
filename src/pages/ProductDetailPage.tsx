@@ -2,10 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navigation from '../components/layout/Navigation';
 import ProductGrid from '../components/product/ProductGrid';
-import Modal from '../components/common/Modal';
 import { ProductService } from '../services/ProductService';
-import { cartService } from '../services/CartService';
-import { useCart } from '../contexts/CartContext';  // ✅ Import useCart
 import { useNavigation } from '../hooks/useNavigation';
 import { useBreadcrumbs } from '../hooks/useBreadcrumbs';
 import { findVariant } from '../types/marker';
@@ -28,11 +25,9 @@ export default function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { navigate } = useNavigation();
   const { updateBreadcrumbsForPage } = useBreadcrumbs();
-  const { refreshCart } = useCart();  // ✅ Get refreshCart function
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [addedToCart, setAddedToCart] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   // Variant selection state
@@ -41,9 +36,6 @@ export default function ProductDetailPage() {
 
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [relatedLoading, setRelatedLoading] = useState<boolean>(true);
-  const [reviews, setReviews] = useState<Array<{ id: string; author: string; rating: number; comment: string; date: string }>>([]);
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const [newReview, setNewReview] = useState<{ author: string; rating: number; comment: string }>({ author: '', rating: 5, comment: '' });
 
   // Get selected variant based on current selection
   const selectedVariant: Variant | null = useMemo(() => {
@@ -68,18 +60,6 @@ export default function ProductDetailPage() {
 
   const goPrev = () => {
     setCurrentSlide((prev) => (slides.length ? (prev - 1 + slides.length) % slides.length : 0));
-  };
-
-  const openReviewModal = () => setIsReviewModalOpen(true);
-  const closeReviewModal = () => setIsReviewModalOpen(false);
-  const submitReview = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!product) return;
-    const id = `r-${Date.now()}`;
-    const date = new Date().toISOString().slice(0, 10);
-    setReviews([{ id, author: newReview.author || 'Anonymous', rating: newReview.rating, comment: newReview.comment, date }, ...reviews]);
-    setNewReview({ author: '', rating: 5, comment: '' });
-    setIsReviewModalOpen(false);
   };
 
   const goNext = () => {
@@ -143,41 +123,7 @@ export default function ProductDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const handleAddToCart = async () => {
-    if (!product || !selectedProductType || !selectedSize) {
-      alert('Please select product type and size');
-      return;
-    }
 
-    if (!selectedVariant) {
-      alert('Selected variant not available');
-      return;
-    }
-
-    if (!selectedVariant.inStock) {
-      alert('This variant is out of stock');
-      return;
-    }
-
-    try {
-      setAddedToCart(true);
-      await cartService.addToCart({
-        markerId: product.id,
-        productType: selectedProductType || 'default',
-        size: selectedSize || 'default',
-        quantity: 1
-      });
-
-      // ✅ Refresh cart to update navbar count immediately
-      await refreshCart();
-
-      setTimeout(() => setAddedToCart(false), 2000);
-    } catch (error) {
-      console.error('Failed to add to cart:', error);
-      alert('Failed to add to cart. Please try again.');
-      setAddedToCart(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -356,60 +302,10 @@ export default function ProductDetailPage() {
                 >
                   ▶ Get the App
                 </a>
-                <button
-                  onClick={handleAddToCart}
-                  className="add-to-cart-btn"
-                >
-                  {addedToCart ? '✓ Added to Cart' : 'Add to Cart'}
-                </button>
+                {/* Add to Cart button hidden */}
               </div>
 
-              {/* Reviews Section */}
-              <section className="reviews-section">
-                <div className="reviews-header">
-                  <h2 className="reviews-title">Reviews</h2>
-                  <button className="btn btn-light-card" onClick={openReviewModal}>Add Review</button>
-                </div>
-                {reviews.length === 0 ? (
-                  <p className="reviews-empty">No reviews yet. Be the first to review.</p>
-                ) : (
-                  <ul className="reviews-list">
-                    {reviews.map(r => (
-                      <li key={r.id} className="review-item">
-                        <div className="review-meta">
-                          <span className="review-author">{r.author}</span>
-                          <span className="review-date">{r.date}</span>
-                          <span className="review-rating">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</span>
-                        </div>
-                        <p className="review-comment">{r.comment}</p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-
-              <Modal open={isReviewModalOpen} title="Add your review" onClose={closeReviewModal}>
-                <form onSubmit={submitReview} className="pd-modal-form">
-                  <label className="pd-field">
-                    <span>Name</span>
-                    <input type="text" value={newReview.author} onChange={(e) => setNewReview({ ...newReview, author: e.target.value })} placeholder="Your name" />
-                  </label>
-                  <label className="pd-field">
-                    <span>Rating</span>
-                    <select value={newReview.rating} onChange={(e) => setNewReview({ ...newReview, rating: Number(e.target.value) })}>
-                      {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n}</option>)}
-                    </select>
-                  </label>
-                  <label className="pd-field">
-                    <span>Comment</span>
-                    <textarea value={newReview.comment} onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })} placeholder="Share details of your experience" rows={4} />
-                  </label>
-                  <div className="pd-modal-actions">
-                    <button type="button" className="btn btn-secondary" onClick={closeReviewModal}>Cancel</button>
-                    <button type="submit" className="btn btn-primary">Submit Review</button>
-                  </div>
-                </form>
-              </Modal>
+              {/* Reviews section hidden */}
 
             </div>
           </div>
