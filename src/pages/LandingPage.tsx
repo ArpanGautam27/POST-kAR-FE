@@ -71,14 +71,13 @@ function useDragScroll(ref: React.RefObject<HTMLElement | null>) {
 
 export default function LandingPage() {
   const [showTerms, setShowTerms] = useState(false);
-  const [showPrivacy, setShowPrivacy] = useState(false);
   const [isWaitlistModalOpen, setIsWaitlistModalOpen] = useState(false);
   const [visitStats, setVisitStats] = useState<VisitStats>({
     totalVisits: 963,
     activeNow: 1,
     lastUpdated: new Date().toISOString()
   });
-  
+
   // Cinematic scroll states
   const containerRef = useRef(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -112,7 +111,7 @@ export default function LandingPage() {
         const shouldMute = next[i];
         v.muted = shouldMute;
         if (!shouldMute) {
-          v.play().catch(() => {});
+          v.play().catch(() => { });
         }
       });
 
@@ -290,12 +289,12 @@ export default function LandingPage() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
-    
+
     const cleanupScroll = () => {
       window.removeEventListener('scroll', handleScroll);
       io.disconnect();
     };
-    
+
     return cleanupScroll;
   }, [totalPanels]);
 
@@ -418,9 +417,9 @@ export default function LandingPage() {
             <div className="section-head" style={{ marginBottom: '1rem' }}>
               <h2 className="section-title">Featured Products</h2>
             </div>
-            <ProductGrid 
-              products={products} 
-              loading={loadingProducts} 
+            <ProductGrid
+              products={products}
+              loading={loadingProducts}
               onProductClick={(id) => { window.location.href = `/product/${id}`; }}
               horizontal={true}
               showArrows={true}
@@ -430,316 +429,316 @@ export default function LandingPage() {
         </div>
       </section>
 
-{/* Services Section (Netflix-style scroll) */}
-<section className="section section-services reveal in">
-  <div className="container">
-    <div
-      className="card"
-      style={{
-        background: 'rgba(255,255,255,0.08)',
-        border: 'none',
-        borderRadius: 12,
-        padding: '1.5rem',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
-    >
-      <h2 className="section-title">Services</h2>
-
-      {/* Horizontal Scrollable Cards */}
-      <div ref={servicesRef} className="services-scroll">
-        {[
-          {
-            title: 'Custom AR Campaigns',
-            meta: 'Branded AR experiences for culture & retail',
-          },
-          {
-            title: 'Creator Tools',
-            meta: 'Upload artworks and publish AR layers',
-            comingSoon: true,
-          },
-          {
-            title: 'Mobile App',
-            meta: 'Native app for scanning & collectibles',
-            comingSoon: true,
-          },
-          {
-            title: 'Virtual Tours',
-            meta: 'Interactive 3D & VR experiences for spaces',
-          },
-          {
-            title: 'Mixed Reality',
-            meta: 'Blend real and virtual worlds seamlessly',
-          },
-        ].map((service, i) => (
+      {/* Services Section (Netflix-style scroll) */}
+      <section className="section section-services reveal in">
+        <div className="container">
           <div
-            key={i}
-            className="card service-card"
+            className="card"
             style={{
-              background: 'transparent',
+              background: 'rgba(255,255,255,0.08)',
               border: 'none',
-              borderRadius: 16,
-              flex: '0 0 auto',
+              borderRadius: 12,
+              padding: '1.5rem',
+              position: 'relative',
+              overflow: 'hidden',
             }}
           >
-            <div className="card-body">
-              <h3 className="card-title">
-                {service.title}
-                {service.comingSoon && (
-                  <span style={{ 
-                    fontSize: '0.7rem', 
-                    marginLeft: '0.5rem', 
-                    color: 'rgba(255,255,255,0.6)',
-                    fontWeight: 400 
-                  }}>
-                    (Coming Soon)
-                  </span>
-                )}
-              </h3>
-              <p className="card-meta">{service.meta}</p>
+            <h2 className="section-title">Services</h2>
+
+            {/* Horizontal Scrollable Cards */}
+            <div ref={servicesRef} className="services-scroll">
+              {[
+                {
+                  title: 'Custom AR Campaigns',
+                  meta: 'Branded AR experiences for culture & retail',
+                },
+                {
+                  title: 'Creator Tools',
+                  meta: 'Upload artworks and publish AR layers',
+                  comingSoon: true,
+                },
+                {
+                  title: 'Mobile App',
+                  meta: 'Native app for scanning & collectibles',
+                  comingSoon: true,
+                },
+                {
+                  title: 'Virtual Tours',
+                  meta: 'Interactive 3D & VR experiences for spaces',
+                },
+                {
+                  title: 'Mixed Reality',
+                  meta: 'Blend real and virtual worlds seamlessly',
+                },
+              ].map((service, i) => (
+                <div
+                  key={i}
+                  className="card service-card"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    borderRadius: 16,
+                    flex: '0 0 auto',
+                  }}
+                >
+                  <div className="card-body">
+                    <h3 className="card-title">
+                      {service.title}
+                      {service.comingSoon && (
+                        <span style={{
+                          fontSize: '0.7rem',
+                          marginLeft: '0.5rem',
+                          color: 'rgba(255,255,255,0.6)',
+                          fontWeight: 400
+                        }}>
+                          (Coming Soon)
+                        </span>
+                      )}
+                    </h3>
+                    <p className="card-meta">{service.meta}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </div>
-</section>
+        </div>
+      </section>
 
-{/* Join Our Growing Community Section */}
-<section className="section section-community reveal in" style={{ padding: '4rem 0' }}>
-  <div className="container">
-    <div
-      className="card"
-      style={{
-        background: 'rgba(255,255,255,0.08)',
-        border: 'none',
-        borderRadius: 12,
-        padding: '3rem 2rem',
-        textAlign: 'center',
-      }}
-    >
-      <h2 style={{ 
-        fontSize: 'clamp(2rem, 4vw, 2.5rem)', 
-        fontWeight: 700, 
-        marginBottom: '1rem',
-        color: '#fff'
-      }}>
-        Join Our Growing Community
-      </h2>
-      <p style={{ 
-        fontSize: 'clamp(1rem, 2vw, 1.1rem)', 
-        color: 'rgba(255,255,255,0.7)',
-        marginBottom: '3rem',
-        maxWidth: '600px',
-        margin: '0 auto 3rem'
-      }}>
-        A little luxury never hurts anyone
-      </p>
+      {/* Join Our Growing Community Section */}
+      <section className="section section-community reveal in" style={{ padding: '4rem 0' }}>
+        <div className="container">
+          <div
+            className="card"
+            style={{
+              background: 'rgba(255,255,255,0.08)',
+              border: 'none',
+              borderRadius: 12,
+              padding: '3rem 2rem',
+              textAlign: 'center',
+            }}
+          >
+            <h2 style={{
+              fontSize: 'clamp(2rem, 4vw, 2.5rem)',
+              fontWeight: 700,
+              marginBottom: '1rem',
+              color: '#fff'
+            }}>
+              Join Our Growing Community
+            </h2>
+            <p style={{
+              fontSize: 'clamp(1rem, 2vw, 1.1rem)',
+              color: 'rgba(255,255,255,0.7)',
+              marginBottom: '3rem',
+              maxWidth: '600px',
+              margin: '0 auto 3rem'
+            }}>
+              A little luxury never hurts anyone
+            </p>
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-        gap: '1.5rem',
-        marginBottom: '2rem',
-        maxWidth: '800px',
-        margin: '0 auto 2rem'
-      }}>
-        <div style={{
-          background: 'rgba(255,255,255,0.05)',
-          borderRadius: '12px',
-          padding: '2rem 1.5rem',
-          border: '1px solid rgba(255,255,255,0.1)'
-        }}>
-          <div style={{ 
-            width: '48px', 
-            height: '48px', 
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 1rem',
-            fontSize: '1.5rem'
-          }}>
-            👁️
-          </div>
-          <div style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            color: '#fff',
-            marginBottom: '0.5rem'
-          }}>
-            {visitStats.totalVisits.toLocaleString()}
-          </div>
-          <div style={{ 
-            fontSize: '0.9rem', 
-            color: 'rgba(255,255,255,0.6)',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-          }}>
-            Total Visits
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+              gap: '1.5rem',
+              marginBottom: '2rem',
+              maxWidth: '800px',
+              margin: '0 auto 2rem'
+            }}>
+              <div style={{
+                background: 'rgba(255,255,255,0.05)',
+                borderRadius: '12px',
+                padding: '2rem 1.5rem',
+                border: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1rem',
+                  fontSize: '1.5rem'
+                }}>
+                  👁️
+                </div>
+                <div style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 700,
+                  color: '#fff',
+                  marginBottom: '0.5rem'
+                }}>
+                  {visitStats.totalVisits.toLocaleString()}
+                </div>
+                <div style={{
+                  fontSize: '0.9rem',
+                  color: 'rgba(255,255,255,0.6)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
+                }}>
+                  Total Visits
+                </div>
+              </div>
+
+              <div style={{
+                background: 'rgba(255,255,255,0.05)',
+                borderRadius: '12px',
+                padding: '2rem 1.5rem',
+                border: '1px solid rgba(255,255,255,0.1)'
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 1rem',
+                  fontSize: '1.5rem'
+                }}>
+                  👥
+                </div>
+                <div style={{
+                  fontSize: '2.5rem',
+                  fontWeight: 700,
+                  color: '#fff',
+                  marginBottom: '0.5rem'
+                }}>
+                  {visitStats.activeNow}
+                </div>
+                <div style={{
+                  fontSize: '0.9rem',
+                  color: 'rgba(255,255,255,0.6)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '1px'
+                }}>
+                  Active Now
+                </div>
+              </div>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem',
+              color: 'rgba(255,255,255,0.5)',
+              fontSize: '0.85rem',
+              marginBottom: '1rem'
+            }}>
+              <span style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: '#4ade80',
+                display: 'inline-block'
+              }} />
+              Live tracking • Updated in real-time
+            </div>
+
+            <button
+              onClick={() => setIsWaitlistModalOpen(true)}
+              className="submit-btn"
+              style={{
+                padding: '1rem 2.5rem',
+                fontSize: '1rem',
+                fontWeight: 600,
+                marginTop: '1rem'
+              }}
+            >
+              Join Waitlist
+            </button>
           </div>
         </div>
-
-        <div style={{
-          background: 'rgba(255,255,255,0.05)',
-          borderRadius: '12px',
-          padding: '2rem 1.5rem',
-          border: '1px solid rgba(255,255,255,0.1)'
-        }}>
-          <div style={{ 
-            width: '48px', 
-            height: '48px', 
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 1rem',
-            fontSize: '1.5rem'
-          }}>
-            👥
-          </div>
-          <div style={{ 
-            fontSize: '2.5rem', 
-            fontWeight: 700, 
-            color: '#fff',
-            marginBottom: '0.5rem'
-          }}>
-            {visitStats.activeNow}
-          </div>
-          <div style={{ 
-            fontSize: '0.9rem', 
-            color: 'rgba(255,255,255,0.6)',
-            textTransform: 'uppercase',
-            letterSpacing: '1px'
-          }}>
-            Active Now
-          </div>
-        </div>
-      </div>
-
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center',
-        gap: '0.5rem',
-        color: 'rgba(255,255,255,0.5)',
-        fontSize: '0.85rem',
-        marginBottom: '1rem'
-      }}>
-        <span style={{ 
-          width: '8px', 
-          height: '8px', 
-          borderRadius: '50%',
-          background: '#4ade80',
-          display: 'inline-block'
-        }} />
-        Live tracking • Updated in real-time
-      </div>
-
-      <button 
-        onClick={() => setIsWaitlistModalOpen(true)}
-        className="submit-btn"
-        style={{ 
-          padding: '1rem 2.5rem',
-          fontSize: '1rem',
-          fontWeight: 600,
-          marginTop: '1rem'
-        }}
-      >
-        Join Waitlist
-      </button>
-    </div>
-  </div>
-</section>
+      </section>
 
 
       {/* Reviews removed as requested */}
 
       {/* Cinematic Hero Section - ALL SLIDES (hidden for minimal landing) */}
       {false && (
-      <section
-        id="cinematic-hero"
-        className="cinematic-hero-section"
-        ref={containerRef}
-        style={{ height: `${totalPanels * 100}vh` }}
-      >
-        <div className="scroll-indicator">
-          <span className="scroll-text">SCROLL</span>
-          <div className="scroll-line">
-            <div 
-              className="scroll-progress-fill"
-              style={{ height: `${scrollProgress * 100}%` }}
+        <section
+          id="cinematic-hero"
+          className="cinematic-hero-section"
+          ref={containerRef}
+          style={{ height: `${totalPanels * 100}vh` }}
+        >
+          <div className="scroll-indicator">
+            <span className="scroll-text">SCROLL</span>
+            <div className="scroll-line">
+              <div
+                className="scroll-progress-fill"
+                style={{ height: `${scrollProgress * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="cinematic-viewport">
+            <div
+              className="cinematic-panels-container"
+              style={{ width: `${totalPanels * 100}vw`, transform: `translateX(${translateVW}vw)` }}
+            >
+              {cinematicPanels.map((panel, index) => {
+                const isActive = activePanel === index;
+                const isPast = activePanel > index;
+
+                return (
+                  <div key={panel.id} className="cinematic-panel">
+                    {/* Background - you can add different backgrounds per slide */}
+                    <div
+                      className="panel-background"
+                      style={{
+                        backgroundColor: '#0a1128', // Dark blue background
+                        transform: isActive ? 'scale(1)' : 'scale(1.1)',
+                        filter: isPast ? 'brightness(0.5)' : 'brightness(0.8)'
+                      }}
+                    />
+
+                    <div className="panel-overlay" />
+
+                    <div
+                      className="panel-content"
+                      style={{
+                        opacity: isActive ? 1 : 0.3,
+                        transform: isActive ? 'translateY(0)' : 'translateY(50px)'
+                      }}
+                    >
+                      <h1 className="panel-heading">{panel.heading}</h1>
+                      <p className="panel-subtitle">{panel.subtitle}</p>
+                      {panel.description && (
+                        <p className="panel-description">{panel.description}</p>
+                      )}
+
+                      {/* Show CTA button on slide 8 */}
+                      {panel.id === 'cta' && (
+                        <Link to="/products" className="submit-btn" style={{ marginTop: '2rem' }}>
+                          Explore Products
+                        </Link>
+                      )}
+
+                      <div
+                        className="panel-line"
+                        style={{ width: isActive ? '96px' : '0px' }}
+                      />
+                    </div>
+
+                    <div className="panel-number">
+                      {String(index + 1).padStart(2, '0')} / {String(totalPanels).padStart(2, '0')}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="cinematic-progress-bar">
+            <div
+              className="cinematic-progress-fill"
+              style={{ width: `${scrollProgress * 100}%` }}
             />
           </div>
-        </div>
-
-        <div className="cinematic-viewport">
-          <div 
-            className="cinematic-panels-container"
-            style={{ width: `${totalPanels * 100}vw`, transform: `translateX(${translateVW}vw)` }}
-          >
-            {cinematicPanels.map((panel, index) => {
-              const isActive = activePanel === index;
-              const isPast = activePanel > index;
-              
-              return (
-                <div key={panel.id} className="cinematic-panel">
-                  {/* Background - you can add different backgrounds per slide */}
-                  <div 
-                    className="panel-background"
-                    style={{
-                      backgroundColor: '#0a1128', // Dark blue background
-                      transform: isActive ? 'scale(1)' : 'scale(1.1)',
-                      filter: isPast ? 'brightness(0.5)' : 'brightness(0.8)'
-                    }}
-                  />
-                  
-                  <div className="panel-overlay" />
-                  
-                  <div 
-                    className="panel-content"
-                    style={{
-                      opacity: isActive ? 1 : 0.3,
-                      transform: isActive ? 'translateY(0)' : 'translateY(50px)'
-                    }}
-                  >
-                    <h1 className="panel-heading">{panel.heading}</h1>
-                    <p className="panel-subtitle">{panel.subtitle}</p>
-                    {panel.description && (
-                      <p className="panel-description">{panel.description}</p>
-                    )}
-                    
-                    {/* Show CTA button on slide 8 */}
-                    {panel.id === 'cta' && (
-                      <Link to="/products" className="submit-btn" style={{ marginTop: '2rem' }}>
-                        Explore Products
-                      </Link>
-                    )}
-                    
-                    <div 
-                      className="panel-line"
-                      style={{ width: isActive ? '96px' : '0px' }}
-                    />
-                  </div>
-
-                  <div className="panel-number">
-                    {String(index + 1).padStart(2, '0')} / {String(totalPanels).padStart(2, '0')}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="cinematic-progress-bar">
-          <div 
-            className="cinematic-progress-fill"
-            style={{ width: `${scrollProgress * 100}%` }}
-          />
-        </div>
-      </section>
+        </section>
       )}
 
       {/* Contact Section - Keep this below slides */}
@@ -780,7 +779,7 @@ export default function LandingPage() {
               <p className="footer-title">Legal</p>
               <div className="footer-links">
                 <a href="#terms" onClick={(e) => { e.preventDefault(); setShowTerms(true); }}>Terms & Conditions</a>
-                <a href="#privacy" onClick={(e) => { e.preventDefault(); setShowPrivacy(true); }}>Privacy Policy</a>
+                <Link to="/privacy-policy">Privacy Policy</Link>
               </div>
             </div>
             <div className="footer-col">
@@ -873,42 +872,13 @@ export default function LandingPage() {
         </div>
       )}
 
-      {/* Privacy Modal */}
-      {showPrivacy && (
-        <div className="modal-overlay">
-          <div className="modal-content legal-modal">
-            <button className="modal-close" onClick={() => setShowPrivacy(false)}>×</button>
-            <h2 className="modal-title">Privacy Policy</h2>
-            <div className="legal-content">
-              <h3>1. Information We Collect</h3>
-              <p>We collect information you provide directly to us, including name, email address, and phone number when you join our waitlist. We also collect usage data when you interact with our AR experiences.</p>
-              <h3>2. How We Use Your Information</h3>
-              <p>We use the information we collect to provide, maintain, and improve our services, to communicate with you about updates and features, and to personalize your experience with PostkAR.</p>
-              <h3>3. Information Sharing</h3>
-              <p>We do not sell your personal information. We may share your information with service providers who assist us in operating our platform, or when required by law.</p>
-              <h3>4. Data Security</h3>
-              <p>We implement appropriate security measures to protect your personal information. However, no method of transmission over the internet is 100% secure.</p>
-              <h3>5. Your Rights</h3>
-              <p>You have the right to access, correct, or delete your personal information. You may also opt-out of marketing communications at any time.</p>
-              <h3>6. Cookies and Tracking</h3>
-              <p>We use cookies and similar tracking technologies to track activity on our service and hold certain information to improve user experience.</p>
-              <h3>7. Children's Privacy</h3>
-              <p>Our service is not intended for children under 13. We do not knowingly collect personal information from children under 13.</p>
-              <h3>8. Changes to Privacy Policy</h3>
-              <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page.</p>
-              <h3>9. Contact Us</h3>
-              <p>If you have questions about this Privacy Policy, please contact us through our official communication channels.</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* === MASCOT === */}
       <Mascot model="home" />
 
       {/* Fullscreen Video Modal */}
       {fullscreenVideo && (
-        <div 
+        <div
           style={{
             position: 'fixed',
             inset: 0,

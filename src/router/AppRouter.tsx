@@ -17,6 +17,7 @@ const OrderDetailPage = withLazyLoading(() => import('../pages/OrderDetailPage')
 const ProfilePage = withLazyLoading(() => import('../pages/ProfilePage'));
 const AddressesPage = withLazyLoading(() => import('../pages/AddressesPage'));
 const NotFoundPage = withLazyLoading(() => import('../pages/NotFoundPage'));
+const PrivacyPolicyPage = withLazyLoading(() => import('../pages/PrivacyPolicyPage'));
 
 // Preload critical pages for better UX
 if (typeof window !== 'undefined') {
@@ -36,12 +37,12 @@ export default function AppRouter() {
             <Routes>
               {/* Landing page route */}
               <Route path="/" element={<LandingPage />} />
-              
+
               {/* Product routes */}
               <Route path="/free-experience" element={<FreeExperiencePage />} />
               <Route path="/products" element={<ProductsPage />} />
               <Route path="/product/:id" element={<ProductDetailPage />} />
-              
+
               {/* Cart route */}
               <Route path="/cart" element={<CartPage />} />
               {/* Checkout route */}
@@ -53,14 +54,17 @@ export default function AppRouter() {
               <Route path="/order/:orderId" element={<OrderDetailPage />} />
               {/* Addresses route */}
               <Route path="/addresses" element={<AddressesPage />} />
-              
+
               {/* Profile route - protected */}
               <Route path="/profile" element={<ProfilePage />} />
-              
+
               {/* Scanner route */}
               {/* Scanner is served as a static page under public/scanner/scan_mind.html */}
               {/* Links should use <a href="/scanner/scan_mind.html"> to trigger a full-page load */}
-              
+
+              {/* Legal pages */}
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+
               {/* 404 Not Found */}
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
