@@ -21,7 +21,7 @@ const SERVICES: Service[] = [
         icon: '📱',
         title: 'Mobile App',
         description: 'Scan any Post-kAR product with our app to instantly unlock immersive AR experiences — no headset needed.',
-        link: 'https://play.google.com/store/apps/details?id=com.postkar',
+        link: 'https://play.google.com/store/apps/details?id=com.postkar.arapp',
     },
     {
         id: 'virtual-tours',
