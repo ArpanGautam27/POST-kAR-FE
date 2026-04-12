@@ -7,15 +7,19 @@ import ProductGrid from '../components/product/ProductGrid';
 import { ProductService } from '../services/ProductService';
 // import { visitCounterService } from '../services/VisitCounterService';
 // import type { VisitStats } from '../services/VisitCounterService';
-import { config } from '../config/environment';
 import type { Product } from '../types';
-// r2-media and LazyVideo not available - using stubs
 import Mascot from '../components/common/Mascot';
 import xLogo from '../assets/x_logo.svg';
 import instagramLogo from '../assets/instagram_logo.svg';
 import linkedinLogo from '../assets/linkedin_logo.svg';
 import lovePng from '../assets/love.png';
 import indianFlagAnim from '../assets/indian_flag.json?url';
+import heroSectionHeaderVideo from '../assets/hero_section_header.mp4';
+
+// Local video URLs (no backend needed)
+const heroVideos = {
+  heroSectionHeader: heroSectionHeaderVideo,
+};
 import './LandingPage.css';
 
 // Simple drag-to-scroll hook
@@ -84,14 +88,66 @@ export default function LandingPage() {
   const servicesRef = useRef<HTMLDivElement | null>(null);
   const feedbackVideos: string[] = [];
   const videoRefs = useRef<HTMLVideoElement[]>([]);
-  const [muted, setMuted] = useState<boolean[]>([]);
+  const [muted, setMuted] = useState<boolean[]>(() => feedbackVideos.map(() => true));
+  const [playingStates, setPlayingStates] = useState<boolean[]>(() => feedbackVideos.map(() => false));
   const [fullscreenVideo, setFullscreenVideo] = useState<{ src: string; index: number } | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const fullscreenVideoRef = useRef<HTMLVideoElement>(null);
+  const spotlightSectionRef = useRef<HTMLElement | null>(null);
 
   // Apply drag scroll to horizontal sections
   useDragScroll(spotlightRef);
   useDragScroll(servicesRef);
+
+  // Initialize muted state when feedbackVideos changes
+  useEffect(() => {
+    setMuted(feedbackVideos.map(() => true));
+    setPlayingStates(feedbackVideos.map(() => false));
+  }, [feedbackVideos.length]);
+
+  // Pause/resume videos based on visibility (IntersectionObserver)
+  useEffect(() => {
+    const section = spotlightSectionRef.current;
+    if (!section) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        videoRefs.current.forEach((video) => {
+          if (!video) return;
+          if (entry.isIntersecting) {
+            // Only resume if not manually paused
+            video.play().catch(() => {});
+          } else {
+            video.pause();
+            // Mute all when out of view for safety
+            video.muted = true;
+          }
+        });
+        // If section goes out of view, reset muted state to all muted
+        if (!entry.isIntersecting) {
+          setMuted(prev => prev.map(() => true));
+          setPlayingStates(prev => prev.map(() => false));
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [feedbackVideos.length]);
+
+  // Toggle play/pause for a specific video card
+  const togglePlayPause = (idx: number) => {
+    const video = videoRefs.current[idx];
+    if (!video) return;
+    if (video.paused) {
+      video.play().catch(() => {});
+      setPlayingStates(prev => { const n = [...prev]; n[idx] = true; return n; });
+    } else {
+      video.pause();
+      setPlayingStates(prev => { const n = [...prev]; n[idx] = false; return n; });
+    }
+  };
 
   const toggleMute = (idx: number) => {
     setMuted(prev => {
@@ -343,7 +399,7 @@ export default function LandingPage() {
       </header>
 
       {/* Community Spotlight: Video Stories */}
-      <section className="section section-video-reviews reveal in" style={{ paddingTop: '2rem' }}>
+      <section ref={spotlightSectionRef} className="section section-video-reviews reveal in" style={{ paddingTop: '2rem' }}>
         <div className="container">
           <div className="card" style={{ background: 'rgba(255,255,255,0.08)', border: 'none', borderRadius: 12, padding: '1rem', position: 'relative', overflow: 'visible' }}>
             <div className="section-head" style={{ marginBottom: '1rem' }}>
@@ -372,28 +428,61 @@ export default function LandingPage() {
                 style={{ WebkitOverflowScrolling: 'touch' as any }}
               >
                 {feedbackVideos.map((src, idx) => (
-                  <div key={idx} className="video-card" style={{ background: '#111', borderRadius: 12, overflow: 'hidden', position: 'relative', aspectRatio: '2 / 3', boxShadow: '0 6px 24px rgba(0,0,0,0.25)' }}>
-                    <LazyVideo
+                  <div
+                    key={idx}
+                    className="video-card"
+                    style={{ background: '#111', borderRadius: 12, overflow: 'hidden', position: 'relative', aspectRatio: '2 / 3', boxShadow: '0 6px 24px rgba(0,0,0,0.25)', cursor: 'pointer' }}
+                    onClick={() => togglePlayPause(idx)}
+                  >
+                    <video
+                      ref={(el) => { if (el) videoRefs.current[idx] = el; }}
                       src={src}
-                      priority={false}
-                      muted={muted[idx]}
+                      muted={muted[idx] !== false}
                       loop
                       playsInline
-                      autoPlay
-                      onVideoRef={(el) => { if (el) videoRefs.current[idx] = el; }}
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none' }}
                     />
+                    {/* Play/Pause overlay indicator */}
+                    {!playingStates[idx] && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          background: 'rgba(0,0,0,0.35)',
+                          pointerEvents: 'none',
+                          transition: 'opacity 0.2s',
+                        }}
+                      >
+                        <div style={{
+                          width: 56,
+                          height: 56,
+                          borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.2)',
+                          backdropFilter: 'blur(8px)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '28px',
+                          color: '#fff',
+                        }}>
+                          ▶
+                        </div>
+                      </div>
+                    )}
                     <button
                       type="button"
-                      onClick={() => toggleMute(idx)}
-                      aria-label={muted[idx] ? 'Unmute video' : 'Mute video'}
+                      onClick={(e) => { e.stopPropagation(); toggleMute(idx); }}
+                      aria-label={muted[idx] !== false ? 'Unmute video' : 'Mute video'}
                       style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.55)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', width: 34, height: 34, borderRadius: 17, cursor: 'pointer', display: 'grid', placeItems: 'center', backdropFilter: 'blur(6px)' as any }}
                     >
-                      {muted[idx] ? '🔇' : '🔊'}
+                      {muted[idx] !== false ? '🔇' : '🔊'}
                     </button>
                     <button
                       type="button"
-                      onClick={() => setFullscreenVideo({ src, index: idx })}
+                      onClick={(e) => { e.stopPropagation(); setFullscreenVideo({ src, index: idx }); }}
                       aria-label="Expand video"
                       style={{ position: 'absolute', top: 8, right: 50, background: 'rgba(0,0,0,0.55)', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', width: 34, height: 34, borderRadius: 17, cursor: 'pointer', display: 'grid', placeItems: 'center', backdropFilter: 'blur(6px)' as any, fontSize: '18px' }}
                     >
