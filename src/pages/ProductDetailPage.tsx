@@ -14,7 +14,7 @@ import './ProductDetailPage.css';
 const productService = ProductService.getInstance();
 
 const WHATSAPP_NUMBER = '917579122216';
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar.arapp';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar';
 
 function getWhatsAppProductUrl(productName: string): string {
   const msg = encodeURIComponent(`Hi, I want to buy this Post-kAR product: ${productName}`);
