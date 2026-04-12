@@ -8,7 +8,7 @@ import { ProfileDropdown } from '../auth/ProfileDropdown';
 import './Navigation.css';
 import headerLogoVideo from '../../assets/logo_new.mp4';
 
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar.arapp';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar';
 const WHATSAPP_NUMBER = '917579122216';
 const WHATSAPP_GENERAL_MSG = encodeURIComponent('Hi, I want to buy a Post-kAR product.');
 

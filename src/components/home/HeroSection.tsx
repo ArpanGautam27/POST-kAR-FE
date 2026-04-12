@@ -1,6 +1,6 @@
 import './HeroSection.css';
 
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar.arapp';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar';
 const WHATSAPP_NUMBER = '917579122216';
 
 export default function HeroSection() {
