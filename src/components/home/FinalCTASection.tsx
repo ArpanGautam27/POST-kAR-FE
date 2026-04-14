@@ -1,6 +1,6 @@
 import './FinalCTASection.css';
 
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar.arapp';
 
 export default function FinalCTASection() {
     const handleDownload = () => {

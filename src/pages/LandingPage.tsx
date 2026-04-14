@@ -20,7 +20,7 @@ import ServicesSection from '../components/home/ServicesSection';
 import CommunitySpotlight from '../components/home/CommunitySpotlight';
 import FinalCTASection from '../components/home/FinalCTASection';
 
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.postkar.arapp';
 
 export default function LandingPage() {
   const [showTerms, setShowTerms] = useState(false);
