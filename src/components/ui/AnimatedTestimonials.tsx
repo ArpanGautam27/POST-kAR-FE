@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Testimonial {
@@ -20,6 +20,8 @@ export const AnimatedTestimonials: React.FC<AnimatedTestimonialsProps> = ({
   autoplay = true
 }) => {
   const [active, setActive] = useState(0);
+  const [isInView, setIsInView] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleNext = () => {
     setActive((prev) => (prev + 1) % testimonials.length);
@@ -30,11 +32,24 @@ export const AnimatedTestimonials: React.FC<AnimatedTestimonialsProps> = ({
   };
 
   useEffect(() => {
-    if (autoplay && testimonials.length > 0) {
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsInView(entry.isIntersecting),
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (autoplay && testimonials.length > 0 && isInView) {
       const interval = setInterval(handleNext, 5000);
       return () => clearInterval(interval);
     }
-  }, [autoplay, active]);
+  }, [autoplay, active, isInView]);
 
   // If we have no testimonials, render nothing to avoid runtime errors
   if (!testimonials || testimonials.length === 0) {
@@ -45,7 +60,7 @@ export const AnimatedTestimonials: React.FC<AnimatedTestimonialsProps> = ({
   const safeIndex = Math.min(Math.max(active, 0), testimonials.length - 1);
 
   return (
-    <div className="animated-testimonials-container">
+    <div className="animated-testimonials-container" ref={containerRef}>
       <div className="testimonials-content">
         <div className="testimonials-grid">
           <AnimatePresence mode="wait">
@@ -78,8 +93,16 @@ export const AnimatedTestimonials: React.FC<AnimatedTestimonialsProps> = ({
             >
               {testimonials[safeIndex].isVideo ? (
                 <video
+                  ref={(el) => {
+                    if (el) {
+                      if (isInView) {
+                        el.play().catch(() => { });
+                      } else {
+                        el.pause();
+                      }
+                    }
+                  }}
                   src={testimonials[safeIndex].src}
-                  autoPlay
                   loop
                   muted={testimonials[safeIndex].muted !== false}
                   playsInline
@@ -99,12 +122,12 @@ export const AnimatedTestimonials: React.FC<AnimatedTestimonialsProps> = ({
         <div className="testimonials-nav">
           <button onClick={handlePrev} className="nav-button">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 12H5M12 19l-7-7 7-7"/>
+              <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
           </button>
           <button onClick={handleNext} className="nav-button">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
+              <path d="M5 12h14M12 5l7 7-7 7" />
             </svg>
           </button>
         </div>
