@@ -14,19 +14,6 @@ interface ProductsGridSectionProps {
 }
 
 export default function ProductsGridSection({ products }: ProductsGridSectionProps) {
-    // For demo purposes, simulate pricing (in production, this would come from backend)
-    const getProductPricing = (index: number) => {
-        const prices = [
-            { original: 499, sale: 349 },
-            { original: 599, sale: 399 },
-            { original: 449, sale: 349 },
-            { original: 699, sale: 399 },
-            { original: 549, sale: 349 },
-            { original: 799, sale: 499 },
-        ];
-        return prices[index % prices.length];
-    };
-
     const displayProducts = products.slice(0, 8);
 
     return (
@@ -40,9 +27,10 @@ export default function ProductsGridSection({ products }: ProductsGridSectionPro
                 </div>
 
                 <div className="products-grid">
-                    {displayProducts.map((product, index) => {
-                        const pricing = getProductPricing(index);
-                        const discount = Math.round(((pricing.original - pricing.sale) / pricing.original) * 100);
+                    {displayProducts.map((product) => {
+                        const sp = product.sellingPrice;
+                        const mrp = product.mrp;
+                        const disc = product.discountPercentage;
 
                         return (
                             <Link
@@ -57,7 +45,7 @@ export default function ProductsGridSection({ products }: ProductsGridSectionPro
                                         className="product-image"
                                         loading="lazy"
                                     />
-                                    {discount > 0 && (
+                                    {disc && disc > 0 && (
                                         <span className="sale-badge">Sale</span>
                                     )}
                                     <div className="product-overlay">
@@ -76,15 +64,17 @@ export default function ProductsGridSection({ products }: ProductsGridSectionPro
                                 </div>
                                 <div className="product-info">
                                     <h3 className="product-name">{product.name}</h3>
-                                    <div className="product-pricing">
-                                        <span className="sale-price">From ₹ {pricing.sale}.00</span>
-                                        {discount > 0 && (
-                                            <>
-                                                <span className="original-price">₹ {pricing.original}.00</span>
-                                                <span className="discount-badge">-{discount}%</span>
-                                            </>
-                                        )}
-                                    </div>
+                                    {sp != null && (
+                                        <div className="product-pricing">
+                                            <span className="sale-price">₹{sp}</span>
+                                            {mrp != null && mrp !== sp && (
+                                                <span className="original-price">₹{mrp}</span>
+                                            )}
+                                            {disc != null && disc > 0 && (
+                                                <span className="discount-badge">-{disc}%</span>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </Link>
                         );

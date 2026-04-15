@@ -32,6 +32,10 @@ export interface Product {
     tags?: string[];
     created_at?: string;
   };
+  // Flat pricing — used for intro offer display on cards and product detail page
+  mrp?: number;
+  sellingPrice?: number;
+  discountPercentage?: number;
   // Variant support - optional for backward compatibility
   productTypes?: import('./marker').ProductType[];
 }

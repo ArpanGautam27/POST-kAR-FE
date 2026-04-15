@@ -274,9 +274,23 @@ export default function ProductDetailPage() {
               {/* Price — always visible */}
               <div className="product-price-section">
                 <div className="pricing-display">
-                  <span className="product-price">₹599</span>
-                  <span className="product-price-original">₹799</span>
-                  <span className="product-discount-badge">25% OFF</span>
+                  {product.sellingPrice != null ? (
+                    <>
+                      <span className="product-price">₹{product.sellingPrice}</span>
+                      {product.mrp != null && product.mrp !== product.sellingPrice && (
+                        <span className="product-price-original">₹{product.mrp}</span>
+                      )}
+                      {product.discountPercentage != null && product.discountPercentage > 0 && (
+                        <span className="product-discount-badge">{product.discountPercentage}% OFF</span>
+                      )}
+                    </>
+                  ) : (
+                    <>
+                      <span className="product-price">₹599</span>
+                      <span className="product-price-original">₹799</span>
+                      <span className="product-discount-badge">25% OFF</span>
+                    </>
+                  )}
                 </div>
               </div>
 
